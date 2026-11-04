@@ -1,0 +1,3289 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Stockeá — Gestión de negocios</title>
+
+<!-- MANIFIESTO PWA INTEGRADO PARA PERMITIR INSTALACIÓN -->
+<link rel="manifest" href='data:application/manifest+json,{"name":"Stockeá","short_name":"Stockeá","start_url":".","display":"standalone","background_color":"#f3f4f6","theme_color":"#2563eb","icons":[{"src":"data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 24 24%22 fill=%22%232563eb%22><path d=%22M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-2 10h-4v4h-2v-4H7v-2h4V7h2v4h4v2z%22/></svg>","sizes":"192x192","type":"image/svg+xml"}]}'>
+
+<script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
+
+<style>
+:root {
+  --bg:#f3f4f6;
+  --panel:#ffffff;
+  --line:#e5e7eb;
+  --blue:#2563eb;
+  --txt:#1f2937;
+  --muted:#6b7280;
+  --green:#10b981;
+  --red:#ef4444;
+}
+
+body.theme-claro {
+  --bg: #f3f4f6;
+  --panel: #ffffff;
+  --line: #e5e7eb;
+  --blue: #2563eb;
+  --txt: #1f2937;
+  --muted: #6b7280;
+  --green: #10b981;
+  --red: #ef4444;
+}
+body.theme-oscuro {
+  --bg: #0b1020;
+  --panel: #141d31;
+  --line: #293650;
+  --blue: #568cff;
+  --txt: #f2f5ff;
+  --muted: #95a3bd;
+  --green: #35d49a;
+  --red: #ff7184;
+}
+body.theme-violeta {
+  --bg: #0f0a1c;
+  --panel: #1a1230;
+  --line: #322359;
+  --blue: #a855f7;
+  --txt: #f5f3ff;
+  --muted: #b3a5d0;
+  --green: #34d399;
+  --red: #f43f5e;
+}
+body.theme-verde {
+  --bg: #06110a;
+  --panel: #0e2b1b;
+  --line: rgba(110, 184, 143, 0.22);
+  --blue: #34d399;
+  --txt: #f0f7f3;
+  --muted: #a3c2b1;
+  --green: #6ee7b7;
+  --red: #ff7184;
+}
+
+* { box-sizing:border-box }
+body {
+  margin:0;
+  background:var(--bg);
+  color:var(--txt);
+  font:15px Arial,sans-serif;
+  transition: background .3s, color .3s;
+}
+button,input,select {
+  font:inherit;
+  border-radius:9px;
+}
+button {
+  border:0;
+  background:var(--blue);
+  color:white;
+  padding:11px 14px;
+  font-weight:bold;
+  cursor:pointer;
+  transition: opacity .2s, background .2s;
+}
+button:hover { opacity:0.9 }
+button:disabled { opacity:.5; cursor:not-allowed }
+input,select {
+  width:100%;
+  padding:12px;
+  background:var(--bg);
+  color:var(--txt);
+  border:1px solid var(--line);
+}
+input[type="color"] {
+  height: 48px;
+  padding: 4px;
+  cursor: pointer;
+}
+label {
+  display:block;
+  font-size:13px;
+  color:var(--muted);
+  margin-bottom:6px;
+}
+.field { margin-bottom:13px }
+header {
+  min-height:68px;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  padding:12px 18px;
+  border-bottom:1px solid var(--line);
+  background:var(--panel);
+  gap:10px;
+}
+.logo-container {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+}
+.header-logo-img {
+  height: 36px;
+  width: auto;
+  object-fit: contain;
+  vertical-align: middle;
+}
+.header-by-text {
+  font-size: 11px;
+  color: var(--muted);
+  font-weight: 600;
+  letter-spacing: 0.5px;
+}
+.user-header-info {
+  display:flex;
+  align-items:center;
+  gap:12px;
+}
+.avatar-mini {
+  width:40px;
+  height:40px;
+  border-radius:50%;
+  background:var(--line);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-weight:bold;
+  overflow:hidden;
+  border:2px solid var(--blue);
+  flex-shrink:0;
+  cursor:pointer;
+  color:var(--muted);
+}
+.avatar-mini img {
+  width:100%;
+  height:100%;
+  object-fit:cover;
+}
+.panel,.card {
+  background:var(--panel);
+  border:1px solid var(--line);
+  border-radius:14px;
+  padding:17px;
+}
+.auth-box {
+  max-width:420px;
+  margin:45px auto;
+  padding:25px;
+}
+.auth-box button { width:100%; margin-top:10px }
+.tabs {
+  display:flex;
+  gap:10px;
+  margin-bottom:20px;
+}
+.tabs button {
+  flex:1;
+  background:transparent;
+  border:1px solid var(--line);
+  color:var(--muted);
+}
+.tabs button.active {
+  background:var(--blue);
+  color:white;
+}
+.hidden { display:none!important }
+.muted,.sub { color:var(--muted) }
+.green { color:var(--green) }
+.danger { background:#512738; color:#ffb7c1 }
+.secondary { background:var(--line); color:var(--txt) }
+.whatsapp-btn { background:#25d366; color:black }
+
+.file-upload-wrapper {
+  position: relative;
+  overflow: hidden;
+  display: inline-block;
+  width: 100%;
+}
+.file-upload-wrapper input[type=file] {
+  font-size: 100px;
+  position: absolute;
+  left: 0;
+  top: 0;
+  opacity: 0;
+  cursor: pointer;
+}
+.file-upload-btn {
+  display: block;
+  width: 100%;
+  background: var(--line);
+  color: var(--txt);
+  padding: 10px;
+  text-align: center;
+  border-radius: 9px;
+  border: 1px dashed var(--blue);
+  cursor: pointer;
+  font-weight: bold;
+  font-size: 13px;
+}
+
+#setup {
+  max-width:550px;
+  margin:30px auto;
+  padding:25px;
+}
+.layout {
+  display:flex;
+  min-height:calc(100vh - 68px);
+}
+nav {
+  width:210px;
+  padding:18px 12px;
+  border-right:1px solid var(--line);
+  background:var(--panel);
+  flex-shrink:0;
+}
+nav button {
+  display:block;
+  width:100%;
+  text-align:left;
+  background:transparent;
+  color:var(--muted);
+  margin-bottom:7px;
+}
+nav button.active {
+  background:var(--line);
+  color:var(--txt);
+}
+main {
+  padding:24px;
+  width:100%;
+  max-width:1250px;
+  margin:auto;
+}
+h1 { margin:0 0 7px; font-size:27px }
+h2 { font-size:20px }
+.sub { margin:0 0 24px }
+.sectionhead {
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  gap:10px;
+  flex-wrap:wrap;
+}
+.stats {
+  display:grid;
+  grid-template-columns:repeat(2,minmax(0,1fr));
+  gap:12px;
+}
+.card p { color:var(--muted); font-size:13px; margin:0 0 6px }
+.card strong {
+  font-size:23px;
+  overflow-wrap:anywhere;
+}
+.panel { margin-top:18px }
+.formgrid {
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:12px;
+}
+.formgrid .full { grid-column:1/-1 }
+.toolbar {
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:10px;
+  margin:15px 0;
+}
+.empty {
+  text-align:center;
+  color:var(--muted);
+  padding:24px 4px;
+}
+.codebox {
+  background:var(--bg);
+  border:1px dashed var(--blue);
+  border-radius:10px;
+  padding:14px;
+  overflow-wrap:anywhere;
+  font-weight:bold;
+  letter-spacing:1px;
+}
+.notice {
+  font-size:12px;
+  color:var(--muted);
+  line-height:1.6;
+  text-align:center;
+  margin-top:25px;
+}
+
+.members-list {
+  display:flex;
+  flex-direction:column;
+  gap:8px;
+  margin-top:10px;
+}
+.member-item {
+  display:flex;
+  align-items:center;
+  gap:10px;
+  padding:10px 12px;
+  background:var(--bg);
+  border:1px solid var(--line);
+  border-radius:9px;
+  font-size:14px;
+}
+.member-badge {
+  font-size:11px;
+  background:var(--line);
+  color:var(--blue);
+  padding:3px 7px;
+  border-radius:6px;
+  font-weight:bold;
+}
+.profile-card {
+  max-width:550px;
+  margin:auto;
+  text-align:center;
+}
+.avatar-large {
+  width:110px;
+  height:110px;
+  border-radius:50%;
+  background:var(--line);
+  margin:0 auto 15px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-size:42px;
+  overflow:hidden;
+  border:2px solid var(--blue);
+  position:relative;
+  color:var(--muted);
+}
+.avatar-large img {
+  width:100%;
+  height:100%;
+  object-fit:cover;
+}
+
+.business-logo-preview {
+  width: 90px;
+  height: 90px;
+  border-radius: 14px;
+  background: var(--bg);
+  border: 1px solid var(--line);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 36px;
+  overflow: hidden;
+  margin: 10px 0;
+}
+.business-logo-preview img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.theme-selector {
+  display: flex;
+  gap: 15px;
+  justify-content: center;
+  margin-top: 15px;
+}
+.theme-circle {
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  border: 2px solid var(--line);
+  cursor: pointer;
+  transition: transform .2s, border-color .2s, box-shadow .2s;
+  padding: 0;
+}
+.theme-circle:hover {
+  transform: scale(1.1);
+}
+.theme-circle.active {
+  border-color: var(--blue);
+  box-shadow: 0 0 12px var(--blue);
+  transform: scale(1.1);
+}
+.theme-circle[data-theme="claro"] { background: #ffffff; }
+.theme-circle[data-theme="oscuro"] { background: #0b1020; }
+.theme-circle[data-theme="violeta"] { background: #0f0a1c; }
+.theme-circle[data-theme="verde"] { background: #06110a; }
+
+.star-product-card {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 10px 0;
+}
+.star-product-img {
+  width: 70px;
+  height: 70px;
+  border-radius: 12px;
+  background: var(--bg);
+  border: 1px solid var(--line);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  font-size: 30px;
+  flex-shrink: 0;
+}
+.star-product-img img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+.cart-floating-btn {
+  position:fixed;
+  bottom:20px;
+  right:20px;
+  background:#25d366;
+  color:black;
+  padding:14px 20px;
+  border-radius:50px;
+  font-weight:bold;
+  box-shadow:0 6px 16px rgba(0,0,0,0.4);
+  z-index:99;
+  display:flex;
+  align-items:center;
+  gap:8px;
+}
+.cart-badge {
+  background:black;
+  color:white;
+  padding:2px 8px;
+  border-radius:12px;
+  font-size:12px;
+}
+
+#homeScreen main { padding-top:30px }
+.home-title {
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  flex-wrap:wrap;
+  gap:12px;
+  margin-bottom:25px;
+}
+.business-grid {
+  display:grid;
+  grid-template-columns:repeat(2,minmax(0,1fr));
+  gap:14px;
+  margin-top:15px;
+}
+.business-card {
+  min-width:0;
+  background:var(--panel);
+  border:1px solid var(--line);
+  border-radius:15px;
+  padding:18px;
+  transition:border-color .2s,transform .2s;
+}
+.business-card:hover {
+  border-color:var(--blue);
+  transform:translateY(-2px);
+}
+.business-icon {
+  width:48px;
+  height:48px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  background:var(--line);
+  border-radius:12px;
+  font-size:25px;
+  margin-bottom:14px;
+  overflow: hidden;
+}
+.business-icon img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+.business-card h3 { margin:0 0 7px; overflow-wrap:anywhere; }
+.business-card p { color:var(--muted); font-size:13px; min-height:32px; }
+.business-card button { width:100% }
+.home-actions {
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:12px;
+  margin-top:22px;
+}
+.home-actions button { min-height:48px }
+
+#productList.product-grid, #publicProductList.product-grid {
+  display:grid;
+  grid-template-columns:repeat(4,minmax(0,1fr));
+  gap:14px;
+  padding:0;
+  border:0;
+  background:transparent;
+}
+.product-card {
+  min-width:0;
+  overflow:hidden;
+  background:var(--panel);
+  border:1px solid var(--line);
+  border-radius:15px;
+  transition:border-color .2s,transform .2s;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+.product-card:hover {
+  border-color:var(--blue);
+  transform:translateY(-2px);
+}
+.product-image {
+  height:170px;
+  background:rgba(0,0,0,0.25);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  overflow:hidden;
+  padding:6px;
+}
+.product-image img {
+  width:100%;
+  height:100%;
+  object-fit:contain;
+  border-radius:8px;
+}
+.product-placeholder { font-size:42px }
+.product-card-body { padding:12px; flex: 1; }
+.product-name {
+  font-size:15px;
+  line-height:1.35;
+  overflow-wrap:anywhere;
+  margin-bottom:8px;
+  font-weight:bold;
+}
+.product-color {
+  display:flex;
+  align-items:center;
+  gap:7px;
+  color:var(--muted);
+  font-size:12px;
+  margin-bottom:10px;
+}
+.product-color-dot {
+  width:14px;
+  height:14px;
+  flex-shrink:0;
+  border:1px solid rgba(255,255,255,0.4);
+  border-radius:50%;
+  box-shadow: 0 0 2px rgba(0,0,0,0.5);
+}
+.product-price {
+  font-size:21px;
+  font-weight:800;
+  color:var(--blue);
+  overflow-wrap:anywhere;
+}
+.product-cost { color:var(--muted); font-size:12px; margin-top:4px; }
+.product-stock {
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  gap:5px;
+  margin-top:12px;
+  padding-top:10px;
+  border-top:1px solid var(--line);
+  font-size:12px;
+}
+.stock-status { font-weight:bold; color:var(--green) }
+.stock-status.low { color:#ffc66d }
+.stock-status.out { color:#ff7184 }
+.product-actions {
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:6px;
+  padding:0 10px 10px;
+}
+.product-actions button {
+  padding:9px 4px;
+  font-size:12px;
+  min-width:0;
+}
+.product-actions .danger { grid-column:1/-1 }
+
+.sale-item-thumb {
+  width: 44px;
+  height: 44px;
+  border-radius: 8px;
+  background: var(--bg);
+  border: 1px solid var(--line);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  font-size: 20px;
+  flex-shrink: 0;
+}
+.sale-item-thumb img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+.sale {
+  display:flex;
+  align-items:center;
+  gap:12px;
+  padding:13px 0;
+  border-bottom:1px solid var(--line);
+  flex-wrap:wrap;
+}
+.sale:last-child { border-bottom:0 }
+.sale p { color:var(--muted); font-size:13px; margin:5px 0 0; }
+.sale-actions { display:flex; align-items:center; gap:10px; margin-left:auto; }
+
+@media(max-width:950px) {
+  #productList.product-grid, #publicProductList.product-grid { grid-template-columns:repeat(3,minmax(0,1fr)); }
+}
+@media(max-width:650px) {
+  header { padding:12px }
+  .layout { display:block }
+  nav {
+    width:100%;
+    display:flex;
+    overflow-x:auto;
+    gap:5px;
+    padding:8px;
+    border-right:0;
+    border-bottom:1px solid var(--line);
+  }
+  nav button { width:auto; white-space:nowrap; margin:0; padding:10px; }
+  main { padding:17px 12px }
+  .stats,.toolbar,.formgrid { grid-template-columns:1fr }
+  .formgrid .full { grid-column:auto }
+  #addProductBtn { width:100% }
+  #productList.product-grid, #publicProductList.product-grid { grid-template-columns:repeat(2,minmax(0,1fr)); gap:10px; }
+  .product-image { height:140px }
+  .product-card-body { padding:10px }
+  .product-name { font-size:14px }
+  .product-price { font-size:19px }
+  .product-actions { padding:0 8px 8px; gap:5px }
+  .product-actions button { font-size:11px; padding:9px 3px }
+  .business-grid,.home-actions { grid-template-columns:1fr }
+  .sale-actions { width:100%; justify-content:space-between; margin-top:8px; }
+}
+</style>
+</head>
+
+<body>
+<header>
+  <div class="logo-container">
+    <img src="stockea-logo.png" alt="Stockeá" class="header-logo-img">
+    <span class="header-by-text">by NEA Software</span>
+  </div>
+  <div class="user-header-info">
+    <button id="headerLogout" class="secondary hidden" style="font-size:12px; padding:8px 10px;">🚪 Salir</button>
+    <div id="headerAvatar" class="avatar-mini hidden" title="Ir a mi perfil">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>
+    </div>
+  </div>
+</header>
+
+<!-- SELECCIÓN DE MODO (NUBE VS LOCAL) -->
+<div id="modeSelectScreen" class="auth-box panel" style="text-align:center">
+  <div style="margin-bottom:15px"><img src="stockea-logo.png" alt="Stockeá" style="height:55px; width:auto;"></div>
+  <p class="sub" style="margin-bottom:20px">Elegí cómo querés usar la aplicación:</p>
+  <button id="btnCloudMode" type="button" style="width:100%; margin-bottom:12px">☁️ Modo Nube (Firebase)</button>
+  <button id="btnLocalMode" type="button" class="secondary" style="width:100%">💾 Modo Local (Este dispositivo)</button>
+</div>
+
+<!-- INICIO DE SESIÓN (NUBE) -->
+<div id="authScreen" class="auth-box panel hidden">
+  <div style="text-align:center;margin-bottom:20px"><img src="stockea-logo.png" alt="Stockeá" style="height:50px; width:auto;"> <span style="font-size:14px;" class="sub">(Nube)</span></div>
+  <div class="tabs">
+    <button id="tabLogin" class="active" type="button">Ingresar</button>
+    <button id="tabRegister" type="button">Crear cuenta</button>
+  </div>
+  <form id="authForm">
+    <div class="field">
+      <label>Correo electrónico</label>
+      <input id="authEmail" type="email" required placeholder="tu@email.com">
+    </div>
+    <div class="field">
+      <label>Contraseña</label>
+      <input id="authPassword" type="password" minlength="6" required placeholder="Mínimo 6 caracteres">
+    </div>
+    <button id="authSubmitBtn" type="submit">Iniciar sesión</button>
+  </form>
+  <button type="button" class="secondary" id="backToModeSelect" style="width:100%; margin-top:10px">← Volver</button>
+  <p id="authError" class="hidden" style="color:var(--red);margin-top:10px;text-align:center"></p>
+</div>
+
+<!-- HOME: LISTA DE NEGOCIOS -->
+<div id="homeScreen" class="hidden">
+  <main>
+    <div class="home-title">
+      <div>
+        <h1 id="homeTitleText">Inicio</h1>
+        <p class="sub">Administrá todos tus negocios desde un solo lugar.</p>
+      </div>
+    </div>
+
+    <h2>Mis negocios</h2>
+    <div id="businessList" class="business-grid">
+      <div class="empty">Cargando tus negocios...</div>
+    </div>
+
+    <div class="home-actions">
+      <button id="homeCreateBtn" type="button">＋ Crear negocio</button>
+      <button id="homeJoinBtn" class="secondary" type="button">⇄ Unirse a negocio</button>
+    </div>
+  </main>
+</div>
+
+<!-- CREAR O UNIRSE A UN NEGOCIO -->
+<div id="setup" class="panel hidden">
+  <div class="sectionhead">
+    <div>
+      <img src="stockea-logo.png" alt="Stockeá" style="height:48px; width:auto; margin-bottom: 10px;">
+      <h1 style="margin-top:10px">Tu negocio</h1>
+      <p class="sub">Creá tu emprendimiento o unite al de tu socio.</p>
+    </div>
+    <button id="backSetupHome" type="button" class="secondary">← Volver al inicio</button>
+  </div>
+
+  <div class="tabs" id="setupTabsContainer">
+    <button id="tabCreateBiz" class="active" type="button">Crear negocio</button>
+    <button id="tabJoinBiz" type="button">Unirse con código</button>
+  </div>
+
+  <form id="createBizForm">
+    <div class="field">
+      <label>Nombre del negocio *</label>
+      <input id="bizName" required placeholder="Mi emprendimiento">
+    </div>
+    <div class="field">
+      <label>Dueños *</label>
+      <input id="owners" required placeholder="Nombre de los dueños">
+    </div>
+    <div class="field">
+      <label>Número de WhatsApp para pedidos (ej: 5493794123456) *</label>
+      <input id="phone" required placeholder="5493794123456">
+    </div>
+    <div class="field">
+      <label>Rubro</label>
+      <select id="businessType">
+        <option>Tecnología y accesorios</option>
+        <option>Ropa y moda</option>
+        <option>Alimentos y bebidas</option>
+        <option>Perfumería</option>
+        <option>Otro</option>
+      </select>
+    </div>
+    <div class="field">
+      <label>Categorías separadas por comas *</label>
+      <input id="categories" required placeholder="Ej.: Funda, Cargador, Vidrio Templado">
+    </div>
+    <button type="submit" style="width:100%">Crear negocio</button>
+  </form>
+
+  <form id="joinBizForm" class="hidden">
+    <div class="field">
+      <label>Código de acceso *</label>
+      <input id="joinCode" required placeholder="Código de tu socio">
+    </div>
+    <button type="submit" style="width:100%">Unirse al negocio</button>
+  </form>
+
+  <p id="setupError" class="hidden" style="color:var(--red);margin-top:10px;text-align:center"></p>
+</div>
+
+<!-- VISTA DE CATÁLOGO PÚBLICO DE SOLO LECTURA -->
+<div id="publicCatalogScreen" class="hidden">
+  <main>
+    <div class="sectionhead" style="margin-bottom:20px">
+      <div>
+        <h1 id="publicCatalogTitle">Catálogo de Productos</h1>
+        <p id="publicCatalogSub" class="sub">Mirá nuestros productos disponibles</p>
+      </div>
+    </div>
+
+    <div class="toolbar">
+      <div style="display:flex; gap:6px; align-items:center;">
+        <input id="publicSearch" placeholder="🔎 Buscar por nombre, modelo o código..." style="flex:1;">
+        <button type="button" id="publicScanCameraBtn" class="secondary" title="Escanear con cámara" style="padding:0 12px; font-size:16px; height:48px;">📷</button>
+      </div>
+      <select id="publicFilterCategory"><option value="">Todas las categorías</option></select>
+    </div>
+
+    <div id="publicProductList" class="product-grid"></div>
+  </main>
+
+  <button id="openCartBtn" class="cart-floating-btn hidden">
+    🛒 Mi Pedido <span id="cartCount" class="cart-badge">0</span>
+  </button>
+</div>
+
+<!-- MODAL DEL CARRITO DE COMPRAS -->
+<div id="cartModal" class="panel hidden" style="position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:1000;width:90%;max-width:480px;box-shadow:0 10px 25px rgba(0,0,0,0.8)">
+  <div class="sectionhead">
+    <h2>🛍️ Tu Pedido</h2>
+    <button id="closeCartBtn" class="secondary" style="padding:4px 10px">✕</button>
+  </div>
+  <div id="cartItemsList" style="max-height:300px;overflow-y:auto;margin:15px 0"></div>
+  <div style="border-top:1px solid var(--line);padding-top:12px;margin-bottom:15px;display:flex;justify-content:space-between;font-size:18px;font-weight:bold">
+    <span>Total:</span>
+    <span id="cartTotal" class="green">$0</span>
+  </div>
+  <button id="sendWhatsappBtn" class="whatsapp-btn" style="width:100%">📱 Pedir por WhatsApp</button>
+</div>
+
+<!-- APLICACIÓN PRIVADA -->
+<div id="app" class="layout hidden">
+  <nav>
+    <button type="button" id="backHomeBtn">⌂ Inicio</button>
+    <button class="active" data-page="dashboard">⌂ Resumen</button>
+    <button data-page="stock">▦ Stock</button>
+    <button data-page="sales">↗ Ventas</button>
+    <button data-page="clients">👥 Clientes</button>
+    <button data-page="settings">⚙ Mi negocio</button>
+  </nav>
+
+  <main>
+    <section id="dashboard">
+      <div class="sectionhead">
+        <div>
+          <h1 id="welcome">Resumen</h1>
+          <p id="storeSubInfo" class="sub">Panel general</p>
+        </div>
+        <select id="periodFilter" style="max-width:190px">
+          <option value="today">Hoy</option>
+          <option value="week">Esta semana</option>
+          <option value="month" selected>Este mes</option>
+          <option value="all">Histórico total</option>
+        </select>
+      </div>
+
+      <div class="stats">
+        <div class="card"><p>Ventas del período</p><strong id="statSales">$0</strong></div>
+        <div class="card"><p>Ganancia bruta estimada</p><strong id="statProfit" class="green">$0</strong></div>
+        <div class="card"><p>Unidades en stock</p><strong id="statStock">0</strong></div>
+        <div class="card"><p>Valor del stock a costo</p><strong id="statValue">$0</strong></div>
+      </div>
+
+      <!-- DESGLOSE POR MÉTODO DE PAGO -->
+      <div class="panel" style="margin-top:18px">
+        <h2>💳 Cobros por Método de Pago</h2>
+        <div class="stats" style="margin-top:12px">
+          <div class="card"><p>Efectivo</p><strong id="statCash" style="font-size:19px">$0</strong></div>
+          <div class="card"><p>Transferencia / MP</p><strong id="statTransfer" style="font-size:19px">$0</strong></div>
+          <div class="card"><p>Tarjeta</p><strong id="statCard" style="font-size:19px">$0</strong></div>
+          <div class="card"><p>Cuenta Corriente</p><strong id="statFiado" style="font-size:19px">$0</strong></div>
+        </div>
+      </div>
+
+      <div class="panel">
+        <h2>🏆 Producto estrella (Más vendido)</h2>
+        <div id="topProduct" class="empty">Todavía no hay ventas.</div>
+      </div>
+      <div class="panel"><h2>Últimas ventas</h2><div id="recentSales"></div></div>
+      <div class="panel"><h2>Stock bajo</h2><div id="lowStock"></div></div>
+    </section>
+
+    <!-- PANTALLA PRINCIPAL DE STOCK (LISTADO Y BUSCADOR) -->
+    <section id="stock" class="hidden">
+      <div class="sectionhead">
+        <div>
+          <h1>Stock</h1>
+          <p class="sub">Productos, precios y cantidades.</p>
+        </div>
+        <div style="display:flex; gap:10px; flex-wrap:wrap;">
+          <button id="exportStockExcel" class="secondary">📊 Exportar Excel</button>
+          <button id="addProductBtn">+ Agregar producto</button>
+        </div>
+      </div>
+
+      <div class="toolbar">
+        <div style="display:flex; gap:6px; align-items:center;">
+          <input id="search" placeholder="🔎 Buscar por nombre, modelo o código..." style="flex:1;">
+          <button type="button" id="searchScanCameraBtn" class="secondary" title="Escanear con cámara" style="padding:0 12px; font-size:16px; height:48px;">📷</button>
+        </div>
+        <select id="filterCategory"><option value="">Todas las categorías</option></select>
+      </div>
+
+      <div id="productList" class="product-grid">
+        <div class="empty">No hay productos todavía.</div>
+      </div>
+    </section>
+
+    <!-- PANTALLA SEPARADA INDEPENDIENTE PARA CREAR O EDITAR UN PRODUCTO -->
+    <section id="productFormPanel" class="hidden">
+      <div class="sectionhead" style="margin-bottom:15px">
+        <button type="button" class="secondary" id="cancelProductBtn">← Volver al stock</button>
+        <h1 id="formTitle" style="margin:0">Nuevo producto</h1>
+      </div>
+
+      <div class="panel">
+        <form id="productForm">
+          <div class="formgrid">
+            <div class="field"><label>Nombre del producto *</label><input id="pName" required placeholder="Ej: Funda Silicona, Cargador"></div>
+            
+            <div class="field">
+              <label>Categoría *</label>
+              <input id="pCategory" list="categoriesDatalist" required placeholder="Ej: Funda, Vidrio, Cargador">
+              <datalist id="categoriesDatalist"></datalist>
+            </div>
+            <div class="field">
+              <label>Modelo (Opcional - No se muestra en tarjeta)</label>
+              <input id="pModel" placeholder="Ej: iPhone 13, Samsung S23">
+            </div>
+
+            <div class="field"><label>Seleccionar color</label><input id="pColorCode" type="color" value="#568cff"></div>
+            <div class="field"><label>Costo por unidad ($)</label><input id="pCost" type="number" min="0" step=".01" required></div>
+            <div class="field"><label>Precio de venta ($)</label><input id="pPrice" type="number" min=".01" step=".01" required></div>
+            <div class="field"><label>Cantidad disponible</label><input id="pQty" type="number" min="0" step="1" required></div>
+            <div class="field"><label>Stock mínimo de alerta</label><input id="pMinStock" type="number" min="0" step="1" value="3" required></div>
+            
+            <div class="field">
+              <label>Código opcional / de barras</label>
+              <div style="display:flex; gap:6px;">
+                <input id="pCode" placeholder="Ej: FND-IP13 o escaneá" style="flex:1;">
+                <button type="button" id="scanCameraBtn" class="secondary" title="Escanear con cámara" style="padding:0 12px; font-size:16px;">📷</button>
+              </div>
+            </div>
+
+            <div class="field full">
+              <label>Foto opcional</label>
+              <div class="file-upload-wrapper">
+                <span class="file-upload-btn">📷 Seleccionar imagen de producto</span>
+                <input id="pImageFile" type="file" accept="image/*">
+              </div>
+              <input id="pImage" type="hidden">
+              <div id="imagePreview"></div>
+            </div>
+          </div>
+          <button type="submit" style="width:100%; margin-top:15px">Guardar producto</button>
+        </form>
+      </div>
+    </section>
+
+    <!-- SECCIÓN DE CLIENTES Y FIADOS -->
+    <section id="clients" class="hidden">
+      <div class="sectionhead">
+        <div>
+          <h1>Clientes y Cuentas Corrientes</h1>
+          <p class="sub">Gestión de créditos y fiados de clientes.</p>
+        </div>
+        <button id="addClientBtn">+ Nuevo cliente</button>
+      </div>
+
+      <div class="toolbar">
+        <input id="searchClient" placeholder="🔎 Buscar cliente por nombre o teléfono...">
+      </div>
+
+      <div class="panel" style="margin-top:10px">
+        <div id="clientsList"><div class="empty">No hay clientes registrados.</div></div>
+      </div>
+    </section>
+
+    <!-- MODAL NUEVO CLIENTE -->
+    <div id="clientModal" class="panel hidden" style="position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:1000;width:90%;max-width:440px;box-shadow:0 10px 25px rgba(0,0,0,0.8)">
+      <div class="sectionhead">
+        <h2>👥 Registrar Cliente</h2>
+        <button id="closeClientModalBtn" class="secondary" style="padding:4px 10px" type="button">✕</button>
+      </div>
+      <form id="clientForm" style="margin-top:15px">
+        <div class="field"><label>Nombre y Apellido *</label><input id="cName" required placeholder="Juan Pérez"></div>
+        <div class="field"><label>Teléfono / WhatsApp *</label><input id="cPhone" required placeholder="3794123456"></div>
+        <div class="field"><label>Dirección / Observaciones</label><input id="cNotes" placeholder="Barrio, zona, etc."></div>
+        <button type="submit" style="width:100%; margin-top:10px">Guardar cliente</button>
+      </form>
+    </div>
+
+    <!-- MODAL REGISTRAR PAGO DE CLIENTE -->
+    <div id="paymentModal" class="panel hidden" style="position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:1000;width:90%;max-width:440px;box-shadow:0 10px 25px rgba(0,0,0,0.8)">
+      <div class="sectionhead">
+        <h2>💵 Registrar Abono / Pago</h2>
+        <button id="closePaymentModalBtn" class="secondary" style="padding:4px 10px" type="button">✕</button>
+      </div>
+      <div style="margin:15px 0">
+        <p id="paymentClientInfo" style="margin:0 0 10px; font-weight:bold;"></p>
+        <form id="paymentForm">
+          <input type="hidden" id="paymentClientId">
+          <div class="field"><label>Monto a abonar ($) *</label><input id="paymentAmount" type="number" min="0.01" step=".01" required placeholder="0.00"></div>
+          <button type="submit" style="width:100%; margin-top:10px">Confirmar pago y descontar deuda</button>
+        </form>
+      </div>
+    </div>
+
+    <section id="sales" class="hidden">
+      <div class="sectionhead">
+        <div>
+          <h1>Ventas</h1>
+          <p class="sub">Historial del negocio.</p>
+        </div>
+        <button id="exportSalesExcel" class="secondary">📊 Exportar Ventas a Excel</button>
+      </div>
+      <div class="panel"><h2>Registro de ventas</h2><div id="allSales"></div></div>
+    </section>
+
+    <section id="settings" class="hidden">
+      <h1>Mi negocio</h1>
+      <p class="sub">Datos del emprendimiento.</p>
+      <div class="panel">
+        <div id="codeSectionContainer">
+          <p><b>Link de tu catálogo público:</b></p>
+          <button id="copyCatalogLinkBtn" class="whatsapp-btn" style="margin-bottom:15px">📋 Copiar enlace de catálogo</button>
+          <p><b>Código de invitación para socios:</b></p>
+          <div id="displayStoreCode" class="codebox">—</div>
+          <button id="copyStoreCode" class="secondary" style="margin-top:10px">Copiar código socio</button>
+        </div>
+
+        <div id="membersSectionContainer" style="margin-top:20px; border-top:1px solid var(--line); padding-top:15px">
+          <p style="margin:0 0 5px"><b>👥 Miembros vinculados:</b></p>
+          <p class="sub" style="font-size:12px; margin-bottom:10px">Socio(s) que tienen acceso en tiempo real a este negocio.</p>
+          <div id="membersList" class="members-list">
+            <div class="empty">Cargando miembros...</div>
+          </div>
+        </div>
+
+        <form id="settingsForm" style="margin-top:20px; border-top:1px solid var(--line); padding-top:15px">
+          <div class="field">
+            <label>Logo del negocio</label>
+            <div id="bizLogoPreview" class="business-logo-preview">🏪</div>
+            <div class="file-upload-wrapper">
+              <span class="file-upload-btn">📷 Subir / Cambiar logo</span>
+              <input id="bizLogoFile" type="file" accept="image/*">
+            </div>
+            <input id="editLogoBase64" type="hidden">
+          </div>
+          <div class="field"><label>Nombre del negocio</label><input id="editBiz" required></div>
+          <div class="field"><label>Dueños</label><input id="editOwners" required></div>
+          <div class="field"><label>Teléfono de WhatsApp (para ventas)</label><input id="editPhone" required></div>
+          <div class="field">
+            <label>Rubro</label>
+            <select id="editType">
+              <option>Tecnología y accesorios</option>
+              <option>Ropa y moda</option>
+              <option>Alimentos y bebidas</option>
+              <option>Perfumería</option>
+              <option>Otro</option>
+            </select>
+          </div>
+          <div class="field"><label>Categorías separadas por comas</label><input id="editCategories" required></div>
+          <button type="submit">Guardar cambios</button>
+        </form>
+      </div>
+    </section>
+
+    <!-- SECCIÓN DE PERFIL & CONFIGURACIÓN -->
+    <section id="profile" class="hidden">
+      <h1>Mi perfil y configuración</h1>
+      <p class="sub">Personalizá tu cuenta, tu foto y el estilo visual de la aplicación.</p>
+      
+      <div class="panel profile-card">
+        <div id="profileAvatar" class="avatar-large">
+          <svg width="55" height="55" viewBox="0 0 24 24" fill="currentColor"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>
+        </div>
+        <form id="profileForm">
+          <div class="field">
+            <label>Foto de perfil</label>
+            <div class="file-upload-wrapper">
+              <span class="file-upload-btn">📷 Cambiar foto de perfil</span>
+              <input id="profileImageFile" type="file" accept="image/*">
+            </div>
+            <input id="profileImageBase64" type="hidden">
+          </div>
+          <div class="field">
+            <label>Nombre visible / Apodo</label>
+            <input id="profileDisplayName" placeholder="Tu nombre o apodo">
+          </div>
+          <div class="field">
+            <label>Correo electrónico (solo lectura)</label>
+            <input id="profileEmail" readonly style="opacity:0.6; cursor:not-allowed">
+          </div>
+          <button type="submit" style="width:100%; margin-bottom: 20px;">Guardar perfil</button>
+        </form>
+
+        <div style="border-top: 1px solid var(--line); padding-top: 20px; text-align: left;">
+          <h3 style="margin: 0 0 5px; font-size: 16px;">⚙️ Configuración</h3>
+          <p class="sub" style="font-size: 12px; margin-bottom: 12px;">Personalización de Tema:</p>
+          <div class="theme-selector">
+            <button type="button" class="theme-circle" data-theme="claro" title="Modo Claro"></button>
+            <button type="button" class="theme-circle" data-theme="oscuro" title="Azul Noche"></button>
+            <button type="button" class="theme-circle" data-theme="violeta" title="Púrpura Neón"></button>
+            <button type="button" class="theme-circle" data-theme="verde" title="Verde NEA"></button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <p class="notice">Stockeá — Gestión compartida en la nube y local.</p>
+  </main>
+</div>
+
+<script>
+/* =========================
+   CONFIGURACIÓN DE FIREBASE
+========================= */
+const firebaseConfig = {
+  apiKey: "AIzaSyDVV2rWhu09PJBEIrwW3F97FZSS7c9_d1Y",
+  authDomain: "stockea-e4cd3.firebaseapp.com",
+  projectId: "stockea-e4cd3",
+  storageBucket: "stockea-e4cd3.firebasestorage.app",
+  messagingSenderId: "942317829839",
+  appId: "1:942317829839:web:d7589b9498ec999bc741ba",
+  measurementId: "G-W8WN7RMZN5"
+};
+
+firebase.initializeApp(firebaseConfig);
+const auth = firebase.auth();
+const db = firebase.firestore();
+
+/* =========================
+   ESTADO DE LA APLICACIÓN
+========================= */
+let appMode = null; 
+let currentUser = null;
+let userProfile = { displayName: "", photoURL: "", theme: "claro" };
+let currentBusiness = null;
+let currentBusinessId = null;
+let products = [];
+let sales = [];
+let clients = [];
+let businessList = [];
+let cart = []; 
+let authMode = "login";
+let editingProductId = null;
+let productUnsubscribe = null;
+let salesUnsubscribe = null;
+let clientsUnsubscribe = null;
+
+const $ = id => document.getElementById(id);
+
+function show(id) { $(id)?.classList.remove("hidden"); }
+function hide(id) { $(id)?.classList.add("hidden"); }
+function setText(id, value) {
+  const element = $(id);
+  if (element) element.textContent = value ?? "";
+}
+
+function money(value) {
+  return new Intl.NumberFormat("es-AR", {
+    style: "currency",
+    currency: "ARS",
+    maximumFractionDigits: 2
+  }).format(Number(value) || 0);
+}
+
+function clean(value) {
+  return String(value ?? "").replace(/[&<>"']/g, char => ({
+    "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;"
+  })[char]);
+}
+
+function randomCode() {
+  return Math.random().toString(36).substring(2, 8).toUpperCase();
+}
+
+function showError(id, message) {
+  const element = $(id);
+  if (!element) return;
+  element.textContent = message;
+  show(id);
+}
+
+function clearError(id) {
+  hide(id);
+  setText(id, "");
+}
+
+function clearListeners() {
+  if (productUnsubscribe) productUnsubscribe();
+  if (salesUnsubscribe) salesUnsubscribe();
+  if (clientsUnsubscribe) clientsUnsubscribe();
+  productUnsubscribe = null;
+  salesUnsubscribe = null;
+  clientsUnsubscribe = null;
+}
+
+/* =========================
+   GESTIÓN DE TEMAS
+========================= */
+function applyTheme(themeName) {
+  document.body.className = "";
+  const validTheme = themeName && ["oscuro", "claro", "violeta", "verde"].includes(themeName) ? themeName : "claro";
+  document.body.classList.add(`theme-${validTheme}`);
+  userProfile.theme = validTheme;
+
+  document.querySelectorAll(".theme-circle").forEach(btn => {
+    btn.classList.toggle("active", btn.dataset.theme === validTheme);
+  });
+}
+
+document.querySelectorAll(".theme-circle").forEach(btn => {
+  btn.onclick = async () => {
+    const newTheme = btn.dataset.theme;
+    applyTheme(newTheme);
+    if (appMode === "local") {
+      localStorage.setItem("stockea_local_theme", newTheme);
+      localStorage.setItem("stockea_local_profile", JSON.stringify(userProfile));
+    } else if (currentUser) {
+      try {
+        await db.collection("users").doc(currentUser.uid).set({ theme: newTheme }, { merge: true });
+      } catch(e) { console.error(e); }
+    }
+  };
+});
+
+/* =========================
+   VERIFICAR SI ES ENLACE PÚBLICO
+========================= */
+window.addEventListener("DOMContentLoaded", async () => {
+  const urlParams = new URLSearchParams(window.location.search);
+  const catalogCode = urlParams.get("catalogo");
+
+  if (catalogCode) {
+    hide("modeSelectScreen");
+    hide("authScreen");
+    hide("homeScreen");
+    hide("setup");
+    hide("app");
+    hide("headerAvatar");
+    hide("headerLogout");
+    await loadPublicCatalog(catalogCode);
+  } else {
+    applyTheme("claro");
+  }
+});
+
+function fillPublicCategories() {
+  const categories = [...new Set(products.map(p => p.category).filter(Boolean))];
+  const filterSelect = $("publicFilterCategory");
+  filterSelect.innerHTML = '<option value="">Todas las categorías</option>' +
+    categories.map(c => `<option value="${clean(c)}">${clean(c)}</option>`).join("");
+}
+
+$("publicSearch")?.addEventListener("input", renderPublicProducts);
+$("publicFilterCategory")?.addEventListener("change", renderPublicProducts);
+
+function renderPublicProducts() {
+  const container = $("publicProductList");
+  if (!container) return;
+  const search = ($("publicSearch")?.value || "").toLowerCase().trim();
+  const category = $("publicFilterCategory")?.value || "";
+
+  const filtered = products.filter(product => {
+    const searchable = [product.name, product.model, product.category, product.code].join(" ").toLowerCase();
+    return searchable.includes(search) && (!category || product.category === category);
+  });
+
+  if (!filtered.length) {
+    container.innerHTML = '<div class="panel empty" style="grid-column:1/-1">No hay productos disponibles.</div>';
+    return;
+  }
+
+  container.innerHTML = filtered.map(product => {
+    const quantity = Number(product.quantity) || 0;
+    const minStock = Number(product.minStock) || 3;
+    const stockClass = quantity <= 0 ? "out" : quantity <= minStock ? "low" : "green";
+    const stockLabel = quantity <= 0 ? "Agotado" : quantity <= minStock ? `Stock bajo (${quantity} disp.)` : `Disponibles: ${quantity}`;
+
+    return `
+      <article class="product-card">
+        <div class="product-image">
+          ${product.image ? `<img src="${product.image}" alt="${clean(product.name)}">` : '<div class="product-placeholder">📦</div>'}
+        </div>
+        <div class="product-card-body">
+          <div class="product-name">${clean(product.name)}</div>
+          <div class="product-price">${money(product.price)}</div>
+          <div class="product-stock">
+            <span class="stock-status ${stockClass}">${stockLabel}</span>
+          </div>
+        </div>
+        <div style="padding:10px">
+          <button type="button" class="whatsapp-btn" style="width:100%" data-add-cart="${product.id}" ${quantity <= 0 ? 'disabled' : ''}>
+            🛒 Agregar al carrito
+          </button>
+        </div>
+      </article>`;
+  }).join("");
+
+  container.querySelectorAll("[data-add-cart]").forEach(btn => {
+    btn.onclick = () => addToCart(btn.dataset.addCart);
+  });
+}
+
+/* =========================
+   LÓGICA DEL CARRITO Y WHATSAPP
+========================= */
+function addToCart(productId) {
+  const product = products.find(p => p.id === productId);
+  if (!product) return;
+
+  const existing = cart.find(item => item.product.id === productId);
+  if (existing) {
+    if (existing.quantity < product.quantity) {
+      existing.quantity++;
+    } else {
+      alert("Alcanzaste el límite de stock disponible de este producto.");
+    }
+  } else {
+    cart.push({ product, quantity: 1 });
+  }
+
+  updateCartUI();
+}
+
+function updateCartUI() {
+  const totalCount = cart.reduce((sum, item) => sum + item.quantity, 0);
+  setText("cartCount", totalCount);
+
+  if (totalCount > 0) {
+    show("openCartBtn");
+  } else {
+    hide("openCartBtn");
+    hide("cartModal");
+  }
+
+  const container = $("cartItemsList");
+  let totalMoney = 0;
+
+  container.innerHTML = cart.map(item => {
+    const subtotal = item.product.price * item.quantity;
+    totalMoney += subtotal;
+    const modelInfo = item.product.model ? ` (${clean(item.product.model)})` : '';
+
+    return `
+      <div style="display:flex;align-items:center;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--line)">
+        <div style="flex:1">
+          <b>${clean(item.product.name)}${modelInfo}</b>
+          <p class="sub" style="font-size:12px;margin:2px 0">${money(item.product.price)} c/u</p>
+        </div>
+        <div style="display:flex;align-items:center;gap:8px">
+          <button type="button" class="secondary" data-cart-minus="${item.product.id}" style="padding:2px 8px">-</button>
+          <span><b>${item.quantity}</b></span>
+          <button type="button" class="secondary" data-cart-plus="${item.product.id}" style="padding:2px 8px">+</button>
+        </div>
+      </div>`;
+  }).join("");
+
+  setText("cartTotal", money(totalMoney));
+
+  container.querySelectorAll("[data-cart-minus]").forEach(btn => {
+    btn.onclick = () => changeCartQty(btn.dataset.cartMinus, -1);
+  });
+  container.querySelectorAll("[data-cart-plus]").forEach(btn => {
+    btn.onclick = () => changeCartQty(btn.dataset.cartPlus, 1);
+  });
+}
+
+function changeCartQty(productId, delta) {
+  const item = cart.find(i => i.product.id === productId);
+  if (!item) return;
+
+  item.quantity += delta;
+  if (item.quantity <= 0) {
+    cart = cart.filter(i => i.product.id !== productId);
+  } else if (item.quantity > item.product.quantity) {
+    item.quantity = item.product.quantity;
+    alert("Límite de stock disponible alcanzado.");
+  }
+
+  updateCartUI();
+}
+
+$("openCartBtn").onclick = () => show("cartModal");
+$("closeCartBtn").onclick = () => hide("cartModal");
+
+$("sendWhatsappBtn").onclick = () => {
+  if (!cart.length) return;
+
+  const phone = currentBusiness?.phone;
+  if (!phone) {
+    alert("El vendedor no configuró un número de WhatsApp.");
+    return;
+  }
+
+  let text = `¡Hola *${currentBusiness.name}*! Quisiera realizar el siguiente pedido:\n\n`;
+  let totalMoney = 0;
+
+  cart.forEach(item => {
+    const subtotal = item.product.price * item.quantity;
+    totalMoney += subtotal;
+    const modelText = item.product.model ? ` [Modelo: ${item.product.model}]` : '';
+    text += `• ${item.quantity}x *${item.product.name}*${modelText} (${money(item.product.price)}) = ${money(subtotal)}\n`;
+  });
+
+  text += `\n*TOTAL: ${money(totalMoney)}*\n\n¿Tienen disponibilidad para coordinar la entrega?`;
+
+  const cleanPhone = phone.replace(/\D/g, "");
+  const whatsappUrl = `https://wa.me/${cleanPhone}?text=${encodeURIComponent(text)}`;
+
+  window.open(whatsappUrl, "_blank");
+};
+
+/* =========================
+   SELECTOR DE MODO INICIAL
+========================= */
+$("btnCloudMode").onclick = () => {
+  appMode = "cloud";
+  hide("modeSelectScreen");
+  show("authScreen");
+};
+
+$("btnLocalMode").onclick = () => {
+  appMode = "local";
+  hide("modeSelectScreen");
+  hide("authScreen");
+  initLocalMode();
+};
+
+$("backToModeSelect").onclick = () => {
+  hide("authScreen");
+  show("modeSelectScreen");
+  hide("headerAvatar");
+  hide("headerLogout");
+};
+
+const triggerLogout = async () => {
+  clearListeners();
+  if (appMode === "cloud") {
+    try { await auth.signOut(); } catch(e){}
+  }
+  appMode = null;
+  currentBusiness = null;
+  currentBusinessId = null;
+  products = [];
+  sales = [];
+  clients = [];
+  businessList = [];
+  userProfile = { displayName: "", photoURL: "", theme: "claro" };
+  hide("app");
+  hide("setup");
+  hide("homeScreen");
+  hide("authScreen");
+  hide("headerAvatar");
+  hide("headerLogout");
+  show("modeSelectScreen");
+};
+
+$("headerLogout").onclick = triggerLogout;
+
+/* =========================
+   MODO LOCAL (LOCALSTORAGE)
+========================= */
+function initLocalMode() {
+  $("tabJoinBiz").classList.add("hidden");
+  loadLocalProfile();
+  show("headerLogout");
+  show("headerAvatar");
+  showHome();
+}
+
+function loadLocalProfile() {
+  const data = localStorage.getItem("stockea_local_profile");
+  const savedTheme = localStorage.getItem("stockea_local_theme") || "claro";
+  if (data) {
+    userProfile = JSON.parse(data);
+    if (!userProfile.theme) userProfile.theme = savedTheme;
+  } else {
+    userProfile = { displayName: "Usuario Local", photoURL: "", theme: savedTheme };
+  }
+  applyTheme(userProfile.theme);
+  updateUIProfile();
+}
+
+async function getLocalBusinesses() {
+  const data = localStorage.getItem("stockea_local_businesses");
+  return data ? JSON.parse(data) : [];
+}
+
+async function saveLocalBusinesses(list) {
+  localStorage.setItem("stockea_local_businesses", JSON.stringify(list));
+}
+
+async function getLocalProducts(bId) {
+  const data = localStorage.getItem(`stockea_local_products_${bId}`);
+  return data ? JSON.parse(data) : [];
+}
+
+async function saveLocalProducts(bId, list) {
+  localStorage.setItem(`stockea_local_products_${bId}`, JSON.stringify(list));
+}
+
+async function getLocalSales(bId) {
+  const data = localStorage.getItem(`stockea_local_sales_${bId}`);
+  return data ? JSON.parse(data) : [];
+}
+
+async function saveLocalSales(bId, list) {
+  localStorage.setItem(`stockea_local_sales_${bId}`, JSON.stringify(list));
+}
+
+async function getLocalClients(bId) {
+  const data = localStorage.getItem(`stockea_local_clients_${bId}`);
+  return data ? JSON.parse(data) : [];
+}
+
+async function saveLocalClients(bId, list) {
+  localStorage.setItem(`stockea_local_clients_${bId}`, JSON.stringify(list));
+}
+
+/* =========================
+   AUTENTICACIÓN NUBE
+========================= */
+$("tabLogin").onclick = () => setAuthMode("login");
+$("tabRegister").onclick = () => setAuthMode("register");
+
+function setAuthMode(mode) {
+  authMode = mode;
+  $("tabLogin").classList.toggle("active", mode === "login");
+  $("tabRegister").classList.toggle("active", mode === "register");
+  setText("authSubmitBtn", mode === "login" ? "Iniciar sesión" : "Crear cuenta");
+  clearError("authError");
+}
+
+$("authForm").addEventListener("submit", async event => {
+  event.preventDefault();
+  clearError("authError");
+
+  const email = $("authEmail").value.trim();
+  const password = $("authPassword").value;
+  $("authSubmitBtn").disabled = true;
+
+  try {
+    if (authMode === "register") {
+      await auth.createUserWithEmailAndPassword(email, password);
+    } else {
+      await auth.signInWithEmailAndPassword(email, password);
+    }
+  } catch (error) {
+    showError("authError", authErrorMessage(error));
+  } finally {
+    $("authSubmitBtn").disabled = false;
+  }
+});
+
+function authErrorMessage(error) {
+  const messages = {
+    "auth/email-already-in-use": "Ese correo ya tiene una cuenta.",
+    "auth/invalid-email": "El correo electrónico no es válido.",
+    "auth/weak-password": "La contraseña debe tener al menos 6 caracteres.",
+    "auth/user-not-found": "No existe una cuenta con ese correo.",
+    "auth/wrong-password": "La contraseña es incorrecta.",
+    "auth/invalid-credential": "Correo o contraseña incorrectos.",
+    "auth/too-many-requests": "Demasiados intentos. Probá más tarde.",
+    "auth/network-request-failed": "No se pudo conectar. Revisá internet."
+  };
+  return messages[error.code] || error.message || "Ocurrió un error.";
+}
+
+/* =========================
+   HOME Y LISTA DE NEGOCIOS
+========================= */
+function showHome() {
+  hide("authScreen");
+  hide("setup");
+  hide("app");
+  show("homeScreen");
+  renderBusinessList();
+}
+
+async function renderBusinessList() {
+  const container = $("businessList");
+  if (!container) return;
+
+  await refreshBusinessList();
+
+  if (!businessList.length) {
+    container.innerHTML = `
+      <div class="panel empty" style="grid-column:1/-1">
+        <div style="font-size:38px">🏪</div>
+        <h3>Todavía no tenés negocios</h3>
+        <p>Creá uno nuevo${appMode === 'cloud' ? ' o unite al negocio de otra persona' : ''}.</p>
+      </div>`;
+    return;
+  }
+
+  container.innerHTML = businessList.map(business => `
+    <article class="business-card">
+      <div class="business-icon">
+        ${business.logo ? `<img src="${business.logo}" alt="Logo">` : '🏪'}
+      </div>
+      <h3>${clean(business.name || "Mi negocio")}</h3>
+      <p>${clean(business.type || "Negocio")}</p>
+      <button type="button" data-open-business="${business.id}">
+        Entrar al negocio →
+      </button>
+    </article>
+  `).join("");
+
+  container.querySelectorAll("[data-open-business]").forEach(button => {
+    button.onclick = async () => {
+      button.disabled = true;
+      try {
+        await openBusiness(button.dataset.openBusiness);
+      } catch (error) {
+        console.error(error);
+        alert(error.message || "No se pudo abrir el negocio.");
+      } finally {
+        button.disabled = false;
+      }
+    };
+  });
+}
+
+$("homeCreateBtn").onclick = () => {
+  hide("homeScreen");
+  show("setup");
+  setBusinessMode("create");
+};
+
+$("homeJoinBtn").onclick = () => {
+  if (appMode === "local") {
+    alert("El modo local no utiliza códigos de invitación compartidos.");
+    return;
+  }
+  hide("homeScreen");
+  show("setup");
+  setBusinessMode("join");
+};
+
+$("backSetupHome").onclick = async () => {
+  clearError("setupError");
+  try { await refreshBusinessList(); } catch (error) { console.error(error); }
+  showHome();
+};
+
+$("backHomeBtn").onclick = async () => {
+  clearListeners();
+  currentBusiness = null;
+  currentBusinessId = null;
+  products = [];
+  sales = [];
+  clients = [];
+  try { await refreshBusinessList(); } catch (error) { console.error(error); }
+  showHome();
+};
+
+/* =========================
+   CAMBIO DE PANTALLAS
+========================= */
+document.querySelectorAll("nav [data-page]").forEach(button => {
+  button.addEventListener("click", () => {
+    const page = button.dataset.page;
+    document.querySelectorAll("nav [data-page]").forEach(item => {
+      item.classList.toggle("active", item === button);
+    });
+
+    ["dashboard", "stock", "productFormPanel", "sales", "clients", "settings", "profile"].forEach(id => {
+      $(id).classList.toggle("hidden", id !== page);
+    });
+
+    if (page === "dashboard") renderDashboard();
+    if (page === "stock") renderProducts();
+    if (page === "sales") renderSales();
+    if (page === "clients") renderClients();
+    if (page === "settings") renderMembersList();
+  });
+});
+
+const openProfileView = () => {
+  document.querySelectorAll("nav [data-page]").forEach(item => {
+    item.classList.remove("active");
+  });
+  ["dashboard", "stock", "productFormPanel", "sales", "clients", "settings", "profile"].forEach(id => {
+    $(id).classList.toggle("hidden", id !== "profile");
+  });
+  loadProfileSection();
+};
+
+$("headerAvatar").onclick = openProfileView;
+
+/* =========================
+   CONFIGURACIÓN CREAR / UNIR
+========================= */
+$("tabCreateBiz").onclick = () => setBusinessMode("create");
+$("tabJoinBiz").onclick = () => setBusinessMode("join");
+
+function setBusinessMode(mode) {
+  const create = mode === "create";
+  $("tabCreateBiz").classList.toggle("active", create);
+  $("tabJoinBiz").classList.toggle("active", !create);
+  $("createBizForm").classList.toggle("hidden", !create);
+  $("joinBizForm").classList.toggle("hidden", create);
+  clearError("setupError");
+}
+
+/* =========================
+   ABRIR UN NEGOCIO
+========================= */
+async function openBusiness(id) {
+  if (appMode === "local") {
+    const list = await getLocalBusinesses();
+    const found = list.find(b => b.id === id);
+    if (!found) throw new Error("Negocio no encontrado.");
+
+    currentBusinessId = id;
+    currentBusiness = found;
+    products = await getLocalProducts(id);
+    sales = await getLocalSales(id);
+    clients = await getLocalClients(id);
+
+    setupBusinessUI();
+    return;
+  }
+
+  if (!currentUser) throw new Error("Iniciá sesión primero.");
+  clearListeners();
+
+  const businessRef = db.collection("businesses").doc(id);
+  const snap = await businessRef.get();
+  if (!snap.exists) throw new Error("El negocio ya no existe.");
+
+  const data = snap.data();
+  if (!(data.memberUids || []).includes(currentUser.uid)) {
+    throw new Error("No tenés acceso a este negocio.");
+  }
+
+  currentBusinessId = id;
+  currentBusiness = { id: snap.id, ...data };
+  products = [];
+  sales = [];
+  clients = [];
+
+  setupBusinessUI();
+  startBusinessListeners();
+}
+
+function setupBusinessUI() {
+  hide("authScreen");
+  hide("setup");
+  hide("homeScreen");
+  show("app");
+
+  setText("welcome", currentBusiness.name || "Mi negocio");
+  setText("storeSubInfo", currentBusiness.type || "Panel general");
+
+  if (appMode === "local") {
+    $("codeSectionContainer").classList.add("hidden");
+    $("membersSectionContainer").classList.add("hidden");
+  } else {
+    $("codeSectionContainer").classList.remove("hidden");
+    $("membersSectionContainer").classList.remove("hidden");
+    setText("displayStoreCode", currentBusiness.accessCode || "—");
+    renderMembersList();
+  }
+
+  $("editBiz").value = currentBusiness.name || "";
+  $("editOwners").value = currentBusiness.owners || "";
+  $("editPhone").value = currentBusiness.phone || "";
+  $("editType").value = currentBusiness.type || "Otro";
+  $("editCategories").value = (currentBusiness.categories || []).join(", ");
+  
+  if (currentBusiness.logo) {
+    $("editLogoBase64").value = currentBusiness.logo;
+    $("bizLogoPreview").innerHTML = `<img src="${currentBusiness.logo}" alt="Logo">`;
+  } else {
+    $("editLogoBase64").value = "";
+    $("bizLogoPreview").innerHTML = "🏪";
+  }
+
+  fillCategoryOptions();
+
+  document.querySelectorAll("nav [data-page]").forEach(button => {
+    button.classList.toggle("active", button.dataset.page === "dashboard");
+  });
+
+  ["dashboard", "stock", "productFormPanel", "sales", "clients", "settings", "profile"].forEach(id => {
+    $(id).classList.toggle("hidden", id !== "dashboard");
+  });
+
+  renderDashboard();
+}
+
+/* =========================
+   PROCESAR LOGO DEL NEGOCIO
+========================= */
+$("bizLogoFile").addEventListener("change", async event => {
+  const file = event.target.files?.[0];
+  if (!file) return;
+
+  if (!file.type.startsWith("image/")) {
+    alert("Elegí una imagen válida.");
+    return;
+  }
+
+  try {
+    const imageData = await compressImage(file);
+    $("editLogoBase64").value = imageData;
+    $("bizLogoPreview").innerHTML = `<img src="${imageData}" alt="Logo">`;
+  } catch (error) {
+    console.error(error);
+    alert("No se pudo procesar el logo.");
+  }
+});
+
+/* =========================
+   GESTIÓN DE PERFIL DE USUARIO
+========================= */
+function loadProfileSection() {
+  $("profileDisplayName").value = userProfile.displayName || "";
+  $("profileEmail").value = currentUser ? currentUser.email : "Modo Local (Sin correo)";
+  $("profileImageBase64").value = userProfile.photoURL || "";
+}
+
+$("profileImageFile").addEventListener("change", async event => {
+  const file = event.target.files?.[0];
+  if (!file) return;
+
+  if (!file.type.startsWith("image/")) {
+    alert("Elegí una imagen válida.");
+    return;
+  }
+
+  try {
+    const imageData = await compressImage(file);
+    $("profileImageBase64").value = imageData;
+    $("profileAvatar").innerHTML = `<img src="${imageData}" alt="Avatar">`;
+  } catch (error) {
+    console.error(error);
+    alert("No se pudo procesar la foto.");
+  }
+});
+
+$("profileForm").addEventListener("submit", async event => {
+  event.preventDefault();
+
+  const displayName = $("profileDisplayName").value.trim();
+  const photoURL = $("profileImageBase64").value;
+
+  userProfile.displayName = displayName;
+  userProfile.photoURL = photoURL;
+
+  try {
+    if (appMode === "local") {
+      localStorage.setItem("stockea_local_profile", JSON.stringify(userProfile));
+      updateUIProfile();
+      alert("¡Perfil local actualizado!");
+    } else if (currentUser) {
+      await db.collection("users").doc(currentUser.uid).set({
+        displayName,
+        photoURL,
+        email: currentUser.email,
+        theme: userProfile.theme || "claro"
+      }, { merge: true });
+
+      updateUIProfile();
+      alert("¡Perfil actualizado en la nube!");
+      if (currentBusiness) renderMembersList();
+    }
+  } catch (error) {
+    console.error(error);
+    alert("No se pudo guardar el perfil.");
+  }
+});
+
+/* =========================
+   MIEMBROS DEL NEGOCIO (NUBE)
+========================= */
+async function renderMembersList() {
+  if (appMode !== "cloud" || !currentBusiness) return;
+  const container = $("membersList");
+  if (!container) return;
+
+  const memberUids = currentBusiness.memberUids || [];
+  const ownerUid = currentBusiness.ownerUid;
+  const isIModernOwner = currentUser?.uid === ownerUid;
+
+  if (!memberUids.length) {
+    container.innerHTML = '<div class="empty">No hay miembros vinculados.</div>';
+    return;
+  }
+
+  try {
+    const memberPromises = memberUids.map(async uid => {
+      const snap = await db.collection("users").doc(uid).get();
+      const data = snap.exists ? snap.data() : {};
+      return {
+        uid,
+        email: data.email || "Usuario sin correo",
+        displayName: data.displayName || "",
+        photoURL: data.photoURL || ""
+      };
+    });
+
+    const members = await Promise.all(memberPromises);
+
+    container.innerHTML = members.map(m => {
+      const isOwner = m.uid === ownerUid;
+      const isMe = m.uid === currentUser?.uid;
+      const name = m.displayName ? `${m.displayName} (${m.email})` : m.email;
+      const avatarHTML = m.photoURL ? `<img src="${m.photoURL}" style="width:100%;height:100%;object-fit:cover">` : `<svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>`;
+
+      return `
+        <div class="member-item">
+          <div class="avatar-mini">${avatarHTML}</div>
+          <span style="flex:1; overflow:hidden; text-overflow:ellipsis">${clean(name)}</span>
+          ${isOwner ? '<span class="member-badge">Creador</span>' : '<span class="member-badge" style="background:var(--line);color:var(--muted)">Socio</span>'}
+          ${isMe ? '<span class="member-badge" style="background:#1b4a3f;color:#35d49a">Vos</span>' : ''}
+          ${(isIModernOwner && !isOwner) ? `<button type="button" class="danger" data-kick-user="${m.uid}" style="padding:4px 8px;font-size:11px">🚫 Expulsar</button>` : ''}
+        </div>
+      `;
+    }).join("");
+
+    container.querySelectorAll("[data-kick-user]").forEach(btn => {
+      btn.onclick = () => kickMember(btn.dataset.kickUser);
+    });
+
+  } catch (error) {
+    console.error("Error al obtener lista de miembros:", error);
+    container.innerHTML = '<div class="empty">Error al cargar la lista de miembros.</div>';
+  }
+}
+
+/* =========================
+   AUTENTICACIÓN INICIAL (NUBE)
+========================= */
+auth.onAuthStateChanged(async user => {
+  currentUser = user;
+  clearListeners();
+
+  const urlParams = new URLSearchParams(window.location.search);
+  if (urlParams.get("catalogo")) return;
+
+  if (!user) {
+    if (appMode === "cloud") {
+      hide("app");
+      hide("setup");
+      hide("homeScreen");
+      hide("headerAvatar");
+      hide("headerLogout");
+      showAuth();
+    }
+    return;
+  }
+
+  appMode = "cloud";
+  hide("authScreen");
+  hide("modeSelectScreen");
+  show("headerLogout");
+  show("headerAvatar");
+
+  try {
+    const userRef = db.collection("users").doc(user.uid);
+    let userSnap = await userRef.get();
+    if (!userSnap.exists) {
+      await userRef.set({ email: user.email || "", businessIds: [], theme: "claro" }, { merge: true });
+      userProfile = { displayName: "", photoURL: "", theme: "claro" };
+    } else {
+      const uData = userSnap.data();
+      userProfile = {
+        displayName: uData.displayName || "",
+        photoURL: uData.photoURL || "",
+        theme: uData.theme || "claro"
+      };
+    }
+
+    applyTheme(userProfile.theme);
+    updateUIProfile();
+    await refreshBusinessList();
+    showHome();
+  } catch (error) {
+    console.error(error);
+    showHome();
+  }
+});
+
+function showAuth() {
+  hide("homeScreen");
+  hide("setup");
+  hide("app");
+  show("authScreen");
+}
+
+/* =========================
+   ESCUCHAR CAMBIOS EN TIEMPO REAL
+========================= */
+function startBusinessListeners() {
+  if (appMode === "local") return;
+  if (!currentBusinessId) return;
+  clearListeners();
+
+  productUnsubscribe = db.collection("businesses")
+    .doc(currentBusinessId)
+    .collection("products")
+    .onSnapshot(snapshot => {
+      products = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+      fillCategoryOptions();
+      renderProducts();
+      renderDashboard();
+    }, error => console.error("Error productos:", error));
+
+  salesUnsubscribe = db.collection("businesses")
+    .doc(currentBusinessId)
+    .collection("sales")
+    .onSnapshot(snapshot => {
+      sales = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+      sales.sort((a, b) => getSaleTime(b) - getSaleTime(a));
+      renderSales();
+      renderDashboard();
+    }, error => console.error("Error ventas:", error));
+
+  clientsUnsubscribe = db.collection("businesses")
+    .doc(currentBusinessId)
+    .collection("clients")
+    .onSnapshot(snapshot => {
+      clients = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+      renderClients();
+    }, error => console.error("Error clientes:", error));
+}
+
+function getSaleTime(sale) {
+  if (sale.createdAt && typeof sale.createdAt.toMillis === "function") {
+    return sale.createdAt.toMillis();
+  }
+  if (sale.createdAt instanceof Date) return sale.createdAt.getTime();
+  return Number(sale.createdAt) || 0;
+}
+
+/* =========================
+   ESCANEO DE CÓDIGO CON CÁMARA
+========================= */
+async function runCameraScanner(targetInputId) {
+  if (!('BarcodeDetector' in window)) {
+    const scanned = prompt("Tu navegador no soporta escaneo directo por cámara. Ingresá o escaneá el código manualmente:");
+    if (scanned !== null) {
+      const inputEl = $(targetInputId);
+      if (inputEl) {
+        inputEl.value = scanned.trim();
+        inputEl.dispatchEvent(new Event('input'));
+      }
+    }
+    return;
+  }
+
+  try {
+    const formats = await window.BarcodeDetector.getSupportedFormats();
+    const barcodeDetector = new window.BarcodeDetector({ formats: formats.length ? formats : ['ean_13', 'code_128', 'qr_code'] });
+    
+    const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } });
+    const video = document.createElement('video');
+    video.srcObject = stream;
+    await video.play();
+
+    const container = document.createElement('div');
+    container.style.cssText = "position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.9);z-index:9999;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:20px;";
+    video.style.cssText = "width:100%;max-width:400px;border-radius:12px;border:2px solid #2563eb;";
+    
+    const cancelBtn = document.createElement('button');
+    cancelBtn.textContent = "Cancelar escaneo";
+    cancelBtn.className = "danger";
+    cancelBtn.style.marginTop = "15px";
+
+    container.appendChild(video);
+    container.appendChild(cancelBtn);
+    document.body.appendChild(container);
+
+    let scanning = true;
+
+    cancelBtn.onclick = () => {
+      scanning = false;
+      stream.getTracks().forEach(t => t.stop());
+      document.body.removeChild(container);
+    };
+
+    const scanFrame = async () => {
+      if (!scanning) return;
+      try {
+        const barcodes = await barcodeDetector.detect(video);
+        if (barcodes.length > 0) {
+          const codeValue = barcodes[0].rawValue;
+          const inputEl = $(targetInputId);
+          if (inputEl) {
+            inputEl.value = codeValue;
+            inputEl.dispatchEvent(new Event('input'));
+          }
+          scanning = false;
+          stream.getTracks().forEach(t => t.stop());
+          document.body.removeChild(container);
+          return;
+        }
+      } catch (err) {
+        console.warn(err);
+      }
+      if (scanning) requestAnimationFrame(scanFrame);
+    };
+
+    requestAnimationFrame(scanFrame);
+
+  } catch (e) {
+    console.error(e);
+    alert("No se pudo acceder a la cámara para escanear el código.");
+  }
+}
+
+$("scanCameraBtn")?.addEventListener("click", () => runCameraScanner("pCode"));
+$("searchScanCameraBtn")?.addEventListener("click", () => runCameraScanner("search"));
+$("publicScanCameraBtn")?.addEventListener("click", () => runCameraScanner("publicSearch"));
+
+/* =========================
+   GESTIÓN DE CLIENTES Y CUENTAS CORRIENTES
+========================= */
+$("addClientBtn").onclick = () => {
+  $("clientForm").reset();
+  show("clientModal");
+};
+$("closeClientModalBtn").onclick = () => hide("clientModal");
+
+$("clientForm").addEventListener("submit", async event => {
+  event.preventDefault();
+  if (!currentBusinessId) return;
+
+  const name = $("cName").value.trim();
+  const phone = $("cPhone").value.trim();
+  const notes = $("cNotes").value.trim();
+
+  try {
+    const data = {
+      name, phone, notes,
+      debt: 0,
+      createdAt: appMode === "cloud" ? firebase.firestore.FieldValue.serverTimestamp() : Date.now()
+    };
+
+    if (appMode === "local") {
+      clients = await getLocalClients(currentBusinessId);
+      data.id = "cli_" + Date.now();
+      clients.push(data);
+      await saveLocalClients(currentBusinessId, clients);
+      hide("clientModal");
+      renderClients();
+    } else {
+      await db.collection("businesses").doc(currentBusinessId).collection("clients").add(data);
+      hide("clientModal");
+    }
+    alert("¡Cliente registrado exitosamente!");
+  } catch (error) {
+    console.error("Error al registrar cliente:", error);
+    alert("No se pudo registrar el cliente. Verificá tu conexión.");
+  }
+});
+
+$("searchClient")?.addEventListener("input", renderClients);
+
+function renderClients() {
+  const container = $("clientsList");
+  if (!container) return;
+
+  const search = ($("searchClient")?.value || "").toLowerCase().trim();
+  const filtered = clients.filter(c => [c.name, c.phone].join(" ").toLowerCase().includes(search));
+
+  if (!filtered.length) {
+    container.innerHTML = '<div class="empty">No hay clientes encontrados.</div>';
+    return;
+  }
+
+  container.innerHTML = filtered.map(client => {
+    const debt = Number(client.debt) || 0;
+    const debtClass = debt > 0 ? "danger" : "green";
+    const debtLabel = debt > 0 ? `Debe: ${money(debt)}` : "Al día (Sin deuda)";
+
+    return `
+      <div class="sale" style="align-items:flex-start">
+        <div style="flex:1">
+          <b style="font-size:16px">${clean(client.name)}</b>
+          <p>📞 Teléfono: ${clean(client.phone)} ${client.notes ? `· Notas: ${clean(client.notes)}` : ''}</p>
+          <p class="${debtClass}" style="font-weight:bold; margin-top:4px">${debtLabel}</p>
+        </div>
+        <div class="sale-actions" style="margin-top:0">
+          ${debt > 0 ? `<button type="button" class="whatsapp-btn" data-pay-client="${client.id}" style="padding:7px 12px;font-size:12px">💵 Registrar Abono</button>` : ''}
+          <button type="button" class="danger" data-delete-client="${client.id}" style="padding:7px 10px;font-size:12px">Eliminar</button>
+        </div>
+      </div>
+    `;
+  }).join("");
+
+  container.querySelectorAll("[data-pay-client]").forEach(btn => {
+    btn.onclick = () => openPaymentModal(btn.dataset.payClient);
+  });
+  container.querySelectorAll("[data-delete-client]").forEach(btn => {
+    btn.onclick = () => deleteClient(btn.dataset.deleteClient);
+  });
+}
+
+function openPaymentModal(clientId) {
+  const client = clients.find(c => c.id === clientId);
+  if (!client) return;
+
+  $("paymentClientId").value = client.id;
+  setText("paymentClientInfo", `Cliente: ${client.name} (Deuda actual: ${money(client.debt)})`);
+  $("paymentAmount").value = "";
+  show("paymentModal");
+}
+$("closePaymentModalBtn").onclick = () => hide("paymentModal");
+
+$("paymentForm").addEventListener("submit", async event => {
+  event.preventDefault();
+  const clientId = $("paymentClientId").value;
+  const amount = Number($("paymentAmount").value);
+  const client = clients.find(c => c.id === clientId);
+
+  if (!client || amount <= 0) return;
+
+  try {
+    const newDebt = Math.max(0, (Number(client.debt) || 0) - amount);
+
+    if (appMode === "local") {
+      client.debt = newDebt;
+      await saveLocalClients(currentBusinessId, clients);
+      hide("paymentModal");
+      renderClients();
+    } else {
+      await db.collection("businesses").doc(currentBusinessId).collection("clients").doc(clientId).update({
+        debt: newDebt
+      });
+      hide("paymentModal");
+    }
+    alert("¡Pago registrado con éxito! Deuda actualizada.");
+  } catch (error) {
+    console.error(error);
+    alert("No se pudo registrar el pago.");
+  }
+});
+
+async function deleteClient(clientId) {
+  if (!confirm("¿Eliminar este cliente de la lista?")) return;
+  try {
+    if (appMode === "local") {
+      clients = clients.filter(c => c.id !== clientId);
+      await saveLocalClients(currentBusinessId, clients);
+      renderClients();
+    } else {
+      await db.collection("businesses").doc(currentBusinessId).collection("clients").doc(clientId).delete();
+    }
+  } catch (error) {
+    console.error(error);
+    alert("No se pudo eliminar el cliente.");
+  }
+}
+
+/* =========================
+   CATEGORÍAS Y PRODUCTOS
+========================= */
+function getCategories() {
+  const categories = currentBusiness?.categories || [];
+  const productCategories = products.map(product => product.category || "");
+  return [...new Set([...categories, ...productCategories])].map(v => String(v).trim()).filter(Boolean);
+}
+
+function fillCategoryOptions() {
+  const categories = getCategories();
+  const datalist = $("categoriesDatalist");
+  const filterSelect = $("filterCategory");
+
+  if (datalist) {
+    datalist.innerHTML = categories.map(c => `<option value="${clean(c)}">`).join("");
+  }
+
+  if (filterSelect) {
+    const prevFilt = filterSelect.value;
+    filterSelect.innerHTML = '<option value="">Todas las categorías</option>' +
+      categories.map(c => `<option value="${clean(c)}">${clean(c)}</option>`).join("");
+    if (categories.includes(prevFilt)) filterSelect.value = prevFilt;
+  }
+}
+
+$("addProductBtn").onclick = () => {
+  if (!currentBusinessId) return;
+  editingProductId = null;
+  $("productForm").reset();
+  $("pColorCode").value = "#568cff";
+  $("pMinStock").value = "3";
+  $("pImage").value = "";
+  $("pImageFile").value = "";
+  $("imagePreview").innerHTML = "";
+
+  setText("formTitle", "Nuevo producto");
+  fillCategoryOptions();
+  
+  hide("stock");
+  show("productFormPanel");
+  window.scrollTo({ top: 0, behavior: "smooth" });
+  $("pName").focus();
+};
+
+$("cancelProductBtn").onclick = () => {
+  hide("productFormPanel");
+  show("stock");
+  editingProductId = null;
+};
+
+$("pImageFile").addEventListener("change", async event => {
+  const file = event.target.files?.[0];
+  if (!file) return;
+
+  if (!file.type.startsWith("image/")) {
+    alert("Elegí un archivo de imagen válido.");
+    event.target.value = "";
+    return;
+  }
+
+  try {
+    $("imagePreview").textContent = "Procesando imagen...";
+    const imageData = await compressImage(file);
+    $("pImage").value = imageData;
+    $("imagePreview").innerHTML = `<img alt="Vista previa" src="${imageData}" style="display:block;max-width:160px;max-height:160px;object-fit:cover;margin-top:10px;border-radius:10px">`;
+  } catch (error) {
+    console.error(error);
+    $("imagePreview").innerHTML = "";
+    alert("No se pudo procesar la imagen.");
+  }
+});
+
+function compressImage(file) {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onerror = () => reject(new Error("Error leyendo el archivo"));
+    reader.onload = () => {
+      const image = new Image();
+      image.onerror = () => reject(new Error("Imagen inválida"));
+      image.onload = () => {
+        const maxSize = 700;
+        const scale = Math.min(1, maxSize / Math.max(image.width, image.height));
+        const canvas = document.createElement("canvas");
+        canvas.width = Math.max(1, Math.round(image.width * scale));
+        canvas.height = Math.max(1, Math.round(image.height * scale));
+        const ctx = canvas.getContext("2d");
+        ctx.drawImage(image, 0, 0, canvas.width, canvas.height);
+        resolve(canvas.toDataURL("image/jpeg", 0.75));
+      };
+      image.src = reader.result;
+    };
+    reader.readAsDataURL(file);
+  });
+}
+
+$("productForm").addEventListener("submit", async event => {
+  event.preventDefault();
+  if (!currentBusinessId) return;
+
+  const name = $("pName").value.trim();
+  const category = $("pCategory").value.trim() || "General";
+  const model = $("pModel").value.trim();
+  const colorCode = $("pColorCode").value || "#568cff";
+  const cost = Number($("pCost").value);
+  const price = Number($("pPrice").value);
+  const quantity = Number($("pQty").value);
+  const minStock = Number($("pMinStock").value) || 3;
+  const code = $("pCode").value.trim();
+  const image = $("pImage").value || "";
+
+  const submitButton = $("productForm").querySelector('button[type="submit"]');
+  submitButton.disabled = true;
+
+  try {
+    const data = {
+      name, category, model, colorCode, cost, price, quantity, minStock, code, image,
+      updatedAt: Date.now()
+    };
+
+    if (currentBusiness && !currentBusiness.categories.includes(category)) {
+      currentBusiness.categories.push(category);
+      if (appMode === "cloud") {
+        await db.collection("businesses").doc(currentBusinessId).update({
+          categories: firebase.firestore.FieldValue.arrayUnion(category)
+        });
+      } else {
+        const list = await getLocalBusinesses();
+        const index = list.findIndex(b => b.id === currentBusinessId);
+        if (index !== -1) {
+          list[index].categories = currentBusiness.categories;
+          await saveLocalBusinesses(list);
+        }
+      }
+    }
+
+    if (appMode === "local") {
+      products = await getLocalProducts(currentBusinessId);
+      if (editingProductId) {
+        const index = products.findIndex(p => p.id === editingProductId);
+        if (index !== -1) {
+          products[index] = { ...products[index], ...data };
+        }
+      } else {
+        data.id = "prod_" + Date.now();
+        data.createdAt = Date.now();
+        products.push(data);
+      }
+      await saveLocalProducts(currentBusinessId, products);
+      hide("productFormPanel");
+      show("stock");
+      editingProductId = null;
+      $("productForm").reset();
+      $("imagePreview").innerHTML = "";
+      fillCategoryOptions();
+      renderProducts();
+      renderDashboard();
+    } else {
+      const collection = db.collection("businesses").doc(currentBusinessId).collection("products");
+      data.updatedAt = firebase.firestore.FieldValue.serverTimestamp();
+      if (editingProductId) {
+        await collection.doc(editingProductId).update(data);
+      } else {
+        data.createdAt = firebase.firestore.FieldValue.serverTimestamp();
+        await collection.add(data);
+      }
+      hide("productFormPanel");
+      show("stock");
+      editingProductId = null;
+      $("productForm").reset();
+      $("imagePreview").innerHTML = "";
+    }
+  } catch (error) {
+    console.error(error);
+    alert("No se pudo guardar el producto.");
+  } finally {
+    submitButton.disabled = false;
+  }
+});
+
+$("search")?.addEventListener("input", renderProducts);
+$("filterCategory")?.addEventListener("change", renderProducts);
+
+function renderProducts() {
+  const container = $("productList");
+  if (!container) return;
+
+  const search = ($("search")?.value || "").toLowerCase().trim();
+  const category = $("filterCategory")?.value || "";
+
+  const filtered = products.filter(product => {
+    const searchable = [product.name, product.model, product.code, product.category].join(" ").toLowerCase();
+    return searchable.includes(search) && (!category || product.category === category);
+  });
+
+  if (!filtered.length) {
+    container.innerHTML = `<div class="panel empty" style="grid-column:1/-1">No se encontraron productos.</div>`;
+    return;
+  }
+
+  container.innerHTML = filtered.map(product => {
+    const quantity = Number(product.quantity) || 0;
+    const minStock = Number(product.minStock) || 3;
+    const stockClass = quantity <= 0 ? "out" : quantity <= minStock ? "low" : "";
+    const stockLabel = quantity <= 0 ? "Sin stock" : quantity <= minStock ? "Stock bajo" : "Disponible";
+
+    return `
+      <article class="product-card">
+        <div class="product-image">
+          ${product.image ? `<img src="${product.image}" alt="${clean(product.name)}">` : '<div class="product-placeholder">📦</div>'}
+        </div>
+        <div class="product-card-body">
+          <div class="product-name">${clean(product.name || "Producto")}</div>
+          <div class="product-color">
+            <span class="product-color-dot" style="background:${product.colorCode || "#568cff"}"></span>
+            Color seleccionado
+          </div>
+          <div class="product-price">${money(product.price)}</div>
+          <div class="product-cost">Costo: ${money(product.cost)}</div>
+          <div class="product-stock">
+            <span>Cantidad: <b>${quantity}</b></span>
+            <span class="stock-status ${stockClass}">${stockLabel}</span>
+          </div>
+          ${product.code ? `<p style="margin:6px 0 0;font-size:11px" class="muted">Cód: ${clean(product.code)}</p>` : ""}
+        </div>
+        <div class="product-actions">
+          <button type="button" data-sell="${product.id}" ${quantity <= 0 ? "disabled" : ""}>Vender</button>
+          <button type="button" class="secondary" data-edit="${product.id}">Editar</button>
+          <button type="button" class="danger" data-delete="${product.id}">Eliminar</button>
+        </div>
+      </article>`;
+  }).join("");
+
+  container.querySelectorAll("[data-sell]").forEach(btn => btn.onclick = () => sellProduct(btn.dataset.sell));
+  container.querySelectorAll("[data-edit]").forEach(btn => btn.onclick = () => editProduct(btn.dataset.edit));
+  container.querySelectorAll("[data-delete]").forEach(btn => btn.onclick = () => deleteProduct(btn.dataset.delete));
+}
+
+function editProduct(id) {
+  const product = products.find(item => item.id === id);
+  if (!product) return;
+
+  editingProductId = id;
+  fillCategoryOptions();
+
+  $("pName").value = product.name || "";
+  $("pCategory").value = product.category || "General";
+  $("pModel").value = product.model || "";
+  $("pColorCode").value = product.colorCode || "#568cff";
+  $("pCost").value = Number(product.cost) || 0;
+  $("pPrice").value = Number(product.price) || 0;
+  $("pQty").value = Number(product.quantity) || 0;
+  $("pMinStock").value = Number(product.minStock) || 3;
+  $("pCode").value = product.code || "";
+  $("pImage").value = product.image || "";
+
+  $("imagePreview").innerHTML = product.image ? `<img src="${product.image}" style="max-width:160px;max-height:160px;object-fit:cover;margin-top:10px;border-radius:10px">` : "";
+  setText("formTitle", "Editar producto");
+  
+  hide("stock");
+  show("productFormPanel");
+  window.scrollTo({ top: 0, behavior: "smooth" });
+}
+
+async function deleteProduct(id) {
+  const product = products.find(item => item.id === id);
+  if (!product || !confirm(`¿Eliminar "${product.name}" del stock?`)) return;
+
+  try {
+    if (appMode === "local") {
+      products = products.filter(p => p.id !== id);
+      await saveLocalProducts(currentBusinessId, products);
+      fillCategoryOptions();
+      renderProducts();
+      renderDashboard();
+    } else {
+      await db.collection("businesses").doc(currentBusinessId).collection("products").doc(id).delete();
+    }
+  } catch (error) {
+    console.error(error);
+    alert("No se pudo eliminar el producto.");
+  }
+}
+
+async function sellProduct(id) {
+  const product = products.find(item => item.id === id);
+  if (!product) return;
+
+  const available = Number(product.quantity) || 0;
+  if (available <= 0) return alert("Este producto no tiene stock.");
+
+  const modelInfo = product.model ? ` (${product.model})` : '';
+  const answer = prompt(`Vender: ${product.name}${modelInfo}\nDisponibles: ${available}\n\n¿Cuántas unidades vendiste?`, "1");
+  if (!answer) return;
+
+  const quantity = Number(answer);
+  if (!Number.isInteger(quantity) || quantity < 1 || quantity > available) {
+    return alert("Cantidad no válida.");
+  }
+
+  const paymentMethodPrompt = prompt("Método de pago:\n1. Efectivo\n2. Transferencia / Mercado Pago\n3. Tarjeta\n4. Cuenta Corriente (Fiado)", "1");
+  let paymentMethod = "Efectivo";
+  let selectedClientId = null;
+
+  if (paymentMethodPrompt === "2") paymentMethod = "Transferencia / MP";
+  else if (paymentMethodPrompt === "3") paymentMethod = "Tarjeta";
+  else if (paymentMethodPrompt === "4") {
+    paymentMethod = "Cuenta Corriente";
+    if (!clients.length) {
+      alert("No hay clientes registrados. Registrá un cliente primero en la sección Clientes.");
+      return;
+    }
+    const clientOptions = clients.map((c, idx) => `${idx + 1}. ${c.name}`).join("\n");
+    const clientChoice = prompt(`Seleccioná el número del cliente:\n${clientOptions}`, "1");
+    const clientIndex = Number(clientChoice) - 1;
+    if (!clients[clientIndex]) return alert("Cliente no válido.");
+    selectedClientId = clients[clientIndex].id;
+  }
+
+  const saleTotal = (product.price || 0) * quantity;
+
+  try {
+    if (appMode === "local") {
+      product.quantity -= quantity;
+      await saveLocalProducts(currentBusinessId, products);
+
+      if (selectedClientId) {
+        const client = clients.find(c => c.id === selectedClientId);
+        if (client) {
+          client.debt = (Number(client.debt) || 0) + saleTotal;
+          await saveLocalClients(currentBusinessId, clients);
+        }
+      }
+
+      sales = await getLocalSales(currentBusinessId);
+      const newSale = {
+        id: "sale_" + Date.now(),
+        productId: id,
+        productName: product.name + (product.model ? ` (${product.model})` : ''),
+        productImage: product.image || "",
+        quantity,
+        unitPrice: product.price || 0,
+        unitCost: product.cost || 0,
+        total: saleTotal,
+        profit: ((product.price || 0) - (product.cost || 0)) * quantity,
+        paymentMethod,
+        clientId: selectedClientId || null,
+        createdAt: Date.now()
+      };
+      sales.unshift(newSale);
+      await saveLocalSales(currentBusinessId, sales);
+
+      renderSales();
+      renderProducts();
+      renderDashboard();
+      alert("¡Venta registrada localmente!");
+      return;
+    }
+
+    const productRef = db.collection("businesses").doc(currentBusinessId).collection("products").doc(id);
+    const saleRef = db.collection("businesses").doc(currentBusinessId).collection("sales").doc();
+    const clientRef = selectedClientId ? db.collection("businesses").doc(currentBusinessId).collection("clients").doc(selectedClientId) : null;
+
+    await db.runTransaction(async transaction => {
+      const productSnap = await transaction.get(productRef);
+      const clientSnap = clientRef ? await transaction.get(clientRef) : null;
+
+      if (!productSnap.exists) throw new Error("Producto no encontrado.");
+
+      const freshData = productSnap.data();
+      const freshQty = Number(freshData.quantity) || 0;
+      if (freshQty < quantity) throw new Error("Stock insuficiente.");
+
+      transaction.update(productRef, {
+        quantity: freshQty - quantity,
+        updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+      });
+
+      if (clientRef && clientSnap && clientSnap.exists) {
+        const currentDebt = Number(clientSnap.data().debt) || 0;
+        transaction.update(clientRef, { debt: currentDebt + saleTotal });
+      }
+
+      const fullName = freshData.name + (freshData.model ? ` (${freshData.model})` : '');
+
+      transaction.set(saleRef, {
+        productId: id,
+        productName: fullName,
+        productImage: freshData.image || "",
+        quantity,
+        unitPrice: freshData.price || 0,
+        unitCost: freshData.cost || 0,
+        total: saleTotal,
+        profit: ((freshData.price || 0) - (freshData.cost || 0)) * quantity,
+        paymentMethod,
+        clientId: selectedClientId || null,
+        createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+        soldBy: currentUser.uid
+      });
+    });
+
+    alert("¡Venta registrada!");
+  } catch (error) {
+    console.error(error);
+    alert(error.message || "Error al registrar la venta.");
+  }
+}
+
+async function cancelSale(saleId) {
+  const sale = sales.find(s => s.id === saleId);
+  if (!sale) return;
+
+  if (!confirm(`¿Anular la venta de ${sale.quantity} unidad(es) de "${sale.productName}"?\nEl producto regresará al stock y se ajustará la cuenta corriente si aplica.`)) return;
+
+  try {
+    if (appMode === "local") {
+      products = await getLocalProducts(currentBusinessId);
+      const product = products.find(p => p.id === sale.productId);
+      if (product) {
+        product.quantity = (Number(product.quantity) || 0) + (Number(sale.quantity) || 0);
+        await saveLocalProducts(currentBusinessId, products);
+      }
+
+      if (sale.paymentMethod === "Cuenta Corriente" && sale.clientId) {
+        clients = await getLocalClients(currentBusinessId);
+        const client = clients.find(c => c.id === sale.clientId);
+        if (client) {
+          client.debt = Math.max(0, (Number(client.debt) || 0) - (Number(sale.total) || 0));
+          await saveLocalClients(currentBusinessId, clients);
+        }
+      }
+
+      sales = sales.filter(s => s.id !== saleId);
+      await saveLocalSales(currentBusinessId, sales);
+
+      renderSales();
+      renderProducts();
+      renderDashboard();
+      renderClients();
+      alert("Venta anulada y stock devuelto.");
+      return;
+    }
+
+    const saleRef = db.collection("businesses").doc(currentBusinessId).collection("sales").doc(saleId);
+    const productRef = sale.productId ? db.collection("businesses").doc(currentBusinessId).collection("products").doc(sale.productId) : null;
+    const clientRef = sale.clientId ? db.collection("businesses").doc(currentBusinessId).collection("clients").doc(sale.clientId) : null;
+
+    await db.runTransaction(async transaction => {
+      const productSnap = productRef ? await transaction.get(productRef) : null;
+      const clientSnap = clientRef && sale.paymentMethod === "Cuenta Corriente" ? await transaction.get(clientRef) : null;
+
+      if (productRef && productSnap && productSnap.exists) {
+        const currentQty = Number(productSnap.data().quantity) || 0;
+        transaction.update(productRef, {
+          quantity: currentQty + (Number(sale.quantity) || 0),
+          updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+        });
+      }
+      if (clientRef && clientSnap && clientSnap.exists && sale.paymentMethod === "Cuenta Corriente") {
+        const currentDebt = Number(clientSnap.data().debt) || 0;
+        transaction.update(clientRef, { debt: Math.max(0, currentDebt - (Number(sale.total) || 0)) });
+      }
+      transaction.delete(saleRef);
+    });
+
+    alert("Venta anulada correctamente.");
+  } catch (error) {
+    console.error(error);
+    alert("No se pudo anular la venta.");
+  }
+}
+
+function renderSales() {
+  const container = $("allSales");
+  if (!container) return;
+
+  if (!sales.length) {
+    container.innerHTML = '<div class="empty">Todavía no hay ventas registradas.</div>';
+    return;
+  }
+
+  container.innerHTML = sales.map(sale => {
+    const date = getSaleTime(sale);
+    const dateText = date ? new Date(date).toLocaleString("es-AR") : "Fecha pendiente";
+    const imgHTML = sale.productImage ? `<img src="${sale.productImage}" alt="Foto">` : "📦";
+    const methodText = sale.paymentMethod ? ` · Pago: ${sale.paymentMethod}` : '';
+
+    return `
+      <div class="sale">
+        <div class="sale-item-thumb">${imgHTML}</div>
+        <div style="flex:1;min-width:150px">
+          <b>${clean(sale.productName || "Producto")}</b>
+          <p>${dateText} · Cantidad: ${Number(sale.quantity) || 0}${methodText}</p>
+        </div>
+        <div class="sale-actions">
+          <div style="text-align:right">
+            <b>${money(sale.total)}</b>
+            <p class="green">Ganancia: ${money(sale.profit)}</p>
+          </div>
+          <button type="button" class="danger" data-cancel-sale="${sale.id}" style="padding:6px 10px;font-size:12px">Anular</button>
+        </div>
+      </div>`;
+  }).join("");
+
+  container.querySelectorAll("[data-cancel-sale]").forEach(btn => {
+    btn.onclick = () => cancelSale(btn.dataset.cancelSale);
+  });
+}
+
+$("periodFilter")?.addEventListener("change", renderDashboard);
+
+function getPeriodStart(period) {
+  const now = new Date();
+  const start = new Date(now);
+
+  if (period === "today") {
+    start.setHours(0, 0, 0, 0);
+    return start.getTime();
+  }
+  if (period === "week") {
+    const day = (start.getDay() + 6) % 7;
+    start.setDate(start.getDate() - day);
+    start.setHours(0, 0, 0, 0);
+    return start.getTime();
+  }
+  if (period === "month") {
+    start.setDate(1);
+    start.setHours(0, 0, 0, 0);
+    return start.getTime();
+  }
+  return 0;
+}
+
+function renderDashboard() {
+  if (!currentBusinessId) return;
+
+  const period = $("periodFilter")?.value || "month";
+  const startTime = getPeriodStart(period);
+
+  const periodSales = sales.filter(sale => getSaleTime(sale) >= startTime);
+  const totalSales = periodSales.reduce((s, x) => s + (Number(x.total) || 0), 0);
+  const totalProfit = periodSales.reduce((s, x) => s + (Number(x.profit) || 0), 0);
+  const stockUnits = products.reduce((s, x) => s + (Number(x.quantity) || 0), 0);
+  const stockValue = products.reduce((s, x) => s + (Number(x.cost) || 0) * (Number(x.quantity) || 0), 0);
+
+  let cashTotal = 0, transferTotal = 0, cardTotal = 0, fiadoTotal = 0;
+  periodSales.forEach(s => {
+    const amt = Number(s.total) || 0;
+    const method = s.paymentMethod || "Efectivo";
+    if (method === "Efectivo") cashTotal += amt;
+    else if (method.includes("Transferencia")) transferTotal += amt;
+    else if (method === "Tarjeta") cardTotal += amt;
+    else if (method === "Cuenta Corriente") fiadoTotal += amt;
+  });
+
+  setText("statSales", money(totalSales));
+  setText("statProfit", money(totalProfit));
+  setText("statStock", stockUnits);
+  setText("statValue", money(stockValue));
+
+  setText("statCash", money(cashTotal));
+  setText("statTransfer", money(transferTotal));
+  setText("statCard", money(cardTotal));
+  setText("statFiado", money(fiadoTotal));
+
+  const soldByProduct = {};
+  periodSales.forEach(sale => {
+    const id = sale.productId || sale.productName || "unknown";
+    if (!soldByProduct[id]) {
+      soldByProduct[id] = { id: sale.productId, name: sale.productName || "Producto", image: sale.productImage || "", quantity: 0, total: 0 };
+    }
+    soldByProduct[id].quantity += Number(sale.quantity) || 0;
+    soldByProduct[id].total += Number(sale.total) || 0;
+  });
+
+  const topProductData = Object.values(soldByProduct).sort((a, b) => b.quantity - a.quantity)[0];
+  
+  if (topProductData) {
+    const matchedProduct = products.find(p => p.id === topProductData.id || p.name === topProductData.name);
+    const finalImg = topProductData.image || matchedProduct?.image;
+    const imgHTML = finalImg ? `<img src="${finalImg}" alt="Foto">` : "📦";
+
+    $("topProduct").innerHTML = `
+      <div class="star-product-card">
+        <div class="star-product-img">${imgHTML}</div>
+        <div style="flex:1">
+          <h3 style="margin:0 0 4px; font-size: 18px;">${clean(topProductData.name)}</h3>
+          <p class="sub" style="margin:0; font-size:13px">🔥 <b>${topProductData.quantity}</b> unidades vendidas</p>
+          <p class="green" style="margin:2px 0 0; font-weight:bold; font-size:14px">Facturado: ${money(topProductData.total)}</p>
+        </div>
+      </div>
+    `;
+  } else {
+    $("topProduct").innerHTML = '<div class="empty">Todavía no hay ventas en este período.</div>';
+  }
+
+  $("recentSales").innerHTML = periodSales.length
+    ? periodSales.slice(0, 5).map(sale => {
+        const time = getSaleTime(sale);
+        const dateText = time ? new Date(time).toLocaleDateString("es-AR") : "—";
+        const imgHTML = sale.productImage ? `<img src="${sale.productImage}" alt="Foto">` : "📦";
+        const methodText = sale.paymentMethod ? ` · ${sale.paymentMethod}` : '';
+        return `
+          <div class="sale">
+            <div class="sale-item-thumb">${imgHTML}</div>
+            <div style="flex:1">
+              <b>${clean(sale.productName || "Producto")}</b>
+              <p>${dateText} · ${Number(sale.quantity) || 0} unidad(es)${methodText}</p>
+            </div>
+            <div class="sale-actions">
+              <b>${money(sale.total)}</b>
+              <button type="button" class="danger" data-cancel-sale="${sale.id}" style="padding:4px 8px;font-size:11px">Anular</button>
+            </div>
+          </div>`;
+      }).join("")
+    : '<div class="empty">Todavía no hay ventas en este período.</div>';
+
+  $("recentSales").querySelectorAll("[data-cancel-sale]").forEach(btn => {
+    btn.onclick = () => cancelSale(btn.dataset.cancelSale);
+  });
+
+  const lowStock = products.filter(p => (Number(p.quantity) || 0) <= (Number(p.minStock) || 3));
+  $("lowStock").innerHTML = lowStock.length
+    ? lowStock.map(p => `
+        <div class="sale">
+          <div class="sale-item-thumb">${p.image ? `<img src="${p.image}" alt="Foto">` : "📦"}</div>
+          <div style="flex:1">
+            <b>${clean(p.name || "Producto")}</b>
+            <p>Stock bajo (Mínimo: ${p.minStock || 3})</p>
+          </div>
+          <span class="stock-status ${Number(p.quantity) <= 0 ? "out" : "low"}">${Number(p.quantity) || 0} unidades</span>
+        </div>`).join("")
+    : '<div class="empty">No hay productos con stock bajo.</div>';
+}
+
+/* =========================
+   EXPORTAR A EXCEL (CSV)
+========================= */
+$("exportStockExcel").onclick = () => {
+  if (!products.length) return alert("No hay productos para exportar.");
+  let csv = "Nombre,Categoria,Modelo,Costo,Precio,Cantidad,StockMinimo,Codigo\n";
+  products.forEach(p => {
+    csv += `"${p.name || ""}","${p.category || ""}","${p.model || ""}","${p.cost || 0}","${p.price || 0}","${p.quantity || 0}","${p.minStock || 3}","${p.code || ""}"\n`;
+  });
+  downloadCSV(csv, "stock_stockea.csv");
+};
+
+$("exportSalesExcel").onclick = () => {
+  if (!sales.length) return alert("No hay ventas para exportar.");
+  let csv = "Fecha,Producto,Cantidad,PrecioUnitario,CostoUnitario,Total,Ganancia,MetodoPago\n";
+  sales.forEach(s => {
+    const d = s.createdAt ? new Date(getSaleTime(s)).toLocaleString("es-AR") : "";
+    csv += `"${d}","${s.productName || ""}","${s.quantity || 0}","${s.unitPrice || 0}","${s.unitCost || 0}","${s.total || 0}","${s.profit || 0}","${s.paymentMethod || "Efectivo"}"\n`;
+  });
+  downloadCSV(csv, "ventas_stockea.csv");
+};
+
+function downloadCSV(csv, filename) {
+  const blob = new Blob(["\ufeff" + csv], { type: 'text/csv;charset=utf-8;' });
+  const link = document.createElement("a");
+  link.href = URL.createObjectURL(blob);
+  link.download = filename;
+  link.style.display = 'none';
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
+}
+
+$("settingsForm").addEventListener("submit", async event => {
+  event.preventDefault();
+  if (!currentBusinessId || !currentBusiness) return;
+
+  const name = $("editBiz").value.trim();
+  const owners = $("editOwners").value.trim();
+  const phone = $("editPhone").value.trim();
+  const type = $("editType").value;
+  const categories = $("editCategories").value.split(",").map(v => v.trim()).filter(Boolean);
+  const logo = $("editLogoBase64").value || "";
+
+  try {
+    if (appMode === "local") {
+      const list = await getLocalBusinesses();
+      const index = list.findIndex(b => b.id === currentBusinessId);
+      if (index !== -1) {
+        list[index] = { ...list[index], name, owners, phone, type, categories, logo };
+        await saveLocalBusinesses(list);
+        currentBusiness = list[index];
+      }
+    } else {
+      await db.collection("businesses").doc(currentBusinessId).update({
+        name, owners, phone, type, categories, logo,
+        updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+      });
+      currentBusiness = { ...currentBusiness, name, owners, phone, type, categories, logo };
+      if (currentBusiness?.catalogId) {
+        try {
+          await db.collection("catalogos").doc(currentBusiness.catalogId).update({ name, phone });
+        } catch(e) { console.warn(e); }
+      }
+    }
+
+    setText("welcome", name);
+    setText("storeSubInfo", type);
+    fillCategoryOptions();
+    await refreshBusinessList();
+    alert("Datos del negocio actualizados.");
+  } catch (error) {
+    console.error(error);
+    alert("No se pudieron guardar los cambios.");
+  }
+});
+
+$("copyStoreCode").onclick = async () => {
+  const code = currentBusiness?.accessCode;
+  if (!code) return;
+  try {
+    await navigator.clipboard.writeText(code);
+    alert("Código copiado: " + code);
+  } catch (error) {
+    prompt("Copiá este código para compartirlo:", code);
+  }
+};
+
+/* =====================================================================
+   PARCHE STOCKEÁ — FUNCIONES SEGURAS Y FORMULARIOS INTEGRADOS
+===================================================================== */
+function secureCode(len = 8) {
+  const chars = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
+  const arr = crypto.getRandomValues(new Uint32Array(len));
+  return Array.from(arr, n => chars[n % chars.length]).join("");
+}
+
+function updateUIProfile() {
+  const headerAvatar = $("headerAvatar");
+  const profileAvatar = $("profileAvatar");
+  if (!headerAvatar) return;
+  show("headerAvatar");
+
+  const small = `<svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>`;
+  const large = small.replace('width="22" height="22"', 'width="55" height="55"');
+
+  if (userProfile.photoURL) {
+    headerAvatar.innerHTML = `<img src="${userProfile.photoURL}" alt="Avatar">`;
+    if (profileAvatar) profileAvatar.innerHTML = `<img src="${userProfile.photoURL}" alt="Avatar">`;
+  } else {
+    headerAvatar.innerHTML = small;
+    if (profileAvatar) profileAvatar.innerHTML = large;
+  }
+}
+
+async function refreshBusinessList() {
+  if (appMode === "local") {
+    businessList = await getLocalBusinesses();
+    return;
+  }
+  if (!currentUser) return;
+
+  const userSnap = await db.collection("users").doc(currentUser.uid).get();
+  const ids = userSnap.exists ? (userSnap.data().businessIds || []) : [];
+  businessList = [];
+
+  for (const id of ids) {
+    try {
+      const snap = await db.collection("businesses").doc(id).get();
+      if (!snap.exists) continue;
+      const data = snap.data();
+      if ((data.memberUids || []).includes(currentUser.uid)) {
+        businessList.push({ id: snap.id, ...data });
+      }
+    } catch (e) {
+      console.warn("Sin acceso al negocio", id);
+    }
+  }
+}
+
+/* Formulario Crear Negocio */
+(function () {
+  const old = $("createBizForm");
+  if (!old) return;
+  const form = old.cloneNode(true);
+  old.replaceWith(form);
+
+  form.addEventListener("submit", async event => {
+    event.preventDefault();
+    clearError("setupError");
+
+    const name = $("bizName").value.trim();
+    const owners = $("owners").value.trim();
+    const phone = $("phone").value.trim();
+    const type = $("businessType").value;
+    const categories = $("categories").value.split(",").map(v => v.trim()).filter(Boolean);
+
+    if (!name || !owners || !phone || !categories.length) {
+      showError("setupError", "Completá los campos obligatorios.");
+      return;
+    }
+
+    const button = form.querySelector('button[type="submit"]');
+    button.disabled = true;
+
+    try {
+      if (appMode === "local") {
+        const list = await getLocalBusinesses();
+        list.push({
+          id: "local_" + Date.now(),
+          name, owners, phone, type, categories,
+          accessCode: "LOCAL",
+          createdAt: Date.now()
+        });
+        await saveLocalBusinesses(list);
+        await refreshBusinessList();
+        showHome();
+        alert("¡Negocio local creado!");
+        form.reset();
+        return;
+      }
+
+      if (!currentUser) {
+        showError("setupError", "Iniciá sesión primero.");
+        return;
+      }
+
+      const code = secureCode(8);
+      const catalogId = secureCode(12);
+      const userRef = db.collection("users").doc(currentUser.uid);
+      const businessRef = db.collection("businesses").doc();
+      const ts = firebase.firestore.FieldValue.serverTimestamp();
+
+      const batch = db.batch();
+      batch.set(businessRef, {
+        name, owners, phone, type, categories,
+        accessCode: code,
+        catalogId,
+        ownerUid: currentUser.uid,
+        memberUids: [currentUser.uid],
+        createdAt: ts
+      });
+      batch.set(userRef, {
+        email: currentUser.email || "",
+        businessIds: firebase.firestore.FieldValue.arrayUnion(businessRef.id)
+      }, { merge: true });
+      batch.set(db.collection("invitaciones").doc(code), {
+        businessId: businessRef.id,
+        createdAt: ts
+      });
+      batch.set(db.collection("catalogos").doc(catalogId), {
+        businessId: businessRef.id,
+        ownerUid: currentUser.uid,
+        name, phone
+      });
+
+      await batch.commit();
+      await refreshBusinessList();
+      showHome();
+      alert("¡Negocio creado en la nube!");
+      form.reset();
+    } catch (error) {
+      console.error(error);
+      showError("setupError", "No se pudo crear el negocio.");
+    } finally {
+      button.disabled = false;
+    }
+  });
+})();
+
+/* Formulario Unirse a Negocio */
+(function () {
+  const old = $("joinBizForm");
+  if (!old) return;
+  const form = old.cloneNode(true);
+  old.replaceWith(form);
+
+  form.addEventListener("submit", async event => {
+    event.preventDefault();
+    clearError("setupError");
+
+    if (!currentUser) {
+      showError("setupError", "Iniciá sesión primero.");
+      return;
+    }
+
+    const code = $("joinCode").value.trim().toUpperCase();
+    if (!code) {
+      showError("setupError", "Ingresá el código de acceso.");
+      return;
+    }
+
+    const button = form.querySelector('button[type="submit"]');
+    button.disabled = true;
+
+    try {
+      const invSnap = await db.collection("invitaciones").doc(code).get();
+      if (!invSnap.exists) throw new Error("El código no existe o ya no es válido.");
+      const businessId = invSnap.data().businessId;
+
+      const batch = db.batch();
+      batch.update(db.collection("businesses").doc(businessId), {
+        memberUids: firebase.firestore.FieldValue.arrayUnion(currentUser.uid),
+        joinCode: code
+      });
+      batch.set(db.collection("users").doc(currentUser.uid), {
+        email: currentUser.email || "",
+        businessIds: firebase.firestore.FieldValue.arrayUnion(businessId)
+      }, { merge: true });
+      await batch.commit();
+
+      await refreshBusinessList();
+      showHome();
+      form.reset();
+      alert("¡Te uniste al negocio!");
+    } catch (error) {
+      console.error(error);
+      const denied = error.code === "permission-denied";
+      showError("setupError", denied ? "El código no es válido o ya sos miembro." : (error.message || "No se pudo unir al negocio."));
+    } finally {
+      button.disabled = false;
+    }
+  });
+})();
+
+async function kickMember(targetUid) {
+  if (!confirm("¿Seguro que querés expulsar a este socio del negocio? Ya no tendrá acceso en tiempo real.")) return;
+  try {
+    await db.collection("businesses").doc(currentBusinessId).update({
+      memberUids: firebase.firestore.FieldValue.arrayRemove(targetUid)
+    });
+    currentBusiness.memberUids = (currentBusiness.memberUids || []).filter(id => id !== targetUid);
+    renderMembersList();
+    alert("El socio fue expulsado del negocio.");
+  } catch (error) {
+    console.error(error);
+    alert("Error al expulsar al miembro.");
+  }
+}
+
+async function loadPublicCatalog(codeOrId) {
+  try {
+    show("publicCatalogScreen");
+    setText("publicCatalogTitle", "Cargando catálogo...");
+
+    let bData = null;
+    let bId = null;
+
+    const localList = JSON.parse(localStorage.getItem("stockea_local_businesses") || "[]");
+    const foundLocal = localList.find(b => b.id === codeOrId);
+
+    if (foundLocal) {
+      bData = foundLocal;
+      bId = foundLocal.id;
+      products = JSON.parse(localStorage.getItem(`stockea_local_products_${bId}`) || "[]");
+    } else {
+      try {
+        const cat = await db.collection("catalogos").doc(String(codeOrId).toUpperCase()).get();
+        if (cat.exists) {
+          bId = cat.data().businessId;
+          bData = { name: cat.data().name, phone: cat.data().phone };
+          const prodSnap = await db.collection("businesses").doc(bId).collection("products").get();
+          products = prodSnap.docs.map(d => ({ id: d.id, ...d.data() }));
+        }
+      } catch (fbError) {
+        console.warn("Error leyendo el catálogo:", fbError);
+      }
+    }
+
+    if (!bData) {
+      setText("publicCatalogTitle", "Catálogo no encontrado");
+      $("publicProductList").innerHTML = '<div class="panel empty">El catálogo que buscás no existe o el enlace es incorrecto.</div>';
+      return;
+    }
+
+    currentBusiness = { id: bId, ...bData };
+    setText("publicCatalogTitle", currentBusiness.name || "Catálogo");
+    setText("publicCatalogSub", `Contacto / WhatsApp: ${currentBusiness.phone || "No especificado"}`);
+    fillPublicCategories();
+    renderPublicProducts();
+  } catch (error) {
+    console.error(error);
+    alert("Error al cargar el catálogo público.");
+  }
+}
+
+async function ensureCatalogId() {
+  if (currentBusiness.catalogId) return currentBusiness.catalogId;
+
+  const id = secureCode(12);
+  const batch = db.batch();
+  batch.update(db.collection("businesses").doc(currentBusinessId), { catalogId: id });
+  batch.set(db.collection("catalogos").doc(id), {
+    businessId: currentBusinessId,
+    ownerUid: currentBusiness.ownerUid,
+    name: currentBusiness.name || "",
+    phone: currentBusiness.phone || ""
+  });
+  await batch.commit();
+  currentBusiness.catalogId = id;
+  return id;
+}
+
+$("copyCatalogLinkBtn").onclick = async () => {
+  let key;
+  try {
+    if (appMode === "local") {
+      alert("En modo local el catálogo solo se ve en este dispositivo.");
+      key = currentBusinessId;
+    } else {
+      key = await ensureCatalogId();
+    }
+  } catch (error) {
+    console.error(error);
+    alert("Solo el creador del negocio puede generar el enlace del catálogo.");
+    return;
+  }
+
+  const link = `${window.location.origin}${window.location.pathname}?catalogo=${key}`;
+  try {
+    await navigator.clipboard.writeText(link);
+    alert("¡Enlace de catálogo copiado!\n" + link);
+  } catch (e) {
+    prompt("Copiá este enlace para enviar a tus clientes:", link);
+  }
+};
+</script>
+</body>
+</html>
