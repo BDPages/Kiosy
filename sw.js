@@ -1,9 +1,13 @@
-const CACHE_NAME = 'stockea-cache-v1';
+const CACHE_NAME = 'kiosy-v2';
 const ASSETS_TO_CACHE = [
+  './',
   './index.html',
-  './manifest.json'
+  './manifest.json',
+  './Kiosy-logo1.png',
+  './Kiosy-logo2.png'
 ];
 
+// Instalación: cachear activos estáticos iniciales
 self.addEventListener('install', event => {
   event.waitUntil(
     caches.open(CACHE_NAME).then(cache => {
@@ -13,28 +17,42 @@ self.addEventListener('install', event => {
   self.skipWaiting();
 });
 
+// Activación: borrar cachés antiguos
 self.addEventListener('activate', event => {
   event.waitUntil(
     caches.keys().then(keys => {
       return Promise.all(
-        keys.filter(key => key !== CACHE_NAME).map(key => caches.delete(key))
+        keys.map(key => {
+          if (key !== CACHE_NAME) {
+            return caches.delete(key);
+          }
+        })
       );
     })
   );
-  self.claim();
+  self.clients.claim();
 });
 
+// Interceptar peticiones: Estrategia Network First para HTML y Network/Cache para lo demás
 self.addEventListener('fetch', event => {
-  if (event.request.url.includes('firestore.googleapis.com') || event.request.url.includes('firebase')) {
-    return;
+  const req = event.request;
+  if (req.mode === 'navigate' || req.destination === 'document') {
+    event.respondWith(
+      fetch(req)
+        .then(response => {
+          const copy = response.clone();
+          caches.open(CACHE_NAME).then(cache => cache.put(req, copy));
+          return response;
+        })
+        .catch(() => caches.match(req))
+    );
+  } else {
+    event.respondWith(
+      caches.match(req).then(cachedRes => {
+        return cachedRes || fetch(req).then(response => {
+          return response;
+        });
+      }).catch(() => {})
+    );
   }
-  event.respondWith(
-    caches.match(event.request).then(response => {
-      return response || fetch(event.request).catch(() => {
-        if (event.request.mode === 'navigate') {
-          return caches.match('./index.html');
-        }
-      });
-    })
-  );
 });
