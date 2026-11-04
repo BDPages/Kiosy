@@ -2,7 +2,7 @@
 <html lang="es">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Kiosy Stock Manager</title>
 
 <!-- PWA MANIFEST -->
@@ -537,50 +537,92 @@ h2 { font-size: 18px; font-weight: 600; margin-top: 0; }
 }
 .sale-item-thumb img { width: 100%; height: 100%; object-fit: contain; }
 
-/* NAVEGACIÓN INFERIOR MÓVIL (<650px) */
-.mobile-nav { display: none; }
+/* NUEVOS ESTILOS RESPONSIVE (PUNTO 4) */
+.charts-grid { display:grid; grid-template-columns:2fr 1fr; gap:20px; margin-bottom:20px; }
+button { touch-action: manipulation; }
+body { -webkit-text-size-adjust: 100%; overflow-x: hidden; }
 
 @media(max-width: 950px) {
   .product-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
   .stats { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .charts-grid { grid-template-columns: 1fr; }
 }
+
 @media(max-width: 650px) {
-  body { padding-bottom: 70px; }
-  header { padding: 12px 16px; }
-  .layout { display: block; }
-  nav { display: none; }
+  .layout { display:block; min-height:auto; padding-bottom: calc(80px + env(safe-area-inset-bottom)); }
+  nav { display:none; }
+
+  header { padding: 10px 14px; padding-top: calc(10px + env(safe-area-inset-top)); min-height:60px; }
+  .header-subtitle { display:none; }
+  #headerLogout { font-size:0 !important; gap:0; padding:8px 10px !important; }
+
   .mobile-nav {
-    display: flex;
-    position: fixed;
-    bottom: 0; left: 0; width: 100%;
-    height: 65px;
-    background: var(--panel);
-    border-top: 1px solid var(--line);
-    z-index: 100;
-    justify-content: space-around;
-    align-items: center;
-    padding: 0 10px;
+    display:flex; position:fixed; bottom:0; left:0; width:100%;
+    height: calc(64px + env(safe-area-inset-bottom));
+    padding: 0 6px env(safe-area-inset-bottom);
+    background:var(--panel); border-top:1px solid var(--line);
+    z-index:100; justify-content:space-around; align-items:stretch;
+    box-shadow:0 -4px 12px rgba(0,0,0,.06);
   }
   .mobile-nav button {
-    background: transparent;
-    border: 0;
-    color: var(--muted);
-    flex-direction: column;
-    gap: 4px;
-    font-size: 11px;
-    padding: 6px;
-    box-shadow: none;
-    font-weight: 500;
+    flex:1; background:transparent; color:var(--muted);
+    flex-direction:column; gap:3px; font-size:11px; font-weight:500;
+    padding:6px 2px; border-radius:0; box-shadow:none;
   }
-  .mobile-nav button svg { width: 22px; height: 22px; }
-  .mobile-nav button.active { color: var(--blue); font-weight: 700; }
-  main { padding: 16px; }
-  .stats, .toolbar, .formgrid { grid-template-columns: 1fr; }
-  .formgrid .full { grid-column: auto; }
-  .product-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
-  .business-grid { grid-template-columns: 1fr; }
-  .sale-actions { width: 100%; justify-content: space-between; margin-top: 8px; }
-  .cart-floating-btn { bottom: 75px; right: 15px; }
+  .mobile-nav button svg { width:22px; height:22px; }
+  .mobile-nav button.active { color:var(--blue); font-weight:700; background:transparent; }
+
+  main { padding:16px 14px; }
+  h1 { font-size:22px; }
+  .sub { margin-bottom:16px; }
+  .panel, .card { padding:14px; }
+  .card strong { font-size:19px; }
+
+  .stats { grid-template-columns:repeat(2, minmax(0,1fr)); gap:10px; }
+  .toolbar, .formgrid { grid-template-columns:1fr; }
+  .formgrid .full { grid-column:auto; }
+  .charts-grid { grid-template-columns:1fr; gap:14px; }
+
+  /* Botones de cabecera de sección a todo el ancho */
+  .sectionhead { align-items:stretch; }
+  .sectionhead > div[style*="display:flex"] { width:100%; }
+  .sectionhead > div[style*="display:flex"] button,
+  .sectionhead > button { flex:1; }
+  #periodFilter { max-width:none !important; width:100%; }
+
+  /* Productos */
+  .product-grid { grid-template-columns:repeat(2, minmax(0,1fr)); gap:10px; }
+  .product-image { height:120px; }
+  .product-card-body { padding:10px; }
+  .product-name { font-size:14px; }
+  .product-price { font-size:18px; }
+  .product-actions { padding:0 8px 8px; gap:6px; }
+  .product-actions button { padding:10px 4px; font-size:12px; min-height:40px; }
+  .product-card:hover, .business-card:hover { transform:none; }
+
+  .business-grid { grid-template-columns:1fr; }
+  .sale-actions { width:100%; justify-content:space-between; margin-top:6px; }
+
+  /* Pantallas de acceso */
+  .auth-box { margin:20px 14px; padding:20px; max-width:none; }
+  #setup { margin:14px; padding:18px; }
+
+  /* Modales como hoja inferior */
+  .modal-overlay { align-items:flex-end; padding:0; }
+  .modal-content {
+    max-width:none; border-radius:18px 18px 0 0; max-height:92vh;
+    padding:20px 18px calc(20px + env(safe-area-inset-bottom));
+    animation: sheetUp .25s ease;
+  }
+  #confirmModal { align-items:center; padding:15px; }
+  #confirmModal .modal-content { border-radius:var(--radius); }
+  @keyframes sheetUp { from { transform:translateY(40px); opacity:0; } to { transform:none; opacity:1; } }
+
+  /* Toasts arriba de la barra inferior */
+  #toastContainer { left:14px; right:14px; bottom:calc(80px + env(safe-area-inset-bottom)); max-width:none; }
+
+  /* Carrito flotante del catálogo público (no hay barra inferior ahí) */
+  .cart-floating-btn { bottom:calc(16px + env(safe-area-inset-bottom)); right:14px; left:14px; justify-content:center; }
 }
 </style>
 </head>
@@ -592,6 +634,7 @@ h2 { font-size: 18px; font-weight: 600; margin-top: 0; }
     <span class="header-subtitle">Stock Manager</span>
   </div>
   <div class="user-header-info">
+    <button id="headerHome" class="secondary hidden" style="font-size:12px; padding:6px 12px;">⌂ Inicio</button>
     <button id="headerLogout" class="secondary hidden" style="font-size:12px; padding:6px 12px;">
       <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><polyline points="16 17 21 12 16 7"></polyline><line x1="21" y1="12" x2="9" y2="12"></line></svg>
       Salir
@@ -891,7 +934,7 @@ h2 { font-size: 18px; font-weight: 600; margin-top: 0; }
       </div>
 
       <!-- GRÁFICOS CHART.JS -->
-      <div style="display:grid; grid-template-columns: 2fr 1fr; gap:20px; margin-bottom:20px;">
+      <div class="charts-grid" style="margin-bottom:20px;">
         <div class="panel" style="margin-top:0;">
           <h2>📊 Ventas por Día</h2>
           <div style="height:250px; position:relative;"><canvas id="salesBarChart"></canvas></div>
@@ -1443,6 +1486,7 @@ const triggerLogout = async () => {
   showToast("Sesión cerrada correctamente", "info");
 };
 $("headerLogout").onclick = triggerLogout;
+$("headerHome").onclick = () => $("backHomeBtn").click();
 
 function initLocalMode() {
   $("tabJoinBiz").classList.add("hidden");
@@ -1527,6 +1571,7 @@ auth.onAuthStateChanged(async user => {
 ========================= */
 function showHome() {
   hide("authScreen"); hide("setup"); hide("app");
+  hide("headerHome");
   show("homeScreen");
   renderBusinessList();
 }
@@ -1605,6 +1650,7 @@ async function openBusiness(id) {
 
 function setupBusinessUI() {
   hide("authScreen"); hide("setup"); hide("homeScreen"); show("app");
+  show("headerHome");
   setText("welcome", currentBusiness.name);
   setText("storeSubInfo", currentBusiness.type || "Panel general");
   setText("displayStoreCode", currentBusiness.accessCode || "—");
@@ -1668,6 +1714,7 @@ function startBusinessListeners() {
 ========================= */
 document.querySelectorAll("nav [data-page], .mobile-nav [data-page]").forEach(btn => {
   btn.onclick = () => {
+    window.scrollTo(0, 0);
     const page = btn.dataset.page;
     document.querySelectorAll("nav [data-page], .mobile-nav [data-page]").forEach(b => b.classList.toggle("active", b.dataset.page === page));
     ["dashboard", "stock", "productFormPanel", "sales", "clients", "settings", "profile"].forEach(id => {
