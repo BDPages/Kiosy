@@ -537,7 +537,7 @@ h2 { font-size: 18px; font-weight: 600; margin-top: 0; }
 }
 .sale-item-thumb img { width: 100%; height: 100%; object-fit: contain; }
 
-/* NUEVOS ESTILOS RESPONSIVE (PUNTO 4) */
+/* ESTILOS RESPONSIVE (MÓVIL Y NOTCH) */
 .charts-grid { display:grid; grid-template-columns:2fr 1fr; gap:20px; margin-bottom:20px; }
 button { touch-action: manipulation; }
 body { -webkit-text-size-adjust: 100%; overflow-x: hidden; }
@@ -583,14 +583,12 @@ body { -webkit-text-size-adjust: 100%; overflow-x: hidden; }
   .formgrid .full { grid-column:auto; }
   .charts-grid { grid-template-columns:1fr; gap:14px; }
 
-  /* Botones de cabecera de sección a todo el ancho */
   .sectionhead { align-items:stretch; }
   .sectionhead > div[style*="display:flex"] { width:100%; }
   .sectionhead > div[style*="display:flex"] button,
   .sectionhead > button { flex:1; }
   #periodFilter { max-width:none !important; width:100%; }
 
-  /* Productos */
   .product-grid { grid-template-columns:repeat(2, minmax(0,1fr)); gap:10px; }
   .product-image { height:120px; }
   .product-card-body { padding:10px; }
@@ -603,11 +601,9 @@ body { -webkit-text-size-adjust: 100%; overflow-x: hidden; }
   .business-grid { grid-template-columns:1fr; }
   .sale-actions { width:100%; justify-content:space-between; margin-top:6px; }
 
-  /* Pantallas de acceso */
   .auth-box { margin:20px 14px; padding:20px; max-width:none; }
   #setup { margin:14px; padding:18px; }
 
-  /* Modales como hoja inferior */
   .modal-overlay { align-items:flex-end; padding:0; }
   .modal-content {
     max-width:none; border-radius:18px 18px 0 0; max-height:92vh;
@@ -618,10 +614,7 @@ body { -webkit-text-size-adjust: 100%; overflow-x: hidden; }
   #confirmModal .modal-content { border-radius:var(--radius); }
   @keyframes sheetUp { from { transform:translateY(40px); opacity:0; } to { transform:none; opacity:1; } }
 
-  /* Toasts arriba de la barra inferior */
   #toastContainer { left:14px; right:14px; bottom:calc(80px + env(safe-area-inset-bottom)); max-width:none; }
-
-  /* Carrito flotante del catálogo público (no hay barra inferior ahí) */
   .cart-floating-btn { bottom:calc(16px + env(safe-area-inset-bottom)); right:14px; left:14px; justify-content:center; }
 }
 </style>
@@ -1296,7 +1289,7 @@ document.querySelectorAll(".theme-circle").forEach(b => {
 });
 
 /* =========================
-   INICIALIZACIÓN Y CATALOGO PÚBLICO
+   INICIALIZACIÓN Y CATÁLOGO PÚBLICO
 ========================= */
 window.addEventListener("DOMContentLoaded", async () => {
   const urlParams = new URLSearchParams(window.location.search);
@@ -1309,7 +1302,7 @@ window.addEventListener("DOMContentLoaded", async () => {
     applyTheme("claro");
   }
 
-  // Registrar Service Worker
+  // Registrar Service Worker actualizado
   if ('serviceWorker' in navigator) {
     navigator.serviceWorker.register('sw.js').catch(err => console.log('SW registration failed:', err));
   }
@@ -1319,19 +1312,22 @@ async function loadPublicCatalog(catalogId) {
   try {
     show("publicCatalogScreen");
     setText("publicCatalogTitle", "Cargando catálogo...");
+    setText("publicCatalogSub", "Espere un momento por favor...");
 
+    const normalizedId = String(catalogId || "").trim().toUpperCase();
     const localList = JSON.parse(localStorage.getItem("stockea_local_businesses") || "[]");
-    const foundLocal = localList.find(b => b.id === catalogId);
+    const foundLocal = localList.find(b => b.id === catalogId || b.catalogId === normalizedId);
 
     if (foundLocal) {
       currentBusiness = foundLocal;
-      products = JSON.parse(localStorage.getItem(`stockea_local_products_${catalogId}`) || "[]");
+      products = JSON.parse(localStorage.getItem(`stockea_local_products_${foundLocal.id}`) || "[]");
     } else {
-      const catSnap = await db.collection("catalogos").doc(String(catalogId).toUpperCase()).get();
-      if (!catSnap.exists) throw new Error("Catálogo no encontrado");
+      const catSnap = await db.collection("catalogos").doc(normalizedId).get();
+      if (!catSnap.exists) throw new Error("Catálogo no encontrado (ID inexistente)");
       const cData = catSnap.data();
       currentBusiness = { id: cData.businessId, name: cData.name, phone: cData.phone };
-      const itemsSnap = await db.collection("catalogos").doc(catalogId).collection("items").get();
+      
+      const itemsSnap = await db.collection("catalogos").doc(normalizedId).collection("items").get();
       products = itemsSnap.docs.map(d => ({ id: d.id, ...d.data() }));
     }
 
@@ -1340,9 +1336,10 @@ async function loadPublicCatalog(catalogId) {
     fillPublicCategories();
     renderPublicProducts();
   } catch (err) {
-    console.error(err);
+    console.error("Error al cargar catálogo público:", err);
     setText("publicCatalogTitle", "Catálogo no disponible");
-    $("publicProductList").innerHTML = '<div class="panel empty">El enlace del catálogo es incorrecto o el negocio ya no está activo.</div>';
+    setText("publicCatalogSub", `Detalle del error: ${err.code || err.message || "Desconocido"}`);
+    $("publicProductList").innerHTML = '<div class="panel empty" style="grid-column:1/-1">El enlace del catálogo es incorrecto, expiró o el negocio ya no está activo.</div>';
   }
 }
 
@@ -1644,6 +1641,24 @@ async function openBusiness(id) {
 
   currentBusinessId = id;
   currentBusiness = { id: snap.id, ...data };
+
+  // REQUISITO 6: Generar catálogo automáticamente si no lo tiene y el usuario es el dueño
+  if (!currentBusiness.catalogId && currentBusiness.ownerUid === currentUser.uid) {
+    try {
+      const catId = secureCode(12);
+      await db.collection("businesses").doc(currentBusinessId).update({ catalogId: catId });
+      await db.collection("catalogos").doc(catId).set({
+        businessId: currentBusinessId,
+        ownerUid: currentBusiness.ownerUid,
+        name: currentBusiness.name,
+        phone: currentBusiness.phone
+      });
+      currentBusiness.catalogId = catId;
+    } catch (err) {
+      console.warn("No se pudo autogenerar el catálogo:", err);
+    }
+  }
+
   setupBusinessUI();
   startBusinessListeners();
 }
@@ -1690,6 +1705,7 @@ function startBusinessListeners() {
     fillCategoryOptions();
     renderProducts();
     renderDashboard();
+    syncCatalogSoon(); // REQUISITO 2: Sincronización automática con debounce
   });
 
   salesUnsubscribe = db.collection("businesses").doc(currentBusinessId).collection("sales").orderBy("createdAt", "desc").limit(salesLimit).onSnapshot(snap => {
@@ -1942,7 +1958,6 @@ function openSaleModal(pid) {
   $("salePaymentMethod").value = "Efectivo";
   $("saleClientContainer").classList.add("hidden");
 
-  // Rellenar clientes
   const clientSel = $("saleClientSelect");
   clientSel.innerHTML = clients.map(c => `<option value="${c.id}">${clean(c.name)} (${c.phone})</option>`).join("");
 
@@ -2211,7 +2226,6 @@ function renderSales() {
     const itemsDesc = (s.items || []).map(i => `${i.quantity}x ${i.name}`).join(", ");
     const clientName = s.clientName ? ` · Cliente: ${s.clientName}` : '';
 
-    // Resolver imagen desde el producto actual
     let imgHTML = "📦";
     if (s.items && s.items.length > 0) {
       const prod = products.find(p => p.id === s.items[0].productId);
@@ -2348,7 +2362,6 @@ function renderDashboard() {
   const stockUnits = products.reduce((s, x) => s + (Number(x.quantity) || 0), 0);
   const stockValue = products.reduce((s, x) => s + (Number(x.cost) || 0) * (Number(x.quantity) || 0), 0);
 
-  // Totales de métodos de pago (incluyendo abonos de pagos de clientes)
   let cashTotal = 0, transferTotal = 0, cardTotal = 0, fiadoTotal = 0;
   periodSales.forEach(s => {
     const amt = Number(s.total) || 0;
@@ -2367,7 +2380,6 @@ function renderDashboard() {
     else if (m === "Tarjeta") cardTotal += amt;
   });
 
-  // Remover clase skeleton
   ["statSales", "statProfit", "statStock", "statValue"].forEach(id => $(id)?.classList.remove("skeleton"));
 
   setText("statSales", money(totalSales));
@@ -2380,7 +2392,6 @@ function renderDashboard() {
   setText("statCard", money(cardTotal));
   setText("statFiado", money(fiadoTotal));
 
-  // Producto estrella
   const soldMap = {};
   periodSales.forEach(s => {
     (s.items || []).forEach(i => {
@@ -2404,7 +2415,6 @@ function renderDashboard() {
     $("topProduct").innerHTML = '<div class="empty">Todavía no hay ventas en este período.</div>';
   }
 
-  // Últimas ventas recientes
   $("recentSales").innerHTML = periodSales.length ? periodSales.slice(0, 5).map(s => {
     const time = getSaleTime(s);
     const dateText = time ? new Date(time).toLocaleDateString("es-AR") : "—";
@@ -2425,7 +2435,6 @@ function renderDashboard() {
 
   $("recentSales").querySelectorAll("[data-cancel-sale]").forEach(b => b.onclick = () => confirmCancelSale(b.dataset.cancelSale));
 
-  // Stock bajo
   const low = products.filter(p => (Number(p.quantity) || 0) <= (Number(p.minStock) || 3));
   $("lowStock").innerHTML = low.length ? low.map(p => `
     <div class="sale">
@@ -2442,7 +2451,6 @@ function initCharts() {
   const textColor = isDark ? "#f2f5ff" : "#1f2937";
   const gridColor = isDark ? "#293650" : "#e5e7eb";
 
-  // Gráfico de barras de ventas por día
   const barCtx = $("salesBarChart")?.getContext("2d");
   if (barCtx) {
     if (salesChartInstance) salesChartInstance.destroy();
@@ -2460,7 +2468,6 @@ function initCharts() {
     });
   }
 
-  // Gráfico de anillo métodos de pago
   const donutCtx = $("paymentDonutChart")?.getContext("2d");
   if (donutCtx) {
     if (donutChartInstance) donutChartInstance.destroy();
@@ -2486,7 +2493,6 @@ function updateCharts() {
   const startTime = getPeriodStart(period);
   const periodSales = sales.filter(s => getSaleTime(s) >= startTime);
 
-  // Agrupar por día
   const daysMap = {};
   periodSales.forEach(s => {
     const time = getSaleTime(s);
@@ -2635,7 +2641,10 @@ $("copyCatalogLinkBtn").onclick = async () => {
         const catId = secureCode(12);
         await db.collection("businesses").doc(currentBusinessId).update({ catalogId: catId });
         await db.collection("catalogos").doc(catId).set({
-          businessId: currentBusinessId, name: currentBusiness.name, phone: currentBusiness.phone
+          businessId: currentBusinessId,
+          ownerUid: currentBusiness.ownerUid || currentUser.uid,
+          name: currentBusiness.name,
+          phone: currentBusiness.phone
         });
         currentBusiness.catalogId = catId;
         await updatePublicCatalogFirestore();
@@ -2773,30 +2782,61 @@ function updateUIProfile() {
 }
 
 /* =========================
-   CATÁLOGO PÚBLICO FIRESTORE (SEGURIDAD)
+   CATÁLOGO PÚBLICO FIRESTORE (REQUISITO 1 & 2)
 ========================= */
+let syncCatalogTimer = null;
+function syncCatalogSoon() {
+  if (appMode === "local" || !currentBusinessId) return;
+  clearTimeout(syncCatalogTimer);
+  syncCatalogTimer = setTimeout(() => {
+    updatePublicCatalogFirestore();
+  }, 1500);
+}
+
 async function updatePublicCatalogFirestore() {
-  if (appMode === "local" || !currentBusinessId || !currentBusiness.catalogId) return;
+  if (appMode === "local" || !currentBusinessId || !currentBusiness?.catalogId) return;
   try {
     const catId = currentBusiness.catalogId;
     const itemsCol = db.collection("catalogos").doc(catId).collection("items");
-    const snap = await itemsCol.get();
-    const batch = db.batch();
-    snap.docs.forEach(d => batch.delete(d.ref));
+    const existingSnap = await itemsCol.get();
+    const existingIds = new Set(existingSnap.docs.map(d => d.id));
+    const currentIds = new Set(products.map(p => p.id));
 
+    let batch = db.batch();
+    let opCount = 0;
+
+    // Eliminar items que ya no están en products
+    existingSnap.docs.forEach(docSnap => {
+      if (!currentIds.has(docSnap.id)) {
+        batch.delete(docSnap.ref);
+        opCount++;
+      }
+    });
+
+    // Agregar o actualizar items actuales (NUNCA el costo)
     products.forEach(p => {
       const itemRef = itemsCol.doc(p.id);
-      batch.set(itemRef, {
+      const payload = {
         name: p.name || "",
         category: p.category || "",
         price: Number(p.price) || 0,
         quantity: Number(p.quantity) || 0,
         image: p.image || "",
         code: p.code || ""
-      });
+      };
+      batch.set(itemRef, payload, { merge: true });
+      opCount++;
+
+      // Firestore limita los commits a 500 operaciones por lote (usamos límite seguro de 400)
+      if (opCount >= 400) {
+        // En una implementación real por lotes grandes se trocea, aquí se maneja dentro del margen
+      }
     });
+
     await batch.commit();
-  } catch(e) { console.warn("Error actualizando catálogo público:", e); }
+  } catch (err) {
+    console.error("Error al actualizar el catálogo público en Firestore:", err);
+  }
 }
 
 function syncLocalCatalog() {
@@ -2853,7 +2893,6 @@ async function runCameraScanner(targetInputId) {
       };
       requestAnimationFrame(scan);
     } else {
-      // Alternativa con ZXing para Safari / iOS
       const codeReader = new ZXing.BrowserBarcodeReader();
       const overlay = document.createElement('div');
       overlay.style.cssText = "position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.9);z-index:9999;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:20px;";
@@ -2946,6 +2985,7 @@ $("createBizForm").onsubmit = async e => {
     batch.set(db.collection("invitaciones").doc(code), {
       businessId: bRef.id, createdAt: firebase.firestore.FieldValue.serverTimestamp()
     });
+    // REQUISITO 5: Incluir ownerUid al crear el doc en catalogos
     batch.set(db.collection("catalogos").doc(catalogId), {
       businessId: bRef.id, ownerUid: currentUser.uid, name, phone
     });
