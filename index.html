@@ -1101,6 +1101,7 @@ body { -webkit-text-size-adjust: 100%; overflow-x: hidden; }
         <div id="codeSectionContainer">
           <p><b>Link de tu catálogo público:</b></p>
           <button id="copyCatalogLinkBtn" class="whatsapp-btn" style="margin-bottom:15px">📋 Copiar enlace de catálogo</button>
+          <button id="syncCatalogBtn" class="secondary" style="margin-bottom:15px; display:block;">🔄 Sincronizar catálogo</button>
           <p><b>Código de invitación para socios:</b></p>
           <div id="displayStoreCode" class="codebox">—</div>
           <button id="copyStoreCode" class="secondary" style="margin-top:10px">Copiar código socio</button>
@@ -1172,7 +1173,7 @@ body { -webkit-text-size-adjust: 100%; overflow-x: hidden; }
       </div>
     </section>
 
-    <p class="notice">Kiosy Stock Manager — Gestión en la nube y local.</p>
+    <p class="notice">Kiosy Stock Manager — Gestión en la nube y local.<br><span style="font-size:11px; opacity:0.8;">Nota: Los negocios creados en modo local no disponen de catálogo público en línea, ya que operan de forma exclusiva en este dispositivo.</span></p>
   </main>
 </div>
 
@@ -1315,21 +1316,13 @@ async function loadPublicCatalog(catalogId) {
     setText("publicCatalogSub", "Espere un momento por favor...");
 
     const normalizedId = String(catalogId || "").trim().toUpperCase();
-    const localList = JSON.parse(localStorage.getItem("stockea_local_businesses") || "[]");
-    const foundLocal = localList.find(b => b.id === catalogId || b.catalogId === normalizedId);
-
-    if (foundLocal) {
-      currentBusiness = foundLocal;
-      products = JSON.parse(localStorage.getItem(`stockea_local_products_${foundLocal.id}`) || "[]");
-    } else {
-      const catSnap = await db.collection("catalogos").doc(normalizedId).get();
-      if (!catSnap.exists) throw new Error("Catálogo no encontrado (ID inexistente)");
-      const cData = catSnap.data();
-      currentBusiness = { id: cData.businessId, name: cData.name, phone: cData.phone };
-      
-      const itemsSnap = await db.collection("catalogos").doc(normalizedId).collection("items").get();
-      products = itemsSnap.docs.map(d => ({ id: d.id, ...d.data() }));
-    }
+    const catSnap = await db.collection("catalogos").doc(normalizedId).get();
+    if (!catSnap.exists) throw new Error("Catálogo no encontrado (ID inexistente)");
+    const cData = catSnap.data();
+    currentBusiness = { id: cData.businessId, name: cData.name, phone: cData.phone };
+    
+    const itemsSnap = await db.collection("catalogos").doc(normalizedId).collection("items").get();
+    products = itemsSnap.docs.map(d => ({ id: d.id, ...d.data() }));
 
     setText("publicCatalogTitle", currentBusiness.name || "Catálogo de Productos");
     setText("publicCatalogSub", `WhatsApp de pedidos: ${currentBusiness.phone || "No especificado"}`);
@@ -1370,8 +1363,9 @@ function renderPublicProducts() {
 
   container.innerHTML = filtered.map(p => {
     const qty = Number(p.quantity) || 0;
-    const stockClass = qty <= 0 ? "out" : qty <= 3 ? "low" : "green";
-    const stockLabel = qty <= 0 ? "Agotado" : qty <= 3 ? `Stock bajo (${qty})` : `Disponible`;
+    const isOut = qty <= 0;
+    const stockClass = isOut ? "out" : qty <= 3 ? "low" : "green";
+    const stockLabel = isOut ? "Agotado" : qty <= 3 ? `Stock bajo (${qty})` : `Disponible`;
 
     return `
       <article class="product-card">
@@ -1384,8 +1378,8 @@ function renderPublicProducts() {
           <div class="product-stock"><span class="stock-status ${stockClass}">${stockLabel}</span></div>
         </div>
         <div style="padding:10px">
-          <button type="button" class="whatsapp-btn" style="width:100%" data-add-cart="${p.id}" ${qty <= 0 ? 'disabled' : ''}>
-            🛒 Agregar al carrito
+          <button type="button" class="whatsapp-btn" style="width:100%" data-add-cart="${p.id}" ${isOut ? 'disabled' : ''}>
+            🛒 ${isOut ? 'Agotado' : 'Agregar al carrito'}
           </button>
         </div>
       </article>`;
@@ -1642,7 +1636,7 @@ async function openBusiness(id) {
   currentBusinessId = id;
   currentBusiness = { id: snap.id, ...data };
 
-  // REQUISITO 6: Generar catálogo automáticamente si no lo tiene y el usuario es el dueño
+  // REQUISITO 6: Si el negocio ya existe pero no tiene catalogId y el usuario es el dueño, generarlo automáticamente
   if (!currentBusiness.catalogId && currentBusiness.ownerUid === currentUser.uid) {
     try {
       const catId = secureCode(12);
@@ -1705,7 +1699,7 @@ function startBusinessListeners() {
     fillCategoryOptions();
     renderProducts();
     renderDashboard();
-    syncCatalogSoon(); // REQUISITO 2: Sincronización automática con debounce
+    syncCatalogSoon(); // REQUISITO 2: Sincronización automática con debounce de 1500ms
   });
 
   salesUnsubscribe = db.collection("businesses").doc(currentBusinessId).collection("sales").orderBy("createdAt", "desc").limit(salesLimit).onSnapshot(snap => {
@@ -1833,7 +1827,6 @@ $("productForm").onsubmit = async e => {
         products.push(data);
       }
       localStorage.setItem(`stockea_local_products_${currentBusinessId}`, JSON.stringify(products));
-      syncLocalCatalog();
     } else {
       const col = db.collection("businesses").doc(currentBusinessId).collection("products");
       if (editingProductId) {
@@ -1931,7 +1924,6 @@ function confirmDeleteProduct(id) {
       if (appMode === "local") {
         products = products.filter(p => p.id !== id);
         localStorage.setItem(`stockea_local_products_${currentBusinessId}`, JSON.stringify(products));
-        syncLocalCatalog();
         renderProducts(); renderDashboard();
       } else {
         await db.collection("businesses").doc(currentBusinessId).collection("products").doc(id).delete();
@@ -2010,7 +2002,6 @@ $("saleModalForm").onsubmit = async e => {
     if (appMode === "local") {
       activeSaleProduct.quantity -= qty;
       localStorage.setItem(`stockea_local_products_${currentBusinessId}`, JSON.stringify(products));
-      syncLocalCatalog();
 
       if (clientId && method === "Cuenta Corriente") {
         const client = clients.find(c => c.id === clientId);
@@ -2278,7 +2269,6 @@ function confirmCancelSale(sid) {
           if (p) p.quantity += item.quantity;
         }
         localStorage.setItem(`stockea_local_products_${currentBusinessId}`, JSON.stringify(products));
-        syncLocalCatalog();
 
         if (s.paymentMethod === "Cuenta Corriente" && s.clientId) {
           const cli = clients.find(c => c.id === s.clientId);
@@ -2587,13 +2577,13 @@ $("settingsForm").onsubmit = async e => {
         localStorage.setItem("stockea_local_businesses", JSON.stringify(list));
         currentBusiness = list[idx];
       }
-      syncLocalCatalog();
     } else {
       await db.collection("businesses").doc(currentBusinessId).update({
         ...data, updatedAt: firebase.firestore.FieldValue.serverTimestamp()
       });
       currentBusiness = { ...currentBusiness, ...data };
       if (currentBusiness.catalogId) {
+        // REQUISITO 7: Actualizar también el doc en catalogos al modificar nombre o teléfono
         await db.collection("catalogos").doc(currentBusiness.catalogId).update({ name: data.name, phone: data.phone });
       }
     }
@@ -2633,29 +2623,53 @@ $("copyStoreCode").onclick = async () => {
 };
 
 $("copyCatalogLinkBtn").onclick = async () => {
+  if (appMode === "local") {
+    return showToast("Los negocios locales no disponen de catálogo público en línea.", "info");
+  }
   let key;
   try {
-    if (appMode === "local") key = currentBusinessId;
-    else {
-      if (!currentBusiness.catalogId) {
-        const catId = secureCode(12);
-        await db.collection("businesses").doc(currentBusinessId).update({ catalogId: catId });
-        await db.collection("catalogos").doc(catId).set({
-          businessId: currentBusinessId,
-          ownerUid: currentBusiness.ownerUid || currentUser.uid,
-          name: currentBusiness.name,
-          phone: currentBusiness.phone
-        });
-        currentBusiness.catalogId = catId;
-        await updatePublicCatalogFirestore();
-      }
-      key = currentBusiness.catalogId;
+    if (!currentBusiness.catalogId) {
+      const catId = secureCode(12);
+      await db.collection("businesses").doc(currentBusinessId).update({ catalogId: catId });
+      await db.collection("catalogos").doc(catId).set({
+        businessId: currentBusinessId,
+        ownerUid: currentBusiness.ownerUid || currentUser.uid,
+        name: currentBusiness.name,
+        phone: currentBusiness.phone
+      });
+      currentBusiness.catalogId = catId;
+      await updatePublicCatalogFirestore();
     }
+    key = currentBusiness.catalogId;
     const link = `${window.location.origin}${window.location.pathname}?catalogo=${key}`;
     await navigator.clipboard.writeText(link);
     showToast("¡Enlace de catálogo copiado!");
   } catch(e) {
     showToast("Error al generar enlace de catálogo", "error");
+  }
+};
+
+// REQUISITO 3: Botón manual "🔄 Sincronizar catálogo"
+$("syncCatalogBtn").onclick = async () => {
+  if (appMode === "local") {
+    return showToast("Los negocios locales no disponen de catálogo público en línea.", "info");
+  }
+  try {
+    if (!currentBusiness.catalogId) {
+      const catId = secureCode(12);
+      await db.collection("businesses").doc(currentBusinessId).update({ catalogId: catId });
+      await db.collection("catalogos").doc(catId).set({
+        businessId: currentBusinessId,
+        ownerUid: currentBusiness.ownerUid || currentUser.uid,
+        name: currentBusiness.name,
+        phone: currentBusiness.phone
+      });
+      currentBusiness.catalogId = catId;
+    }
+    await updatePublicCatalogFirestore();
+    showToast("¡Catálogo sincronizado exitosamente!");
+  } catch (err) {
+    showToast("Error al sincronizar catálogo", "error");
   }
 };
 
@@ -2794,7 +2808,11 @@ function syncCatalogSoon() {
 }
 
 async function updatePublicCatalogFirestore() {
-  if (appMode === "local" || !currentBusinessId || !currentBusiness?.catalogId) return;
+  if (appMode === "local" || !currentBusinessId) return;
+  if (!currentBusiness?.catalogId) {
+    showToast("Catálogo: El negocio no tiene un ID de catálogo asociado.", "info");
+    return;
+  }
   try {
     const catId = currentBusiness.catalogId;
     const itemsCol = db.collection("catalogos").doc(catId).collection("items");
@@ -2805,7 +2823,7 @@ async function updatePublicCatalogFirestore() {
     let batch = db.batch();
     let opCount = 0;
 
-    // Eliminar items que ya no están en products
+    // Borrar solo los items que ya no existen en products
     existingSnap.docs.forEach(docSnap => {
       if (!currentIds.has(docSnap.id)) {
         batch.delete(docSnap.ref);
@@ -2813,7 +2831,7 @@ async function updatePublicCatalogFirestore() {
       }
     });
 
-    // Agregar o actualizar items actuales (NUNCA el costo)
+    // Copiar items actuales (NUNCA el costo)
     products.forEach(p => {
       const itemRef = itemsCol.doc(p.id);
       const payload = {
@@ -2826,21 +2844,15 @@ async function updatePublicCatalogFirestore() {
       };
       batch.set(itemRef, payload, { merge: true });
       opCount++;
-
-      // Firestore limita los commits a 500 operaciones por lote (usamos límite seguro de 400)
-      if (opCount >= 400) {
-        // En una implementación real por lotes grandes se trocea, aquí se maneja dentro del margen
-      }
     });
 
-    await batch.commit();
+    if (opCount > 0) {
+      await batch.commit();
+    }
   } catch (err) {
-    console.error("Error al actualizar el catálogo público en Firestore:", err);
+    console.error("Error al actualizar catálogo público:", err);
+    showToast("Catálogo: " + (err.code || err.message), "error");
   }
-}
-
-function syncLocalCatalog() {
-  if (appMode !== "local") return;
 }
 
 /* =========================
@@ -2975,6 +2987,7 @@ $("createBizForm").onsubmit = async e => {
     const bRef = db.collection("businesses").doc();
     const batch = db.batch();
 
+    // REQUISITO 5: Incluir businessId, ownerUid, name y phone en el doc de catalogos
     batch.set(bRef, {
       name, owners, phone, type, categories, accessCode: code, catalogId,
       ownerUid: currentUser.uid, memberUids: [currentUser.uid], createdAt: firebase.firestore.FieldValue.serverTimestamp()
@@ -2985,7 +2998,6 @@ $("createBizForm").onsubmit = async e => {
     batch.set(db.collection("invitaciones").doc(code), {
       businessId: bRef.id, createdAt: firebase.firestore.FieldValue.serverTimestamp()
     });
-    // REQUISITO 5: Incluir ownerUid al crear el doc en catalogos
     batch.set(db.collection("catalogos").doc(catalogId), {
       businessId: bRef.id, ownerUid: currentUser.uid, name, phone
     });
