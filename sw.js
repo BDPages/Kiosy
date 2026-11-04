@@ -7,7 +7,7 @@ const ASSETS_TO_CACHE = [
   './Kiosy-logo2.png'
 ];
 
-// Instalación: cachear activos estáticos iniciales
+// Instalación: cachear activos estáticos
 self.addEventListener('install', event => {
   event.waitUntil(
     caches.open(CACHE_NAME).then(cache => {
@@ -17,7 +17,7 @@ self.addEventListener('install', event => {
   self.skipWaiting();
 });
 
-// Activación: borrar cachés antiguos
+// Activación: borrar cachés viejos
 self.addEventListener('activate', event => {
   event.waitUntil(
     caches.keys().then(keys => {
@@ -33,7 +33,7 @@ self.addEventListener('activate', event => {
   self.clients.claim();
 });
 
-// Interceptar peticiones: Estrategia Network First para HTML y Network/Cache para lo demás
+// Interceptar peticiones: Estrategia Network First para HTML
 self.addEventListener('fetch', event => {
   const req = event.request;
   if (req.mode === 'navigate' || req.destination === 'document') {
