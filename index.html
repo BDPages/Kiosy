@@ -180,10 +180,12 @@ header {
 }
 .logo-container {
   display: flex;
-  align-items: center;
+  align-items: baseline;
   gap: 8px;
 }
-.header-logo-img { height: 36px; width: auto; object-fit: contain; }
+.header-logo-img { height: 32px; width: auto; object-fit: contain; }
+.header-subtitle { font-size: 13px; color: var(--muted); font-weight: 600; }
+.welcome-logo-img { height: 60px; width: auto; object-fit: contain; margin-bottom: 10px; }
 
 .user-header-info {
   display: flex;
@@ -586,7 +588,8 @@ h2 { font-size: 18px; font-weight: 600; margin-top: 0; }
 <body>
 <header>
   <div class="logo-container">
-    <img src="Kiosy-logo1.png" alt="Kiosy Stock Manager" class="header-logo-img" onerror="this.style.display='none'">
+    <img src="Kiosy-logo2.png" alt="Kiosy Stock Manager" class="header-logo-img" onerror="this.style.display='none'">
+    <span class="header-subtitle">Stock Manager</span>
   </div>
   <div class="user-header-info">
     <button id="headerLogout" class="secondary hidden" style="font-size:12px; padding:6px 12px;">
@@ -657,11 +660,7 @@ h2 { font-size: 18px; font-weight: 600; margin-top: 0; }
 <!-- SELECCIÓN DE MODO (NUBE VS LOCAL) -->
 <div id="modeSelectScreen" class="auth-box panel" style="text-align:center">
   <div style="margin-bottom:15px">
-    <svg width="60" height="60" viewBox="0 0 24 24" fill="none" stroke="var(--blue)" stroke-width="2"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path></svg>
-  </div>
-  <div style="display: flex; align-items: baseline; justify-content: center; gap: 8px; margin-bottom: 6px;">
-    <h1 style="margin: 0; font-size: 26px;">Kiosy</h1>
-    <span style="font-size: 14px; color: var(--muted); font-weight: 600;">Stock Manager</span>
+    <img src="Kiosy-logo2.png" alt="Kiosy" class="welcome-logo-img" onerror="this.style.display='none'">
   </div>
   <p class="sub" style="margin-bottom:25px">Elegí cómo querés usar la aplicación:</p>
   <button id="btnCloudMode" type="button" style="width:100%; margin-bottom:12px">
@@ -825,7 +824,7 @@ h2 { font-size: 18px; font-weight: 600; margin-top: 0; }
       Clientes
     </button>
     <button data-page="settings">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l-.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l-.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06-.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
       Mi negocio
     </button>
     <button data-page="profile">
