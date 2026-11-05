@@ -19,19 +19,19 @@
 <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-storage-compat.js"></script>
 
-<!-- CHART.JS PARA GRÁFICOS -->
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<!-- CHART.JS PARA GRÁFICOS (Versión exacta fijada) -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
 
-<!-- ZXING PARA ESCANEO ALTERNATIVO EN iOS/SAFARI -->
-<script src="https://unpkg.com/@zxing/library@latest"></script>
+<!-- ZXING PARA ESCANEO ALTERNATIVO EN iOS/SAFARI (Versión exacta fijada) -->
+<script src="https://unpkg.com/@zxing/library@0.21.0/umd/index.min.js"></script>
 
 <style>
 :root {
   --bg:#f3f4f6;
   --panel:#ffffff;
   --line:#e5e7eb;
-  --blue:#2563eb;
-  --blue-hover:#1d4ed8;
+  --blue:#a855f7;
+  --blue-hover:#9333ea;
   --txt:#1f2937;
   --muted:#6b7280;
   --green:#10b981;
@@ -49,8 +49,8 @@ body.theme-claro {
   --bg: #f3f4f6;
   --panel: #ffffff;
   --line: #e5e7eb;
-  --blue: #2563eb;
-  --blue-hover: #1d4ed8;
+  --blue: #a855f7;
+  --blue-hover: #9333ea;
   --txt: #1f2937;
   --muted: #6b7280;
   --green: #10b981;
@@ -64,8 +64,8 @@ body.theme-oscuro {
   --bg: #0b1020;
   --panel: #141d31;
   --line: #293650;
-  --blue: #568cff;
-  --blue-hover: #3b76ff;
+  --blue: #a855f7;
+  --blue-hover: #9333ea;
   --txt: #f2f5ff;
   --muted: #95a3bd;
   --green: #35d49a;
@@ -79,8 +79,8 @@ body.theme-violeta {
   --bg: #0f0a1c;
   --panel: #1a1230;
   --line: #322359;
-  --blue: #a855f7;
-  --blue-hover: #9333ea;
+  --blue: #c084fc;
+  --blue-hover: #a855f7;
   --txt: #f5f3ff;
   --muted: #b3a5d0;
   --green: #34d399;
@@ -94,8 +94,8 @@ body.theme-verde {
   --bg: #06110a;
   --panel: #0e2b1b;
   --line: rgba(110, 184, 143, 0.22);
-  --blue: #34d399;
-  --blue-hover: #10b981;
+  --blue: #a855f7;
+  --blue-hover: #9333ea;
   --txt: #f0f7f3;
   --muted: #a3c2b1;
   --green: #6ee7b7;
@@ -148,7 +148,7 @@ input, select, textarea {
 input:focus, select:focus, textarea:focus {
   outline: none;
   border-color: var(--blue);
-  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15);
+  box-shadow: 0 0 0 3px rgba(168, 85, 247, 0.2);
 }
 input[type="color"] {
   height: 48px;
@@ -251,8 +251,21 @@ header {
 .danger:hover { opacity: 0.85; background: var(--danger-bg); }
 .secondary { background: var(--line); color: var(--txt); }
 .secondary:hover { opacity: 0.85; }
-.whatsapp-btn { background: #25d366; color: #fff; }
-.whatsapp-btn:hover { background: #20ba5a; }
+
+/* SVG ICON CLASSES */
+.icon {
+  width: 18px;
+  height: 18px;
+  vertical-align: middle;
+  flex-shrink: 0;
+}
+.icon-lg {
+  width: 40px;
+  height: 40px;
+  vertical-align: middle;
+  flex-shrink: 0;
+  color: var(--muted);
+}
 
 /* SKELETON LOADERS */
 .skeleton {
@@ -341,7 +354,10 @@ header {
   cursor: pointer;
 }
 .file-upload-btn {
-  display: block;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
   width: 100%;
   background: var(--line);
   color: var(--txt);
@@ -386,7 +402,7 @@ nav button.active {
 
 main { padding: 30px; width: 100%; max-width: 1300px; margin: auto; }
 h1 { margin: 0 0 6px; font-size: 26px; font-weight: 700; }
-h2 { font-size: 18px; font-weight: 600; margin-top: 0; }
+h2 { font-size: 18px; font-weight: 600; margin-top: 0; display: flex; align-items: center; gap: 8px; }
 .sub { margin: 0 0 24px; color: var(--muted); font-size: 14px; }
 .sectionhead {
   display: flex;
@@ -476,20 +492,12 @@ h2 { font-size: 18px; font-weight: 600; margin-top: 0; }
 .theme-circle[data-theme="violeta"] { background: #0f0a1c; }
 .theme-circle[data-theme="verde"] { background: #06110a; }
 
-.cart-floating-btn {
-  position: fixed; bottom: 85px; right: 20px;
-  background: #25d366; color: white; padding: 14px 22px;
-  border-radius: 50px; font-weight: 700; box-shadow: var(--shadow-lg);
-  z-index: 99; display: flex; align-items: center; gap: 10px;
-}
-.cart-badge { background: black; color: white; padding: 3px 9px; border-radius: 12px; font-size: 12px; }
-
-/* 🌟 BOTÓN FLOTANTE DE VENTA RÁPIDA (FAB) */
+/* BOTÓN FLOTANTE DE VENTA RÁPIDA (FAB) */
 .quick-sale-fab {
   position: fixed;
   bottom: 80px;
   right: 20px;
-  background: #a855f7; /* Tonalidad violeta Kiosy */
+  background: var(--blue);
   color: white;
   padding: 12px 20px;
   border-radius: 50px;
@@ -505,7 +513,7 @@ h2 { font-size: 18px; font-weight: 600; margin-top: 0; }
   transition: transform 0.2s, background 0.2s, box-shadow 0.2s;
 }
 .quick-sale-fab:hover {
-  background: #9333ea;
+  background: var(--blue-hover);
   transform: translateY(-2px);
   box-shadow: 0 12px 25px rgba(168, 85, 247, 0.6);
 }
@@ -521,7 +529,7 @@ h2 { font-size: 18px; font-weight: 600; margin-top: 0; }
 .business-card:hover { border-color: var(--blue); transform: translateY(-2px); }
 .business-icon {
   width: 50px; height: 50px; display: flex; align-items: center; justify-content: center;
-  background: var(--line); border-radius: 12px; font-size: 24px; margin-bottom: 14px; overflow: hidden;
+  background: var(--line); border-radius: 12px; margin-bottom: 14px; overflow: hidden;
 }
 .business-icon img { width: 100%; height: 100%; object-fit: cover; }
 .business-card h3 { margin: 0 0 6px; }
@@ -538,7 +546,6 @@ h2 { font-size: 18px; font-weight: 600; margin-top: 0; }
   height: 160px; background: rgba(0,0,0,0.03); display: flex; align-items: center; justify-content: center; overflow: hidden; padding: 8px;
 }
 .product-image img { width: 100%; height: 100%; object-fit: contain; border-radius: 8px; }
-.product-placeholder { font-size: 40px; }
 .product-card-body { padding: 14px; flex: 1; }
 .product-name { font-size: 15px; font-weight: 700; margin-bottom: 6px; }
 .product-price { font-size: 20px; font-weight: 800; color: var(--blue); }
@@ -562,7 +569,7 @@ h2 { font-size: 18px; font-weight: 600; margin-top: 0; }
 .sale-actions { display: flex; align-items: center; gap: 12px; margin-left: auto; }
 .sale-item-thumb {
   width: 44px; height: 44px; border-radius: 8px; background: var(--bg);
-  border: 1px solid var(--line); display: flex; align-items: center; justify-content: center; overflow: hidden; font-size: 20px; flex-shrink: 0;
+  border: 1px solid var(--line); display: flex; align-items: center; justify-content: center; overflow: hidden; flex-shrink: 0;
 }
 .sale-item-thumb img { width: 100%; height: 100%; object-fit: contain; }
 
@@ -601,7 +608,6 @@ body { -webkit-text-size-adjust: 100%; overflow-x: hidden; }
   .mobile-nav button svg { width:22px; height:22px; }
   .mobile-nav button.active { color:var(--blue); font-weight:700; background:transparent; }
 
-  /* Ajuste de posición del botón flotante en móvil para no tapar el menú inferior */
   .quick-sale-fab {
     bottom: calc(75px + env(safe-area-inset-bottom));
     right: 16px;
@@ -652,7 +658,6 @@ body { -webkit-text-size-adjust: 100%; overflow-x: hidden; }
   @keyframes sheetUp { from { transform:translateY(40px); opacity:0; } to { transform:none; opacity:1; } }
 
   #toastContainer { left:14px; right:14px; bottom:calc(80px + env(safe-area-inset-bottom)); max-width:none; }
-  .cart-floating-btn { bottom:calc(16px + env(safe-area-inset-bottom)); right:14px; left:14px; justify-content:center; }
 }
 </style>
 </head>
@@ -664,9 +669,12 @@ body { -webkit-text-size-adjust: 100%; overflow-x: hidden; }
     <span class="header-subtitle">Stock Manager</span>
   </div>
   <div class="user-header-info">
-    <button id="headerHome" class="secondary hidden" style="font-size:12px; padding:6px 12px;">⌂ Inicio</button>
+    <button id="headerHome" class="secondary hidden" style="font-size:12px; padding:6px 12px;">
+      <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg>
+      Inicio
+    </button>
     <button id="headerLogout" class="secondary hidden" style="font-size:12px; padding:6px 12px;">
-      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><polyline points="16 17 21 12 16 7"></polyline><line x1="21" y1="12" x2="9" y2="12"></line></svg>
+      <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><polyline points="16 17 21 12 16 7"></polyline><line x1="21" y1="12" x2="9" y2="12"></line></svg>
       Salir
     </button>
     <div id="headerAvatar" class="avatar-mini hidden" title="Ir a mi perfil"></div>
@@ -676,9 +684,9 @@ body { -webkit-text-size-adjust: 100%; overflow-x: hidden; }
 <!-- CONTENEDOR DE TOASTS -->
 <div id="toastContainer"></div>
 
-<!-- 🌟 BOTÓN FLOTANTE DE VENTA RÁPIDA (FAB) -->
+<!-- BOTÓN FLOTANTE DE VENTA RÁPIDA (FAB) -->
 <button id="globalQuickSaleBtn" class="quick-sale-fab hidden" type="button" title="Registrar venta rápida">
-  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="9" cy="21" r="1"></circle><circle cx="20" cy="21" r="1"></circle><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path></svg>
+  <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg>
   Venta rápida
 </button>
 
@@ -686,35 +694,33 @@ body { -webkit-text-size-adjust: 100%; overflow-x: hidden; }
 <div id="quickSaleModal" class="modal-overlay hidden">
   <div class="modal-content" style="max-width: 650px;">
     <div class="sectionhead" style="margin-bottom:15px;">
-      <h2 style="margin:0;">⚡ Nueva venta rápida</h2>
+      <h2 style="margin:0;">
+        <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg>
+        Nueva venta rápida
+      </h2>
       <button type="button" id="closeQuickSaleModalBtn" class="secondary" style="padding:4px 10px;">✕</button>
     </div>
 
-    <!-- Buscador y selector de productos -->
     <div class="field">
       <label>Buscar productos para agregar</label>
-      <input id="qsSearchInput" placeholder="🔎 Escribí el nombre o código del producto...">
+      <input id="qsSearchInput" placeholder="Buscar por nombre o código del producto...">
     </div>
     
     <div id="qsProductResults" style="max-height: 180px; overflow-y: auto; border: 1px solid var(--line); border-radius: var(--radius); margin-bottom: 15px; background: var(--bg);">
-      <!-- Se llena dinámicamente -->
     </div>
 
-    <!-- Lista de productos seleccionados -->
     <div class="field">
-      <label><b>Productos en el carrito de venta:</b></label>
+      <label><b>Productos en la venta:</b></label>
       <div id="qsCartList" style="max-height: 200px; overflow-y: auto; border: 1px solid var(--line); border-radius: var(--radius); padding: 10px; background: var(--bg);">
         <div class="empty" style="padding: 20px;">No hay productos seleccionados.</div>
       </div>
     </div>
 
-    <!-- Totales -->
     <div style="background:var(--bg); padding:12px; border-radius:var(--radius); margin-bottom:15px; display:flex; justify-content:space-between; align-items:center;">
       <span style="font-weight:500;">Total general de la venta:</span>
       <span id="qsModalTotal" class="green" style="font-size:22px; font-weight:800;">$0,00</span>
     </div>
 
-    <!-- Formulario de Pago y Cliente -->
     <form id="qsForm">
       <div class="formgrid">
         <div class="field">
@@ -735,7 +741,7 @@ body { -webkit-text-size-adjust: 100%; overflow-x: hidden; }
         <label>Observaciones / Comentarios (Opcional)</label>
         <textarea id="qsNotes" rows="2" placeholder="Detalles adicionales de la venta..."></textarea>
       </div>
-      <button type="submit" id="qsConfirmBtn" style="width:100%; margin-top: 10px; background: #a855f7;">Confirmar venta</button>
+      <button type="submit" id="qsConfirmBtn" style="width:100%; margin-top: 10px;">Confirmar venta</button>
     </form>
   </div>
 </div>
@@ -752,7 +758,7 @@ body { -webkit-text-size-adjust: 100%; overflow-x: hidden; }
   </div>
 </div>
 
-<!-- MODAL DE VENTA DESDE STOCK (ORIGINAL) -->
+<!-- MODAL DE VENTA DESDE STOCK -->
 <div id="saleModal" class="modal-overlay hidden">
   <div class="modal-content">
     <div class="sectionhead" style="margin-bottom:15px;">
@@ -801,11 +807,11 @@ body { -webkit-text-size-adjust: 100%; overflow-x: hidden; }
   </div>
   <p class="sub" style="margin-bottom:25px">Elegí cómo querés usar la aplicación:</p>
   <button id="btnCloudMode" type="button" style="width:100%; margin-bottom:12px">
-    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 10h-1.26A8 8 0 1 0 9 20h9a5 5 0 0 0 0-10z"></path></svg>
+    <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 10h-1.26A8 8 0 1 0 9 20h9a5 5 0 0 0 0-10z"></path></svg>
     Modo Nube (Firebase)
   </button>
   <button id="btnLocalMode" type="button" class="secondary" style="width:100%">
-    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path><polyline points="17 21 17 13 7 13 7 21"></polyline><polyline points="7 3 7 8 15 8"></polyline></svg>
+    <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path><polyline points="17 21 17 13 7 13 7 21"></polyline><polyline points="7 3 7 8 15 8"></polyline></svg>
     Modo Local (Este dispositivo)
   </button>
 </div>
@@ -831,6 +837,9 @@ body { -webkit-text-size-adjust: 100%; overflow-x: hidden; }
     </div>
     <button id="authSubmitBtn" type="submit">Iniciar sesión</button>
   </form>
+  <div style="text-align:center; margin-top:12px;">
+    <button type="button" id="btnForgotPassword" style="background:transparent; border:0; color:var(--blue); font-size:13px; padding:4px; box-shadow:none;">¿Olvidaste tu contraseña?</button>
+  </div>
   <button type="button" class="secondary" id="backToModeSelect" style="width:100%; margin-top:10px">← Volver</button>
   <p id="authError" class="hidden" style="color:var(--red);margin-top:10px;text-align:center"></p>
 </div>
@@ -850,11 +859,11 @@ body { -webkit-text-size-adjust: 100%; overflow-x: hidden; }
     </div>
     <div style="display:flex; gap:12px; margin-top:24px;">
       <button id="homeCreateBtn" type="button" style="flex:1;">
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+        <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
         Crear negocio
       </button>
       <button id="homeJoinBtn" class="secondary" type="button" style="flex:1;">
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"></path><polyline points="10 17 15 12 10 7"></polyline><line x1="15" y1="12" x2="3" y2="12"></line></svg>
+        <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"></path><polyline points="10 17 15 12 10 7"></polyline><line x1="15" y1="12" x2="3" y2="12"></line></svg>
         Unirse a negocio
       </button>
     </div>
@@ -896,45 +905,6 @@ body { -webkit-text-size-adjust: 100%; overflow-x: hidden; }
     <button type="submit" style="width:100%">Unirse al negocio</button>
   </form>
   <p id="setupError" class="hidden" style="color:var(--red);margin-top:10px;text-align:center"></p>
-</div>
-
-<!-- VISTA DE CATÁLOGO PÚBLICO -->
-<div id="publicCatalogScreen" class="hidden">
-  <main>
-    <div class="sectionhead" style="margin-bottom:20px">
-      <div>
-        <h1 id="publicCatalogTitle">Catálogo de Productos</h1>
-        <p id="publicCatalogSub" class="sub">Mirá nuestros productos disponibles</p>
-      </div>
-    </div>
-    <div class="toolbar" style="grid-template-columns: 1fr 200px;">
-      <div style="display:flex; gap:6px; align-items:center;">
-        <input id="publicSearch" placeholder="🔎 Buscar por nombre, modelo o código..." style="flex:1;">
-        <button type="button" id="publicScanCameraBtn" class="secondary" title="Escanear con cámara" style="padding:0 14px; height:48px;">📷</button>
-      </div>
-      <select id="publicFilterCategory"><option value="">Todas las categorías</option></select>
-    </div>
-    <div id="publicProductList" class="product-grid"></div>
-  </main>
-  <button id="openCartBtn" class="cart-floating-btn hidden">
-    🛒 Mi Pedido <span id="cartCount" class="cart-badge">0</span>
-  </button>
-</div>
-
-<!-- MODAL DEL CARRITO DE COMPRAS PÚBLICO -->
-<div id="cartModal" class="modal-overlay hidden">
-  <div class="modal-content">
-    <div class="sectionhead">
-      <h2 style="margin:0;">🛍️ Tu Pedido</h2>
-      <button id="closeCartBtn" class="secondary" style="padding:4px 10px">✕</button>
-    </div>
-    <div id="cartItemsList" style="max-height:300px;overflow-y:auto;margin:15px 0"></div>
-    <div style="border-top:1px solid var(--line);padding-top:12px;margin-bottom:15px;display:flex;justify-content:space-between;font-size:18px;font-weight:bold">
-      <span>Total:</span>
-      <span id="cartTotal" class="green">$0</span>
-    </div>
-    <button id="sendWhatsappBtn" class="whatsapp-btn" style="width:100%">📱 Pedir por WhatsApp</button>
-  </div>
 </div>
 
 <!-- APLICACIÓN PRIVADA -->
@@ -1018,7 +988,10 @@ body { -webkit-text-size-adjust: 100%; overflow-x: hidden; }
       </div>
 
       <div class="panel" style="margin-bottom:20px;">
-        <h2>💳 Cobros por Método de Pago (Incluye Abonos)</h2>
+        <h2>
+          <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="1" y="4" width="22" height="16" rx="2" ry="2"></rect><line x1="1" y1="10" x2="23" y2="10"></line></svg>
+          Cobros por Método de Pago (Incluye Abonos)
+        </h2>
         <div class="stats" style="margin-bottom:0; margin-top:12px;">
           <div class="card"><p>Efectivo</p><strong id="statCash" style="font-size:18px">$0</strong></div>
           <div class="card"><p>Transferencia / MP</p><strong id="statTransfer" style="font-size:18px">$0</strong></div>
@@ -1030,17 +1003,26 @@ body { -webkit-text-size-adjust: 100%; overflow-x: hidden; }
       <!-- GRÁFICOS CHART.JS -->
       <div class="charts-grid" style="margin-bottom:20px;">
         <div class="panel" style="margin-top:0;">
-          <h2>📊 Ventas por Día</h2>
+          <h2>
+            <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="20" x2="18" y2="10"></line><line x1="12" y1="20" x2="12" y2="4"></line><line x1="6" y1="20" x2="6" y2="14"></line></svg>
+            Ventas por Día
+          </h2>
           <div style="height:250px; position:relative;"><canvas id="salesBarChart"></canvas></div>
         </div>
         <div class="panel" style="margin-top:0;">
-          <h2>🍩 Métodos de Pago</h2>
+          <h2>
+            <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21.21 15.89A10 10 0 1 1 8 2.83"></path><path d="M22 12A10 10 0 0 0 12 2v10z"></path></svg>
+            Métodos de Pago
+          </h2>
           <div style="height:250px; position:relative;"><canvas id="paymentDonutChart"></canvas></div>
         </div>
       </div>
 
       <div class="panel">
-        <h2>🏆 Producto estrella (Más vendido)</h2>
+        <h2>
+          <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
+          Producto estrella (Más vendido)
+        </h2>
         <div id="topProduct" class="empty">Todavía no hay ventas.</div>
       </div>
       <div class="panel"><h2>Últimas ventas</h2><div id="recentSales"></div></div>
@@ -1055,14 +1037,19 @@ body { -webkit-text-size-adjust: 100%; overflow-x: hidden; }
           <p class="sub">Productos, precios y cantidades.</p>
         </div>
         <div style="display:flex; gap:10px; flex-wrap:wrap;">
-          <button id="exportStockExcel" class="secondary">📊 Exportar Excel</button>
+          <button id="exportStockExcel" class="secondary">
+            <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+            Exportar Excel
+          </button>
           <button id="addProductBtn">+ Agregar producto</button>
         </div>
       </div>
       <div class="toolbar">
         <div style="display:flex; gap:6px; align-items:center;">
-          <input id="search" placeholder="🔎 Buscar por nombre, modelo o código..." style="flex:1;">
-          <button type="button" id="searchScanCameraBtn" class="secondary" title="Escanear con cámara" style="padding:0 14px; height:48px;">📷</button>
+          <input id="search" placeholder="Buscar por nombre, modelo o código..." style="flex:1;">
+          <button type="button" id="searchScanCameraBtn" class="secondary" title="Escanear con cámara" style="padding:0 14px; height:48px;">
+            <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path><circle cx="12" cy="13" r="4"></circle></svg>
+          </button>
         </div>
         <select id="filterCategory"><option value="">Todas las categorías</option></select>
       </div>
@@ -1090,7 +1077,7 @@ body { -webkit-text-size-adjust: 100%; overflow-x: hidden; }
               <datalist id="categoriesDatalist"></datalist>
             </div>
             <div class="field"><label>Modelo / Presentación (Opcional)</label><input id="pModel" placeholder="Ej: Retornable, 50g"></div>
-            <div class="field"><label>Color</label><input id="pColorCode" type="color" value="#568cff"></div>
+            <div class="field"><label>Color</label><input id="pColorCode" type="color" value="#a855f7"></div>
             <div class="field"><label>Costo por unidad ($) *</label><input id="pCost" type="number" min="0" step=".01" required></div>
             <div class="field"><label>Precio de venta ($) *</label><input id="pPrice" type="number" min=".01" step=".01" required></div>
             <div class="field"><label>Cantidad disponible *</label><input id="pQty" type="number" min="0" step="1" required></div>
@@ -1099,13 +1086,18 @@ body { -webkit-text-size-adjust: 100%; overflow-x: hidden; }
               <label>Código de barras / opcional</label>
               <div style="display:flex; gap:6px;">
                 <input id="pCode" placeholder="Ej: 779123456 o escaneá" style="flex:1;">
-                <button type="button" id="scanCameraBtn" class="secondary" title="Escanear con cámara" style="padding:0 14px;">📷</button>
+                <button type="button" id="scanCameraBtn" class="secondary" title="Escanear con cámara" style="padding:0 14px;">
+                  <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path><circle cx="12" cy="13" r="4"></circle></svg>
+                </button>
               </div>
             </div>
             <div class="field full">
               <label>Foto del producto</label>
               <div class="file-upload-wrapper">
-                <span class="file-upload-btn">📷 Seleccionar imagen</span>
+                <span class="file-upload-btn">
+                  <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path><circle cx="12" cy="13" r="4"></circle></svg>
+                  Seleccionar imagen
+                </span>
                 <input id="pImageFile" type="file" accept="image/*">
               </div>
               <input id="pImage" type="hidden">
@@ -1127,7 +1119,7 @@ body { -webkit-text-size-adjust: 100%; overflow-x: hidden; }
         <button id="addClientBtn">+ Nuevo cliente</button>
       </div>
       <div class="toolbar">
-        <input id="searchClient" placeholder="🔎 Buscar cliente por nombre o teléfono..." style="grid-column: 1 / -1;">
+        <input id="searchClient" placeholder="Buscar cliente por nombre o teléfono..." style="grid-column: 1 / -1;">
       </div>
       <div class="panel" style="margin-top:10px">
         <div id="clientsList"><div class="empty">No hay clientes registrados.</div></div>
@@ -1138,7 +1130,10 @@ body { -webkit-text-size-adjust: 100%; overflow-x: hidden; }
     <div id="clientModal" class="modal-overlay hidden">
       <div class="modal-content">
         <div class="sectionhead">
-          <h2 style="margin:0;">👥 Registrar Cliente</h2>
+          <h2 style="margin:0;">
+            <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
+            Registrar Cliente
+          </h2>
           <button id="closeClientModalBtn" class="secondary" style="padding:4px 10px" type="button">✕</button>
         </div>
         <form id="clientForm" style="margin-top:15px">
@@ -1154,7 +1149,10 @@ body { -webkit-text-size-adjust: 100%; overflow-x: hidden; }
     <div id="paymentModal" class="modal-overlay hidden">
       <div class="modal-content">
         <div class="sectionhead">
-          <h2 style="margin:0;">💵 Registrar Abono / Pago</h2>
+          <h2 style="margin:0;">
+            <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="1" x2="12" y2="23"></line><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path></svg>
+            Registrar Abono / Pago
+          </h2>
           <button id="closePaymentModalBtn" class="secondary" style="padding:4px 10px" type="button">✕</button>
         </div>
         <div style="margin:15px 0">
@@ -1183,7 +1181,10 @@ body { -webkit-text-size-adjust: 100%; overflow-x: hidden; }
           <h1>Ventas</h1>
           <p class="sub">Historial del negocio.</p>
         </div>
-        <button id="exportSalesExcel" class="secondary">📊 Exportar Ventas a Excel</button>
+        <button id="exportSalesExcel" class="secondary">
+          <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+          Exportar Ventas a Excel
+        </button>
       </div>
       <div class="panel">
         <h2>Registro de ventas</h2>
@@ -1200,16 +1201,16 @@ body { -webkit-text-size-adjust: 100%; overflow-x: hidden; }
       <p class="sub">Datos del emprendimiento y socios.</p>
       <div class="panel">
         <div id="codeSectionContainer">
-          <p><b>Link de tu catálogo público:</b></p>
-          <button id="copyCatalogLinkBtn" class="whatsapp-btn" style="margin-bottom:15px">📋 Copiar enlace de catálogo</button>
-          <button id="syncCatalogBtn" class="secondary" style="margin-bottom:15px; display:block;">🔄 Sincronizar catálogo</button>
           <p><b>Código de invitación para socios:</b></p>
           <div id="displayStoreCode" class="codebox">—</div>
           <button id="copyStoreCode" class="secondary" style="margin-top:10px">Copiar código socio</button>
         </div>
 
         <div id="membersSectionContainer" style="margin-top:20px; border-top:1px solid var(--line); padding-top:15px">
-          <p style="margin:0 0 5px"><b>👥 Miembros vinculados:</b></p>
+          <p style="margin:0 0 5px; display:flex; align-items:center; gap:6px;">
+            <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
+            <b>Miembros vinculados:</b>
+          </p>
           <p class="sub" style="font-size:12px; margin-bottom:10px">Socio(s) que tienen acceso en tiempo real a este negocio.</p>
           <div id="membersList" class="members-list"><div class="empty">Cargando miembros...</div></div>
         </div>
@@ -1217,9 +1218,14 @@ body { -webkit-text-size-adjust: 100%; overflow-x: hidden; }
         <form id="settingsForm" style="margin-top:20px; border-top:1px solid var(--line); padding-top:15px">
           <div class="field">
             <label>Logo del negocio</label>
-            <div id="bizLogoPreview" class="business-logo-preview">🏪</div>
+            <div id="bizLogoPreview" class="business-logo-preview">
+              <svg class="icon-lg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path></svg>
+            </div>
             <div class="file-upload-wrapper">
-              <span class="file-upload-btn">📷 Subir / Cambiar logo</span>
+              <span class="file-upload-btn">
+                <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path><circle cx="12" cy="13" r="4"></circle></svg>
+                Subir / Cambiar logo
+              </span>
               <input id="bizLogoFile" type="file" accept="image/*">
             </div>
             <input id="editLogoBase64" type="hidden">
@@ -1248,12 +1254,17 @@ body { -webkit-text-size-adjust: 100%; overflow-x: hidden; }
       <h1>Mi perfil y configuración</h1>
       <p class="sub">Personalizá tu cuenta, foto y tema visual.</p>
       <div class="panel profile-card">
-        <div id="profileAvatar" class="avatar-large">👤</div>
+        <div id="profileAvatar" class="avatar-large">
+          <svg class="icon-lg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
+        </div>
         <form id="profileForm">
           <div class="field">
             <label>Foto de perfil</label>
             <div class="file-upload-wrapper">
-              <span class="file-upload-btn">📷 Cambiar foto</span>
+              <span class="file-upload-btn">
+                <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path><circle cx="12" cy="13" r="4"></circle></svg>
+                Cambiar foto
+              </span>
               <input id="profileImageFile" type="file" accept="image/*">
             </div>
             <input id="profileImageBase64" type="hidden">
@@ -1263,7 +1274,10 @@ body { -webkit-text-size-adjust: 100%; overflow-x: hidden; }
           <button type="submit" style="width:100%; margin-bottom: 20px;">Guardar perfil</button>
         </form>
         <div style="border-top: 1px solid var(--line); padding-top: 20px; text-align: left;">
-          <h3 style="margin: 0 0 5px; font-size: 16px;">⚙️ Tema Visual</h3>
+          <h3 style="margin: 0 0 5px; font-size: 16px; display:flex; align-items:center; gap:6px;">
+            <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l-.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06-.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
+            Tema Visual
+          </h3>
           <div class="theme-selector">
             <button type="button" class="theme-circle" data-theme="claro" title="Modo Claro"></button>
             <button type="button" class="theme-circle" data-theme="oscuro" title="Azul Noche"></button>
@@ -1274,7 +1288,7 @@ body { -webkit-text-size-adjust: 100%; overflow-x: hidden; }
       </div>
     </section>
 
-    <p class="notice">Kiosy Stock Manager — Gestión en la nube y local.<br><span style="font-size:11px; opacity:0.8;">Nota: Los negocios creados en modo local no disponen de catálogo público en línea, ya que operan de forma exclusiva en este dispositivo.</span></p>
+    <p class="notice">Kiosy Stock Manager — Gestión en la nube y local.</p>
   </main>
 </div>
 
@@ -1310,14 +1324,14 @@ let sales = [];
 let payments = [];
 let clients = [];
 let businessList = [];
-let cart = []; 
 let authMode = "login";
 let editingProductId = null;
 let productUnsubscribe = null;
 let salesUnsubscribe = null;
 let paymentsUnsubscribe = null;
 let clientsUnsubscribe = null;
-let salesLimit = 200;
+let lastSaleDoc = null;
+let hasMoreSales = false;
 
 // Estado para Venta Rápida
 let quickSaleItems = [];
@@ -1325,6 +1339,11 @@ let quickSaleItems = [];
 // Gráficos Chart.js
 let salesChartInstance = null;
 let donutChartInstance = null;
+
+const SVG_BOX = `<svg class="icon-lg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path><polyline points="3.27 6.96 12 12.01 20.73 6.96"></polyline><line x1="12" y1="22.08" x2="12" y2="12"></line></svg>`;
+const SVG_STORE = `<svg class="icon-lg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg>`;
+const SVG_USER = `<svg class="icon-lg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>`;
+const SVG_FIRE = `<svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>`;
 
 const $ = id => document.getElementById(id);
 const show = id => $(id)?.classList.remove("hidden");
@@ -1344,7 +1363,9 @@ function showToast(message, type = "success") {
   if (!container) return;
   const toast = document.createElement("div");
   toast.className = `toast ${type}`;
-  toast.innerHTML = `<span>${message}</span>`;
+  const textSpan = document.createElement("span");
+  textSpan.textContent = message;
+  toast.appendChild(textSpan);
   container.appendChild(toast);
   setTimeout(() => {
     toast.style.opacity = "0";
@@ -1367,6 +1388,43 @@ $("confirmYesBtn").onclick = () => {
   hide("confirmModal");
   confirmCallback = null;
 };
+
+/* =========================
+   COMPRESIÓN DE IMÁGENES (PUNTO D)
+========================= */
+function compressImageToBlob(file, maxPx = 800, quality = 0.75) {
+  return new Promise((res, rej) => {
+    const reader = new FileReader();
+    reader.onload = e => {
+      const img = new Image();
+      img.onload = () => {
+        const scale = Math.min(1, maxPx / Math.max(img.width, img.height));
+        const canvas = document.createElement("canvas");
+        canvas.width = img.width * scale;
+        canvas.height = img.height * scale;
+        const ctx = canvas.getContext("2d");
+        ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+        canvas.toBlob(blob => {
+          if (blob) res(blob);
+          else rej(new Error("Error al comprimir la imagen"));
+        }, "image/jpeg", quality);
+      };
+      img.onerror = rej;
+      img.src = e.target.result;
+    };
+    reader.onerror = rej;
+    reader.readAsDataURL(file);
+  });
+}
+
+function blobToBase64(blob) {
+  return new Promise((res, rej) => {
+    const r = new FileReader();
+    r.onload = e => res(e.target.result);
+    r.onerror = rej;
+    r.readAsDataURL(blob);
+  });
+}
 
 /* =========================
    TEMAS
@@ -1394,176 +1452,14 @@ document.querySelectorAll(".theme-circle").forEach(b => {
 });
 
 /* =========================
-   INICIALIZACIÓN Y CATÁLOGO PÚBLICO
+   INICIALIZACIÓN DE PWA
 ========================= */
 window.addEventListener("DOMContentLoaded", async () => {
-  const urlParams = new URLSearchParams(window.location.search);
-  const catalogCode = urlParams.get("catalogo");
-
-  if (catalogCode) {
-    hide("modeSelectScreen"); hide("authScreen"); hide("homeScreen"); hide("setup"); hide("app"); hide("globalQuickSaleBtn");
-    await loadPublicCatalog(catalogCode);
-  } else {
-    applyTheme("claro");
-  }
-
-  // Registrar Service Worker actualizado
+  applyTheme("claro");
   if ('serviceWorker' in navigator) {
     navigator.serviceWorker.register('sw.js').catch(err => console.log('SW registration failed:', err));
   }
 });
-
-async function loadPublicCatalog(catalogId) {
-  try {
-    show("publicCatalogScreen");
-    setText("publicCatalogTitle", "Cargando catálogo...");
-    setText("publicCatalogSub", "Espere un momento por favor...");
-
-    const normalizedId = String(catalogId || "").trim().toUpperCase();
-    const catSnap = await db.collection("catalogos").doc(normalizedId).get();
-    if (!catSnap.exists) throw new Error("Catálogo no encontrado (ID inexistente)");
-    const cData = catSnap.data();
-    currentBusiness = { id: cData.businessId, name: cData.name, phone: cData.phone };
-    
-    const itemsSnap = await db.collection("catalogos").doc(normalizedId).collection("items").get();
-    products = itemsSnap.docs.map(d => ({ id: d.id, ...d.data() }));
-
-    setText("publicCatalogTitle", currentBusiness.name || "Catálogo de Productos");
-    setText("publicCatalogSub", `WhatsApp de pedidos: ${currentBusiness.phone || "No especificado"}`);
-    fillPublicCategories();
-    renderPublicProducts();
-  } catch (err) {
-    console.error("Error al cargar catálogo público:", err);
-    setText("publicCatalogTitle", "Catálogo no disponible");
-    setText("publicCatalogSub", `Detalle del error: ${err.code || err.message || "Desconocido"}`);
-    $("publicProductList").innerHTML = '<div class="panel empty" style="grid-column:1/-1">El enlace del catálogo es incorrecto, expiró o el negocio ya no está activo.</div>';
-  }
-}
-
-function fillPublicCategories() {
-  const cats = [...new Set(products.map(p => p.category).filter(Boolean))];
-  const sel = $("publicFilterCategory");
-  sel.innerHTML = '<option value="">Todas las categorías</option>' + cats.map(c => `<option value="${clean(c)}">${clean(c)}</option>`).join("");
-}
-
-$("publicSearch")?.addEventListener("input", renderPublicProducts);
-$("publicFilterCategory")?.addEventListener("change", renderPublicProducts);
-
-function renderPublicProducts() {
-  const container = $("publicProductList");
-  if (!container) return;
-  const search = ($("publicSearch")?.value || "").toLowerCase().trim();
-  const cat = $("publicFilterCategory")?.value || "";
-
-  const filtered = products.filter(p => {
-    const text = [p.name, p.category, p.code].join(" ").toLowerCase();
-    return text.includes(search) && (!cat || p.category === cat);
-  });
-
-  if (!filtered.length) {
-    container.innerHTML = '<div class="panel empty" style="grid-column:1/-1">No hay productos disponibles.</div>';
-    return;
-  }
-
-  container.innerHTML = filtered.map(p => {
-    const qty = Number(p.quantity) || 0;
-    const isOut = qty <= 0;
-    const stockClass = isOut ? "out" : qty <= 3 ? "low" : "green";
-    const stockLabel = isOut ? "Agotado" : qty <= 3 ? `Stock bajo (${qty})` : `Disponible`;
-
-    return `
-      <article class="product-card">
-        <div class="product-image">
-          ${p.image ? `<img src="${p.image}" alt="${clean(p.name)}">` : '<div class="product-placeholder">📦</div>'}
-        </div>
-        <div class="product-card-body">
-          <div class="product-name">${clean(p.name)}</div>
-          <div class="product-price">${money(p.price)}</div>
-          <div class="product-stock"><span class="stock-status ${stockClass}">${stockLabel}</span></div>
-        </div>
-        <div style="padding:10px">
-          <button type="button" class="whatsapp-btn" style="width:100%" data-add-cart="${p.id}" ${isOut ? 'disabled' : ''}>
-            🛒 ${isOut ? 'Agotado' : 'Agregar al carrito'}
-          </button>
-        </div>
-      </article>`;
-  }).join("");
-
-  container.querySelectorAll("[data-add-cart]").forEach(btn => {
-    btn.onclick = () => addToCart(btn.dataset.addCart);
-  });
-}
-
-/* =========================
-   CARRITO PÚBLICO Y WHATSAPP
-========================= */
-function addToCart(pid) {
-  const prod = products.find(p => p.id === pid);
-  if (!prod) return;
-  const existing = cart.find(i => i.product.id === pid);
-  if (existing) {
-    if (existing.quantity < prod.quantity) existing.quantity++;
-    else showToast("Alcanzaste el límite de stock disponible.", "error");
-  } else {
-    cart.push({ product: prod, quantity: 1 });
-  }
-  updateCartUI();
-}
-
-function updateCartUI() {
-  const count = cart.reduce((s, i) => s + i.quantity, 0);
-  setText("cartCount", count);
-  if (count > 0) show("openCartBtn"); else { hide("openCartBtn"); hide("cartModal"); }
-
-  const container = $("cartItemsList");
-  let total = 0;
-  container.innerHTML = cart.map(i => {
-    const sub = i.product.price * i.quantity;
-    total += sub;
-    return `
-      <div style="display:flex;align-items:center;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--line)">
-        <div><b>${clean(i.product.name)}</b><p class="sub" style="font-size:12px;margin:2px 0">${money(i.product.price)} c/u</p></div>
-        <div style="display:flex;align-items:center;gap:8px">
-          <button type="button" class="secondary" data-cart-minus="${i.product.id}" style="padding:2px 8px">-</button>
-          <span><b>${i.quantity}</b></span>
-          <button type="button" class="secondary" data-cart-plus="${i.product.id}" style="padding:2px 8px">+</button>
-        </div>
-      </div>`;
-  }).join("");
-
-  setText("cartTotal", money(total));
-
-  container.querySelectorAll("[data-cart-minus]").forEach(b => b.onclick = () => changeCartQty(b.dataset.cartMinus, -1));
-  container.querySelectorAll("[data-cart-plus]").forEach(b => b.onclick = () => changeCartQty(b.dataset.cartPlus, 1));
-}
-
-function changeCartQty(pid, delta) {
-  const item = cart.find(i => i.product.id === pid);
-  if (!item) return;
-  item.quantity += delta;
-  if (item.quantity <= 0) cart = cart.filter(i => i.product.id !== pid);
-  else if (item.quantity > item.product.quantity) item.quantity = item.product.quantity;
-  updateCartUI();
-}
-
-$("openCartBtn").onclick = () => show("cartModal");
-$("closeCartBtn").onclick = () => hide("cartModal");
-
-$("sendWhatsappBtn").onclick = () => {
-  if (!cart.length) return;
-  const phone = currentBusiness?.phone;
-  if (!phone) return showToast("El vendedor no configuró WhatsApp.", "error");
-
-  let text = `¡Hola *${currentBusiness.name}*! Quisiera realizar el siguiente pedido:\n\n`;
-  let total = 0;
-  cart.forEach(i => {
-    const sub = i.product.price * i.quantity;
-    total += sub;
-    text += `• ${i.quantity}x *${i.product.name}* (${money(i.product.price)}) = ${money(sub)}\n`;
-  });
-  text += `\n*TOTAL: ${money(total)}*\n\n¿Tienen disponibilidad?`;
-  window.open(`https://wa.me/${phone.replace(/\D/g, "")}?text=${encodeURIComponent(text)}`, "_blank");
-};
 
 /* =========================
    MODOS DE INICIO
@@ -1575,7 +1471,7 @@ $("backToModeSelect").onclick = () => { hide("authScreen"); show("modeSelectScre
 const triggerLogout = async () => {
   clearListeners();
   if (appMode === "cloud") { try { await auth.signOut(); } catch(e){} }
-  appMode = null; currentBusiness = null; products = []; sales = []; payments = []; clients = []; cart = [];
+  appMode = null; currentBusiness = null; products = []; sales = []; payments = []; clients = [];
   hide("app"); hide("setup"); hide("homeScreen"); hide("authScreen"); hide("headerAvatar"); hide("headerLogout"); hide("globalQuickSaleBtn");
   show("modeSelectScreen");
   showToast("Sesión cerrada correctamente", "info");
@@ -1600,7 +1496,7 @@ function loadLocalProfile() {
 }
 
 /* =========================
-   AUTENTICACIÓN NUBE
+   AUTENTICACIÓN NUBE Y RESET PASS
 ========================= */
 $("tabLogin").onclick = () => setAuthMode("login");
 $("tabRegister").onclick = () => setAuthMode("register");
@@ -1610,6 +1506,17 @@ function setAuthMode(m) {
   $("tabRegister").classList.toggle("active", m === "register");
   setText("authSubmitBtn", m === "login" ? "Iniciar sesión" : "Crear cuenta");
 }
+
+$("btnForgotPassword").onclick = async () => {
+  const email = $("authEmail").value.trim();
+  if (!email) return showToast("Ingresá tu correo electrónico para restablecer la contraseña.", "info");
+  try {
+    await auth.sendPasswordResetEmail(email);
+    showToast("Te enviamos un correo para restablecer tu contraseña.");
+  } catch (err) {
+    showToast(err.message || "Error al enviar el correo.", "error");
+  }
+};
 
 $("authForm").addEventListener("submit", async e => {
   e.preventDefault();
@@ -1630,7 +1537,6 @@ $("authForm").addEventListener("submit", async e => {
 auth.onAuthStateChanged(async user => {
   currentUser = user;
   clearListeners();
-  if (new URLSearchParams(window.location.search).get("catalogo")) return;
 
   if (!user) {
     if (appMode === "cloud") {
@@ -1656,7 +1562,6 @@ auth.onAuthStateChanged(async user => {
     }
     applyTheme(userProfile.theme);
     updateUIProfile();
-    await refreshBusinessList();
     showHome();
   } catch (e) { console.error(e); showHome(); }
 });
@@ -1683,7 +1588,7 @@ async function renderBusinessList() {
 
   container.innerHTML = businessList.map(b => `
     <article class="business-card">
-      <div class="business-icon">${b.logo ? `<img src="${b.logo}">` : '🏪'}</div>
+      <div class="business-icon">${b.logo ? `<img src="${b.logo}">` : SVG_STORE}</div>
       <h3>${clean(b.name)}</h3>
       <p>${clean(b.type || "Negocio")}</p>
       <button type="button" data-open-business="${b.id}" style="width:100%">Entrar al negocio →</button>
@@ -1719,6 +1624,8 @@ $("tabJoinBiz").onclick = () => setBizMode("join");
    ABRIR NEGOCIO Y LISTENERS
 ========================= */
 async function openBusiness(id) {
+  clearListeners();
+
   if (appMode === "local") {
     const list = JSON.parse(localStorage.getItem("stockea_local_businesses") || "[]");
     currentBusiness = list.find(b => b.id === id);
@@ -1740,22 +1647,6 @@ async function openBusiness(id) {
   currentBusinessId = id;
   currentBusiness = { id: snap.id, ...data };
 
-  if (!currentBusiness.catalogId && currentBusiness.ownerUid === currentUser.uid) {
-    try {
-      const catId = secureCode(12);
-      await db.collection("businesses").doc(currentBusinessId).update({ catalogId: catId });
-      await db.collection("catalogos").doc(catId).set({
-        businessId: currentBusinessId,
-        ownerUid: currentBusiness.ownerUid,
-        name: currentBusiness.name,
-        phone: currentBusiness.phone
-      });
-      currentBusiness.catalogId = catId;
-    } catch (err) {
-      console.warn("No se pudo autogenerar el catálogo:", err);
-    }
-  }
-
   setupBusinessUI();
   startBusinessListeners();
 }
@@ -1763,7 +1654,7 @@ async function openBusiness(id) {
 function setupBusinessUI() {
   hide("authScreen"); hide("setup"); hide("homeScreen"); show("app");
   show("headerHome");
-  show("globalQuickSaleBtn"); // Mostrar botón flotante de Venta Rápida
+  show("globalQuickSaleBtn");
   setText("welcome", currentBusiness.name);
   setText("storeSubInfo", currentBusiness.type || "Panel general");
   setText("displayStoreCode", currentBusiness.accessCode || "—");
@@ -1779,7 +1670,7 @@ function setupBusinessUI() {
     $("bizLogoPreview").innerHTML = `<img src="${currentBusiness.logo}">`;
   } else {
     $("editLogoBase64").value = "";
-    $("bizLogoPreview").innerHTML = "🏪";
+    $("bizLogoPreview").innerHTML = SVG_STORE;
   }
 
   fillCategoryOptions();
@@ -1792,6 +1683,9 @@ function clearListeners() {
   if (paymentsUnsubscribe) paymentsUnsubscribe();
   if (clientsUnsubscribe) clientsUnsubscribe();
   productUnsubscribe = salesUnsubscribe = paymentsUnsubscribe = clientsUnsubscribe = null;
+  sales = [];
+  lastSaleDoc = null;
+  hasMoreSales = false;
 }
 
 function startBusinessListeners() {
@@ -1803,19 +1697,33 @@ function startBusinessListeners() {
     fillCategoryOptions();
     renderProducts();
     renderDashboard();
-    syncCatalogSoon();
   });
 
-  salesUnsubscribe = db.collection("businesses").doc(currentBusinessId).collection("sales").orderBy("createdAt", "desc").limit(salesLimit).onSnapshot(snap => {
-    sales = snap.docs.map(d => ({ id: d.id, ...d.data() }));
-    renderSales();
-    renderDashboard();
-  });
+  // Carga inicial paginada de ventas (Punto C)
+  db.collection("businesses").doc(currentBusinessId).collection("sales")
+    .orderBy("createdAt", "desc")
+    .limit(50)
+    .get().then(snap => {
+      if (!snap.empty) {
+        lastSaleDoc = snap.docs[snap.docs.length - 1];
+        sales = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+        hasMoreSales = snap.docs.length === 50;
+      } else {
+        sales = [];
+        hasMoreSales = false;
+      }
+      renderSales();
+      renderDashboard();
+    });
 
-  paymentsUnsubscribe = db.collection("businesses").doc(currentBusinessId).collection("payments").onSnapshot(snap => {
-    payments = snap.docs.map(d => ({ id: d.id, ...d.data() }));
-    renderDashboard();
-  });
+  // Optimización de lecturas de payments (Punto C: últimos 90 días o máximo 200 registros)
+  paymentsUnsubscribe = db.collection("businesses").doc(currentBusinessId).collection("payments")
+    .orderBy("createdAt", "desc")
+    .limit(200)
+    .onSnapshot(snap => {
+      payments = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+      renderDashboard();
+    });
 
   clientsUnsubscribe = db.collection("businesses").doc(currentBusinessId).collection("clients").onSnapshot(snap => {
     clients = snap.docs.map(d => ({ id: d.id, ...d.data() }));
@@ -1824,7 +1732,7 @@ function startBusinessListeners() {
 }
 
 /* ========================================================
-   IMPLEMENTACIÓN: VENTA RÁPIDA (GLOBAL FAB & MODAL)
+   VENTA RÁPIDA (GLOBAL FAB & MODAL)
 ======================================================== */
 $("globalQuickSaleBtn").onclick = () => {
   quickSaleItems = [];
@@ -1833,9 +1741,8 @@ $("globalQuickSaleBtn").onclick = () => {
   $("qsPaymentMethod").value = "Efectivo";
   $("qsClientContainer").classList.add("hidden");
   
-  // Rellenar clientes
   const clientSel = $("qsClientSelect");
-  clientSel.innerHTML = clients.map(c => `<option value="${c.id}">${clean(c.name)} (${c.phone})</option>`).join("");
+  clientSel.innerHTML = clients.map(c => `<option value="${c.id}">${clean(c.name)} (${clean(c.phone)})</option>`).join("");
 
   renderQuickSaleResults("");
   renderQuickSaleCart();
@@ -1869,7 +1776,7 @@ function renderQuickSaleResults(query) {
       <div style="display:flex; align-items:center; justify-content:space-between; padding:8px 12px; border-bottom:1px solid var(--line); background:var(--panel);">
         <div style="display:flex; align-items:center; gap:10px;">
           <div style="width:36px; height:36px; border-radius:6px; background:var(--bg); display:flex; align-items:center; justify-content:center; overflow:hidden;">
-            ${p.image ? `<img src="${p.image}" style="width:100%; height:100%; object-fit:contain;">` : '📦'}
+            ${p.image ? `<img src="${p.image}" style="width:100%; height:100%; object-fit:contain;">` : SVG_BOX}
           </div>
           <div>
             <b style="font-size:14px;">${clean(p.name)}</b>
@@ -1926,7 +1833,7 @@ function renderQuickSaleCart() {
       <div style="display:flex; align-items:center; justify-content:space-between; padding:8px 0; border-bottom:1px solid var(--line); gap:10px;">
         <div style="display:flex; align-items:center; gap:8px; flex:1;">
           <div style="width:32px; height:32px; border-radius:6px; background:var(--bg); display:flex; align-items:center; justify-content:center; overflow:hidden;">
-            ${item.product.image ? `<img src="${item.product.image}" style="width:100%; height:100%; object-fit:contain;">` : '📦'}
+            ${item.product.image ? `<img src="${item.product.image}" style="width:100%; height:100%; object-fit:contain;">` : SVG_BOX}
           </div>
           <div>
             <b style="font-size:13px;">${clean(item.product.name)}</b>
@@ -1945,7 +1852,6 @@ function renderQuickSaleCart() {
 
   setText("qsModalTotal", money(totalGeneral));
 
-  // Eventos de cantidad y eliminación en carrito rápido
   container.querySelectorAll("[data-qs-minus]").forEach(b => b.onclick = () => updateQuickSaleQty(b.dataset.qsMinus, -1));
   container.querySelectorAll("[data-qs-plus]").forEach(b => b.onclick = () => updateQuickSaleQty(b.dataset.qsPlus, 1));
   container.querySelectorAll("[data-qs-remove]").forEach(b => b.onclick = () => removeQuickSaleItem(b.dataset.qsRemove));
@@ -1998,6 +1904,9 @@ $("qsPaymentMethod").onchange = e => {
   }
 };
 
+/* ========================================================
+   TRANSACCIÓN EN FIRESTORE CORREGIDA (PUNTO B.1)
+======================================================== */
 $("qsForm").onsubmit = async e => {
   e.preventDefault();
   if (!quickSaleItems.length) return showToast("Agregue al menos un producto a la venta.", "error");
@@ -2035,14 +1944,12 @@ $("qsForm").onsubmit = async e => {
 
   try {
     if (appMode === "local") {
-      // Descontar inventario local
       for (const item of quickSaleItems) {
         const prod = products.find(p => p.id === item.product.id);
         if (prod) prod.quantity -= item.quantity;
       }
       localStorage.setItem(`stockea_local_products_${currentBusinessId}`, JSON.stringify(products));
 
-      // Actualizar deuda de cliente si aplica
       if (clientId && method === "Cuenta Corriente") {
         const client = clients.find(c => c.id === clientId);
         if (client) {
@@ -2054,70 +1961,68 @@ $("qsForm").onsubmit = async e => {
       const newSale = {
         id: "sale_" + Date.now(),
         items: saleItemsFormatted,
-        total,
-        profit,
-        paymentMethod: method,
+        total, profit, paymentMethod: method,
         clientId: clientId || null,
         clientName: clientId ? clients.find(c => c.id === clientId)?.name || "" : "",
-        notes,
-        createdAt: Date.now()
+        notes, createdAt: Date.now()
       };
       sales.unshift(newSale);
       localStorage.setItem(`stockea_local_sales_${currentBusinessId}`, JSON.stringify(sales));
 
       hide("quickSaleModal");
       renderProducts(); renderSales(); renderDashboard(); renderClients();
-      showToast("¡Venta registrada correctamente!");
+      showToast("Venta registrada correctamente");
     } else {
-      // Transacción segura en Cloud Firestore
+      // TRANSACCIÓN DE LECTURAS ANTES DE ESCRITURAS (PUNTO B.1)
       const clientRef = clientId ? db.collection("businesses").doc(currentBusinessId).collection("clients").doc(clientId) : null;
       const saleRef = db.collection("businesses").doc(currentBusinessId).collection("sales").doc();
 
       await db.runTransaction(async t => {
-        // Verificar stock de todos los productos en la transacción
-        for (const item of quickSaleItems) {
-          const pRef = db.collection("businesses").doc(currentBusinessId).collection("products").doc(item.product.id);
-          const pSnap = await t.get(pRef);
-          if (!pSnap.exists) throw new Error(`El producto ${item.product.name} ya no existe.`);
+        // 1. TODAS LAS LECTURAS PRIMERO
+        const productSnaps = await Promise.all(
+          quickSaleItems.map(item => {
+            const pRef = db.collection("businesses").doc(currentBusinessId).collection("products").doc(item.product.id);
+            return t.get(pRef);
+          })
+        );
+        const clientSnap = clientRef ? await t.get(clientRef) : null;
+
+        // 2. VALIDACIONES
+        productSnaps.forEach((pSnap, idx) => {
+          const item = quickSaleItems[idx];
+          if (!pSnap.exists) throw new Error(`El producto ${item.product.name} no existe.`);
           const currentQty = pSnap.data().quantity || 0;
           if (currentQty < item.quantity) throw new Error(`Stock insuficiente para ${item.product.name}. Stock actual: ${currentQty}`);
-        }
+        });
 
-        // Si hay cliente para cuenta corriente, actualizar deuda
         let clientName = "";
-        if (clientRef) {
-          const cSnap = await t.get(clientRef);
-          if (cSnap.exists) {
-            clientName = cSnap.data().name || "";
-            t.update(clientRef, { debt: (cSnap.data().debt || 0) + total });
-          }
+        if (clientSnap && clientSnap.exists) {
+          clientName = clientSnap.data().name || "";
         }
 
-        // Descontar stock
-        for (const item of quickSaleItems) {
-          const pRef = db.collection("businesses").doc(currentBusinessId).collection("products").doc(item.product.id);
-          const pSnap = await t.get(pRef);
+        // 3. TODAS LAS ESCRITURAS DESPUÉS
+        productSnaps.forEach((pSnap, idx) => {
+          const item = quickSaleItems[idx];
           const currentQty = pSnap.data().quantity || 0;
-          t.update(pRef, { quantity: currentQty - item.quantity });
+          t.update(pSnap.ref, { quantity: currentQty - item.quantity });
+        });
+
+        if (clientSnap && clientSnap.exists) {
+          t.update(clientRef, { debt: (clientSnap.data().debt || 0) + total });
         }
 
-        // Registrar venta
         t.set(saleRef, {
           items: saleItemsFormatted,
-          total,
-          profit,
-          paymentMethod: method,
+          total, profit, paymentMethod: method,
           clientId: clientId || null,
-          clientName,
-          notes,
+          clientName, notes,
           createdAt: firebase.firestore.FieldValue.serverTimestamp(),
           soldBy: currentUser.uid
         });
       });
 
-      await updatePublicCatalogFirestore();
       hide("quickSaleModal");
-      showToast("¡Venta registrada correctamente!");
+      showToast("Venta registrada correctamente");
     }
   } catch (err) {
     showToast(err.message || "Error al procesar la venta rápida", "error");
@@ -2154,7 +2059,7 @@ $("headerAvatar").onclick = () => document.querySelector('nav [data-page="profil
 $("addProductBtn").onclick = () => {
   editingProductId = null;
   $("productForm").reset();
-  $("pColorCode").value = "#568cff";
+  $("pColorCode").value = "#a855f7";
   $("pMinStock").value = "3";
   $("pImage").value = "";
   $("pImageFile").value = "";
@@ -2167,18 +2072,20 @@ $("addProductBtn").onclick = () => {
 
 $("cancelProductBtn").onclick = () => { hide("productFormPanel"); show("stock"); };
 
+/* SUBIDA DE IMAGEN COMPRIMIDA EN STORAGE (PUNTO D) */
 $("pImageFile").onchange = async e => {
   const f = e.target.files?.[0];
   if (!f) return;
   try {
     $("imagePreview").textContent = "Subiendo imagen...";
+    const blob = await compressImageToBlob(f, 800, 0.75);
     if (appMode === "local") {
-      const base64 = await compressImage(f);
+      const base64 = await blobToBase64(blob);
       $("pImage").value = base64;
       $("imagePreview").innerHTML = `<img src="${base64}" style="max-width:140px; border-radius:8px;">`;
     } else {
-      const ref = storage.ref(`businesses/${currentBusinessId}/products/${Date.now()}_${f.name}`);
-      await ref.put(f);
+      const ref = storage.ref(`businesses/${currentBusinessId}/products/${Date.now()}.jpg`);
+      await ref.put(blob, { contentType: "image/jpeg" });
       const url = await ref.getDownloadURL();
       $("pImage").value = url;
       $("imagePreview").innerHTML = `<img src="${url}" style="max-width:140px; border-radius:8px;">`;
@@ -2188,25 +2095,6 @@ $("pImageFile").onchange = async e => {
     $("imagePreview").innerHTML = "";
   }
 };
-
-function compressImage(file) {
-  return new Promise((res, rej) => {
-    const reader = new FileReader();
-    reader.onload = e => {
-      const img = new Image();
-      img.onload = () => {
-        const scale = Math.min(1, 600 / Math.max(img.width, img.height));
-        const canvas = document.createElement("canvas");
-        canvas.width = img.width * scale; canvas.height = img.height * scale;
-        const ctx = canvas.getContext("2d");
-        ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
-        res(canvas.toDataURL("image/jpeg", 0.75));
-      };
-      img.src = e.target.result;
-    };
-    reader.readAsDataURL(file);
-  });
-}
 
 $("productForm").onsubmit = async e => {
   e.preventDefault();
@@ -2242,7 +2130,6 @@ $("productForm").onsubmit = async e => {
         data.createdAt = firebase.firestore.FieldValue.serverTimestamp();
         await col.add(data);
       }
-      await updatePublicCatalogFirestore();
     }
     showToast("¡Producto guardado exitosamente!");
     hide("productFormPanel"); show("stock");
@@ -2285,7 +2172,7 @@ function renderProducts() {
     return `
       <article class="product-card">
         <div class="product-image">
-          ${p.image ? `<img src="${p.image}" alt="${clean(p.name)}">` : '<div class="product-placeholder">📦</div>'}
+          ${p.image ? `<img src="${p.image}" alt="${clean(p.name)}">` : SVG_BOX}
         </div>
         <div class="product-card-body">
           <div class="product-name">${clean(p.name)}</div>
@@ -2313,7 +2200,7 @@ function editProduct(id) {
   $("pName").value = p.name || "";
   $("pCategory").value = p.category || "";
   $("pModel").value = p.model || "";
-  $("pColorCode").value = p.colorCode || "#568cff";
+  $("pColorCode").value = p.colorCode || "#a855f7";
   $("pCost").value = p.cost || 0;
   $("pPrice").value = p.price || 0;
   $("pQty").value = p.quantity || 0;
@@ -2334,7 +2221,6 @@ function confirmDeleteProduct(id) {
         renderProducts(); renderDashboard();
       } else {
         await db.collection("businesses").doc(currentBusinessId).collection("products").doc(id).delete();
-        await updatePublicCatalogFirestore();
       }
       showToast("Producto eliminado");
     } catch(e) { showToast("Error al eliminar", "error"); }
@@ -2342,7 +2228,7 @@ function confirmDeleteProduct(id) {
 }
 
 /* =========================
-   MODAL DE VENTA DESDE STOCK (ORIGINAL)
+   MODAL DE VENTA DESDE STOCK
 ========================= */
 let activeSaleProduct = null;
 function openSaleModal(pid) {
@@ -2358,7 +2244,7 @@ function openSaleModal(pid) {
   $("saleClientContainer").classList.add("hidden");
 
   const clientSel = $("saleClientSelect");
-  clientSel.innerHTML = clients.map(c => `<option value="${c.id}">${clean(c.name)} (${c.phone})</option>`).join("");
+  clientSel.innerHTML = clients.map(c => `<option value="${c.id}">${clean(c.name)} (${clean(c.phone)})</option>`).join("");
 
   updateSaleModalTotal();
   show("saleModal");
@@ -2390,6 +2276,7 @@ function updateSaleModalTotal() {
   setText("saleModalTotal", money(qty * (activeSaleProduct.price || 0)));
 }
 
+/* TRANSACCIÓN EN FIRESTORE CORREGIDA (PUNTO B.2) */
 $("saleModalForm").onsubmit = async e => {
   e.preventDefault();
   if (!activeSaleProduct) return;
@@ -2428,29 +2315,35 @@ $("saleModalForm").onsubmit = async e => {
 
       hide("saleModal");
       renderProducts(); renderSales(); renderDashboard(); renderClients();
-      showToast("¡Venta registrada correctamente!");
+      showToast("Venta registrada correctamente");
       return;
     }
 
+    // TRANSACCIÓN DE LECTURAS ANTES DE ESCRITURAS (PUNTO B.2)
     const prodRef = db.collection("businesses").doc(currentBusinessId).collection("products").doc(activeSaleProduct.id);
     const saleRef = db.collection("businesses").doc(currentBusinessId).collection("sales").doc();
     const clientRef = clientId ? db.collection("businesses").doc(currentBusinessId).collection("clients").doc(clientId) : null;
 
     await db.runTransaction(async t => {
+      // 1. TODAS LAS LECTURAS PRIMERO
       const pSnap = await t.get(prodRef);
+      const cSnap = clientRef ? await t.get(clientRef) : null;
+
+      // 2. VALIDACIONES
       if (!pSnap.exists) throw new Error("Producto no encontrado");
       const currentQty = pSnap.data().quantity || 0;
       if (currentQty < qty) throw new Error("Stock insuficiente");
 
+      let clientName = "";
+      if (cSnap && cSnap.exists) {
+        clientName = cSnap.data().name || "";
+      }
+
+      // 3. TODAS LAS ESCRITURAS DESPUÉS
       t.update(prodRef, { quantity: currentQty - qty });
 
-      let clientName = "";
-      if (clientRef) {
-        const cSnap = await t.get(clientRef);
-        if (cSnap.exists) {
-          clientName = cSnap.data().name || "";
-          t.update(clientRef, { debt: (cSnap.data().debt || 0) + total });
-        }
+      if (cSnap && cSnap.exists) {
+        t.update(clientRef, { debt: (cSnap.data().debt || 0) + total });
       }
 
       t.set(saleRef, {
@@ -2461,9 +2354,8 @@ $("saleModalForm").onsubmit = async e => {
       });
     });
 
-    await updatePublicCatalogFirestore();
     hide("saleModal");
-    showToast("¡Venta registrada correctamente!");
+    showToast("Venta registrada correctamente");
   } catch(err) {
     showToast(err.message || "Error al registrar la venta", "error");
   }
@@ -2521,11 +2413,11 @@ function renderClients() {
       <div class="sale" style="align-items:flex-start">
         <div style="flex:1">
           <b style="font-size:16px">${clean(c.name)}</b>
-          <p>📞 Teléfono: ${clean(c.phone)} ${c.notes ? '· Notas: ' + clean(c.notes) : ''}</p>
+          <p>Teléfono: ${clean(c.phone)} ${c.notes ? '· Notas: ' + clean(c.notes) : ''}</p>
           <p class="${debtClass}" style="font-weight:bold; margin-top:4px">${debtLabel}</p>
         </div>
         <div class="sale-actions">
-          ${debt > 0 ? `<button type="button" class="whatsapp-btn" data-pay-client="${c.id}" style="padding:6px 12px; font-size:12px;">💵 Registrar Abono</button>` : ''}
+          ${debt > 0 ? `<button type="button" class="secondary" data-pay-client="${c.id}" style="padding:6px 12px; font-size:12px;">Registrar Abono</button>` : ''}
           <button type="button" class="danger" data-delete-client="${c.id}" style="padding:6px 10px; font-size:12px;">Eliminar</button>
         </div>
       </div>`;
@@ -2570,7 +2462,7 @@ $("paymentForm").onsubmit = async e => {
       payments.push(paymentData);
       localStorage.setItem(`stockea_local_payments_${currentBusinessId}`, JSON.stringify(payments));
       hide("paymentModal"); renderClients(); renderDashboard();
-      showToast("¡Abono registrado!");
+      showToast("Abono registrado");
     } else {
       const batch = db.batch();
       const pRef = db.collection("businesses").doc(currentBusinessId).collection("payments").doc();
@@ -2579,7 +2471,7 @@ $("paymentForm").onsubmit = async e => {
       batch.update(cRef, { debt: newDebt });
       await batch.commit();
       hide("paymentModal");
-      showToast("¡Abono registrado!");
+      showToast("Abono registrado");
     }
   } catch(err) {
     showToast("Error al registrar abono", "error");
@@ -2602,7 +2494,7 @@ function confirmDeleteClientRecord(cid) {
 }
 
 /* =========================
-   VENTAS E HISTORIAL
+   VENTAS E HISTORIAL CON PAGINACIÓN (PUNTO C)
 ========================= */
 function getSaleTime(s) {
   if (s.createdAt && typeof s.createdAt.toMillis === "function") return s.createdAt.toMillis();
@@ -2620,14 +2512,15 @@ function renderSales() {
     return;
   }
 
+  /* ESCAPADO CON CLEAN EN CAMPOS SENSIBLES (PUNTO E) */
   container.innerHTML = sales.map(s => {
     const time = getSaleTime(s);
     const dateText = time ? new Date(time).toLocaleString("es-AR") : "—";
-    const itemsDesc = (s.items || []).map(i => `${i.quantity}x ${i.name}`).join(", ");
-    const clientName = s.clientName ? ` · Cliente: ${s.clientName}` : '';
-    const notesText = s.notes ? ` · 📝 ${s.notes}` : '';
+    const itemsDesc = (s.items || []).map(i => `${i.quantity}x ${clean(i.name)}`).join(", ");
+    const clientName = s.clientName ? ` · Cliente: ${clean(s.clientName)}` : '';
+    const notesText = s.notes ? ` · Nota: ${clean(s.notes)}` : '';
 
-    let imgHTML = "📦";
+    let imgHTML = SVG_BOX;
     if (s.items && s.items.length > 0) {
       const prod = products.find(p => p.id === s.items[0].productId);
       if (prod && prod.image) imgHTML = `<img src="${prod.image}">`;
@@ -2637,8 +2530,8 @@ function renderSales() {
       <div class="sale">
         <div class="sale-item-thumb">${imgHTML}</div>
         <div style="flex:1; min-width:180px;">
-          <b>${clean(itemsDesc)}</b>
-          <p>${dateText} · Pago: ${s.paymentMethod || 'Efectivo'}${clientName}${notesText}</p>
+          <b>${itemsDesc}</b>
+          <p>${dateText} · Pago: ${clean(s.paymentMethod || 'Efectivo')}${clientName}${notesText}</p>
         </div>
         <div class="sale-actions">
           <div style="text-align:right;">
@@ -2654,19 +2547,42 @@ function renderSales() {
     b.onclick = () => confirmCancelSale(b.dataset.cancelSale);
   });
 
-  if (appMode === "cloud" && sales.length >= salesLimit) {
+  if (appMode === "cloud" && hasMoreSales) {
     show("loadMoreSalesContainer");
   } else {
     hide("loadMoreSalesContainer");
   }
 }
 
-$("loadMoreSalesBtn").onclick = () => {
-  salesLimit += 200;
-  startBusinessListeners();
-  showToast("Cargando más ventas...", "info");
+/* CARGAR MÁS VENTAS CON PAGINACIÓN startAfter (PUNTO C) */
+$("loadMoreSalesBtn").onclick = async () => {
+  if (!lastSaleDoc || appMode !== "cloud") return;
+  $("loadMoreSalesBtn").disabled = true;
+  try {
+    const snap = await db.collection("businesses").doc(currentBusinessId).collection("sales")
+      .orderBy("createdAt", "desc")
+      .startAfter(lastSaleDoc)
+      .limit(50)
+      .get();
+
+    if (!snap.empty) {
+      lastSaleDoc = snap.docs[snap.docs.length - 1];
+      const newSales = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+      sales = [...sales, ...newSales];
+      hasMoreSales = snap.docs.length === 50;
+    } else {
+      hasMoreSales = false;
+    }
+    renderSales();
+    renderDashboard();
+  } catch(e) {
+    showToast("Error al cargar más ventas", "error");
+  } finally {
+    $("loadMoreSalesBtn").disabled = false;
+  }
 };
 
+/* TRANSACCIÓN EN FIRESTORE CORREGIDA (PUNTO B.3) */
 function confirmCancelSale(sid) {
   openConfirmModal("Anular venta", "¿Estás seguro de anular esta venta? El stock regresará y se ajustará la cuenta corriente si aplica.", async () => {
     const s = sales.find(x => x.id === sid);
@@ -2695,34 +2611,48 @@ function confirmCancelSale(sid) {
         return;
       }
 
+      // TRANSACCIÓN DE LECTURAS ANTES DE ESCRITURAS (PUNTO B.3)
       const saleRef = db.collection("businesses").doc(currentBusinessId).collection("sales").doc(sid);
+
       await db.runTransaction(async t => {
+        // 1. TODAS LAS LECTURAS PRIMERO
         const sSnap = await t.get(saleRef);
         if (!sSnap.exists) throw new Error("Venta no encontrada");
         const sData = sSnap.data();
 
-        for (const item of (sData.items || [])) {
-          if (item.productId) {
-            const pRef = db.collection("businesses").doc(currentBusinessId).collection("products").doc(item.productId);
-            const pSnap = await t.get(pRef);
-            if (pSnap.exists) {
-              t.update(pRef, { quantity: (pSnap.data().quantity || 0) + item.quantity });
+        const items = sData.items || [];
+        const productSnaps = await Promise.all(
+          items.map(item => {
+            if (item.productId) {
+              const pRef = db.collection("businesses").doc(currentBusinessId).collection("products").doc(item.productId);
+              return t.get(pRef);
             }
-          }
-        }
+            return Promise.resolve(null);
+          })
+        );
 
-        if (sData.paymentMethod === "Cuenta Corriente" && sData.clientId) {
-          const cRef = db.collection("businesses").doc(currentBusinessId).collection("clients").doc(sData.clientId);
-          const cSnap = await t.get(cRef);
-          if (cSnap.exists) {
-            t.update(cRef, { debt: Math.max(0, (cSnap.data().debt || 0) - sData.total) });
+        const clientRef = (sData.paymentMethod === "Cuenta Corriente" && sData.clientId) 
+          ? db.collection("businesses").doc(currentBusinessId).collection("clients").doc(sData.clientId)
+          : null;
+        const cSnap = clientRef ? await t.get(clientRef) : null;
+
+        // 2. ESCRITURAS DESPUÉS
+        productSnaps.forEach((pSnap, idx) => {
+          if (pSnap && pSnap.exists) {
+            const item = items[idx];
+            t.update(pSnap.ref, { quantity: (pSnap.data().quantity || 0) + item.quantity });
           }
+        });
+
+        if (cSnap && cSnap.exists) {
+          t.update(clientRef, { debt: Math.max(0, (cSnap.data().debt || 0) - sData.total) });
         }
 
         t.delete(saleRef);
       });
 
-      await updatePublicCatalogFirestore();
+      sales = sales.filter(x => x.id !== sid);
+      renderSales(); renderProducts(); renderDashboard(); renderClients();
       showToast("Venta anulada correctamente");
     } catch(err) {
       showToast("Error al anular venta", "error");
@@ -2805,7 +2735,7 @@ function renderDashboard() {
   if (topProd) {
     $("topProduct").innerHTML = `
       <div style="display:flex; align-items:center; gap:14px;">
-        <div class="sale-item-thumb">🔥</div>
+        <div class="sale-item-thumb">${SVG_FIRE}</div>
         <div>
           <h3 style="margin:0 0 4px; font-size:16px;">${clean(topProd.name)}</h3>
           <p class="sub" style="margin:0;"><b>${topProd.qty}</b> unidades vendidas · Facturado: ${money(topProd.total)}</p>
@@ -2818,13 +2748,13 @@ function renderDashboard() {
   $("recentSales").innerHTML = periodSales.length ? periodSales.slice(0, 5).map(s => {
     const time = getSaleTime(s);
     const dateText = time ? new Date(time).toLocaleDateString("es-AR") : "—";
-    const itemsDesc = (s.items || []).map(i => `${i.quantity}x ${i.name}`).join(", ");
+    const itemsDesc = (s.items || []).map(i => `${i.quantity}x ${clean(i.name)}`).join(", ");
     return `
       <div class="sale">
-        <div class="sale-item-thumb">📦</div>
+        <div class="sale-item-thumb">${SVG_BOX}</div>
         <div style="flex:1">
-          <b>${clean(itemsDesc)}</b>
-          <p>${dateText} · ${s.paymentMethod || 'Efectivo'}</p>
+          <b>${itemsDesc}</b>
+          <p>${dateText} · ${clean(s.paymentMethod || 'Efectivo')}</p>
         </div>
         <div class="sale-actions">
           <b>${money(s.total)}</b>
@@ -2838,7 +2768,7 @@ function renderDashboard() {
   const low = products.filter(p => (Number(p.quantity) || 0) <= (Number(p.minStock) || 3));
   $("lowStock").innerHTML = low.length ? low.map(p => `
     <div class="sale">
-      <div class="sale-item-thumb">${p.image ? `<img src="${p.image}">` : '📦'}</div>
+      <div class="sale-item-thumb">${p.image ? `<img src="${p.image}">` : SVG_BOX}</div>
       <div style="flex:1"><b>${clean(p.name)}</b><p>Stock bajo (Mínimo: ${p.minStock || 3})</p></div>
       <span class="stock-status ${p.quantity <= 0 ? 'out' : 'low'}">${p.quantity} unidades</span>
     </div>`).join("") : '<div class="empty">No hay productos con stock bajo.</div>';
@@ -2856,7 +2786,7 @@ function initCharts() {
     if (salesChartInstance) salesChartInstance.destroy();
     salesChartInstance = new Chart(barCtx, {
       type: 'bar',
-      data: { labels: [], datasets: [{ label: 'Ventas ($)', data: [], backgroundColor: '#2563eb', borderRadius: 6 }] },
+      data: { labels: [], datasets: [{ label: 'Ventas ($)', data: [], backgroundColor: '#a855f7', borderRadius: 6 }] },
       options: {
         responsive: true, maintainAspectRatio: false,
         plugins: { legend: { display: false } },
@@ -2875,7 +2805,7 @@ function initCharts() {
       type: 'doughnut',
       data: {
         labels: ['Efectivo', 'Transferencia/MP', 'Tarjeta', 'Fiado'],
-        datasets: [{ data: [0, 0, 0, 0], backgroundColor: ['#10b981', '#2563eb', '#f59e0b', '#ef4444'] }]
+        datasets: [{ data: [0, 0, 0, 0], backgroundColor: ['#10b981', '#a855f7', '#f59e0b', '#ef4444'] }]
       },
       options: {
         responsive: true, maintainAspectRatio: false,
@@ -2923,11 +2853,15 @@ function updateCharts() {
 }
 
 /* =========================
-   EXPORTAR A EXCEL (CSV)
+   EXPORTAR A EXCEL CON CSV INJECTION PROTECTION (PUNTO E)
 ========================= */
 function escapeCSV(str) {
   if (str === null || str === undefined) return '""';
-  return `"${String(str).replace(/"/g, '""')}"`;
+  let s = String(str).replace(/"/g, '""');
+  if (/^[=+\-@]/.test(s)) {
+    s = "'" + s;
+  }
+  return `"${s}"`;
 }
 
 $("exportStockExcel").onclick = () => {
@@ -2992,9 +2926,6 @@ $("settingsForm").onsubmit = async e => {
         ...data, updatedAt: firebase.firestore.FieldValue.serverTimestamp()
       });
       currentBusiness = { ...currentBusiness, ...data };
-      if (currentBusiness.catalogId) {
-        await db.collection("catalogos").doc(currentBusiness.catalogId).update({ name: data.name, phone: data.phone });
-      }
     }
     setText("welcome", data.name);
     setText("storeSubInfo", data.type);
@@ -3005,17 +2936,19 @@ $("settingsForm").onsubmit = async e => {
   }
 };
 
+/* SUBIDA DE LOGO COMPRIMIDO (PUNTO D) */
 $("bizLogoFile").onchange = async e => {
   const f = e.target.files?.[0];
   if (!f) return;
   try {
+    const blob = await compressImageToBlob(f, 800, 0.75);
     if (appMode === "local") {
-      const b64 = await compressImage(f);
+      const b64 = await blobToBase64(blob);
       $("editLogoBase64").value = b64;
       $("bizLogoPreview").innerHTML = `<img src="${b64}">`;
     } else {
-      const ref = storage.ref(`businesses/${currentBusinessId}/logo_${Date.now()}`);
-      await ref.put(f);
+      const ref = storage.ref(`businesses/${currentBusinessId}/logo_${Date.now()}.jpg`);
+      await ref.put(blob, { contentType: "image/jpeg" });
       const url = await ref.getDownloadURL();
       $("editLogoBase64").value = url;
       $("bizLogoPreview").innerHTML = `<img src="${url}">`;
@@ -3028,57 +2961,7 @@ $("copyStoreCode").onclick = async () => {
   const code = currentBusiness?.accessCode;
   if (!code) return;
   await navigator.clipboard.writeText(code);
-  showToast("¡Código copiado al portapapeles!");
-};
-
-$("copyCatalogLinkBtn").onclick = async () => {
-  if (appMode === "local") {
-    return showToast("Los negocios locales no disponen de catálogo público en línea.", "info");
-  }
-  let key;
-  try {
-    if (!currentBusiness.catalogId) {
-      const catId = secureCode(12);
-      await db.collection("businesses").doc(currentBusinessId).update({ catalogId: catId });
-      await db.collection("catalogos").doc(catId).set({
-        businessId: currentBusinessId,
-        ownerUid: currentBusiness.ownerUid || currentUser.uid,
-        name: currentBusiness.name,
-        phone: currentBusiness.phone
-      });
-      currentBusiness.catalogId = catId;
-      await updatePublicCatalogFirestore();
-    }
-    key = currentBusiness.catalogId;
-    const link = `${window.location.origin}${window.location.pathname}?catalogo=${key}`;
-    await navigator.clipboard.writeText(link);
-    showToast("¡Enlace de catálogo copiado!");
-  } catch(e) {
-    showToast("Error al generar enlace de catálogo", "error");
-  }
-};
-
-$("syncCatalogBtn").onclick = async () => {
-  if (appMode === "local") {
-    return showToast("Los negocios locales no disponen de catálogo público en línea.", "info");
-  }
-  try {
-    if (!currentBusiness.catalogId) {
-      const catId = secureCode(12);
-      await db.collection("businesses").doc(currentBusinessId).update({ catalogId: catId });
-      await db.collection("catalogos").doc(catId).set({
-        businessId: currentBusinessId,
-        ownerUid: currentBusiness.ownerUid || currentUser.uid,
-        name: currentBusiness.name,
-        phone: currentBusiness.phone
-      });
-      currentBusiness.catalogId = catId;
-    }
-    await updatePublicCatalogFirestore();
-    showToast("¡Catálogo sincronizado exitosamente!");
-  } catch (err) {
-    showToast("Error al sincronizar catálogo", "error");
-  }
+  showToast("Código copiado al portapapeles");
 };
 
 async function renderMembersList() {
@@ -3101,7 +2984,7 @@ async function renderMembersList() {
 
       return `
         <div class="member-item">
-          <div class="avatar-mini">${m.photoURL ? `<img src="${m.photoURL}">` : '👤'}</div>
+          <div class="avatar-mini">${m.photoURL ? `<img src="${m.photoURL}">` : SVG_USER}</div>
           <span style="flex:1">${clean(name)}</span>
           ${isCreator ? '<span class="member-badge">Creador</span>' : '<span class="member-badge" style="background:var(--line);">Socio</span>'}
           ${mine ? '<span class="member-badge" style="background:#1b4a3f; color:#35d49a">Vos</span>' : ''}
@@ -3154,20 +3037,23 @@ function loadProfileSection() {
   $("profileEmail").value = currentUser ? currentUser.email : "Modo Local";
   $("profileImageBase64").value = userProfile.photoURL || "";
   if (userProfile.photoURL) $("profileAvatar").innerHTML = `<img src="${userProfile.photoURL}">`;
+  else $("profileAvatar").innerHTML = SVG_USER;
 }
 
+/* SUBIDA DE FOTO DE PERFIL COMPRIMIDA (PUNTO D) */
 $("profileImageFile").onchange = async e => {
   const f = e.target.files?.[0];
   if (!f) return;
   try {
+    const blob = await compressImageToBlob(f, 800, 0.75);
     if (appMode === "local") {
-      const b64 = await compressImage(f);
+      const b64 = await blobToBase64(blob);
       userProfile.photoURL = b64;
       $("profileAvatar").innerHTML = `<img src="${b64}">`;
       localStorage.setItem("stockea_local_profile", JSON.stringify(userProfile));
     } else {
-      const ref = storage.ref(`users/${currentUser.uid}/avatar_${Date.now()}`);
-      await ref.put(f);
+      const ref = storage.ref(`users/${currentUser.uid}/avatar_${Date.now()}.jpg`);
+      await ref.put(blob, { contentType: "image/jpeg" });
       const url = await ref.getDownloadURL();
       userProfile.photoURL = url;
       $("profileAvatar").innerHTML = `<img src="${url}">`;
@@ -3200,60 +3086,7 @@ function updateUIProfile() {
   const ha = $("headerAvatar");
   if (!ha) return;
   if (userProfile.photoURL) ha.innerHTML = `<img src="${userProfile.photoURL}">`;
-  else ha.innerHTML = '👤';
-}
-
-/* =========================
-   CATÁLOGO PÚBLICO FIRESTORE
-========================= */
-let syncCatalogTimer = null;
-function syncCatalogSoon() {
-  if (appMode === "local" || !currentBusinessId) return;
-  clearTimeout(syncCatalogTimer);
-  syncCatalogTimer = setTimeout(() => {
-    updatePublicCatalogFirestore();
-  }, 1500);
-}
-
-async function updatePublicCatalogFirestore() {
-  if (appMode === "local" || !currentBusinessId) return;
-  if (!currentBusiness?.catalogId) return;
-  try {
-    const catId = currentBusiness.catalogId;
-    const itemsCol = db.collection("catalogos").doc(catId).collection("items");
-    const existingSnap = await itemsCol.get();
-    const currentIds = new Set(products.map(p => p.id));
-
-    let batch = db.batch();
-    let opCount = 0;
-
-    existingSnap.docs.forEach(docSnap => {
-      if (!currentIds.has(docSnap.id)) {
-        batch.delete(docSnap.ref);
-        opCount++;
-      }
-    });
-
-    products.forEach(p => {
-      const itemRef = itemsCol.doc(p.id);
-      const payload = {
-        name: p.name || "",
-        category: p.category || "",
-        price: Number(p.price) || 0,
-        quantity: Number(p.quantity) || 0,
-        image: p.image || "",
-        code: p.code || ""
-      };
-      batch.set(itemRef, payload, { merge: true });
-      opCount++;
-    });
-
-    if (opCount > 0) {
-      await batch.commit();
-    }
-  } catch (err) {
-    console.error("Error al actualizar catálogo público:", err);
-  }
+  else ha.innerHTML = SVG_USER;
 }
 
 /* =========================
@@ -3334,7 +3167,6 @@ async function runCameraScanner(targetInputId) {
 
 $("scanCameraBtn")?.addEventListener("click", () => runCameraScanner("pCode"));
 $("searchScanCameraBtn")?.addEventListener("click", () => runCameraScanner("search"));
-$("publicScanCameraBtn")?.addEventListener("click", () => runCameraScanner("publicSearch"));
 
 /* =========================
    UTILIDADES
@@ -3384,12 +3216,11 @@ $("createBizForm").onsubmit = async e => {
     }
 
     const code = secureCode(8);
-    const catalogId = secureCode(12);
     const bRef = db.collection("businesses").doc();
     const batch = db.batch();
 
     batch.set(bRef, {
-      name, owners, phone, type, categories, accessCode: code, catalogId,
+      name, owners, phone, type, categories, accessCode: code,
       ownerUid: currentUser.uid, memberUids: [currentUser.uid], createdAt: firebase.firestore.FieldValue.serverTimestamp()
     });
     batch.set(db.collection("users").doc(currentUser.uid), {
@@ -3397,9 +3228,6 @@ $("createBizForm").onsubmit = async e => {
     }, { merge: true });
     batch.set(db.collection("invitaciones").doc(code), {
       businessId: bRef.id, createdAt: firebase.firestore.FieldValue.serverTimestamp()
-    });
-    batch.set(db.collection("catalogos").doc(catalogId), {
-      businessId: bRef.id, ownerUid: currentUser.uid, name, phone
     });
 
     await batch.commit();
