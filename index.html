@@ -115,7 +115,7 @@ body {
   transition: background .3s, color .3s;
 }
 
-button, input, select {
+button, input, select, textarea {
   font: inherit;
   border-radius: var(--radius);
 }
@@ -137,7 +137,7 @@ button:hover { background: var(--blue-hover); }
 button:active { transform: scale(0.98); }
 button:disabled { opacity: .5; cursor: not-allowed; transform: none; }
 
-input, select {
+input, select, textarea {
   width: 100%;
   padding: 11px 14px;
   background: var(--bg);
@@ -145,7 +145,7 @@ input, select {
   border: 1px solid var(--line);
   transition: border-color .2s, box-shadow .2s;
 }
-input:focus, select:focus {
+input:focus, select:focus, textarea:focus {
   outline: none;
   border-color: var(--blue);
   box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15);
@@ -271,7 +271,7 @@ header {
 /* TOAST NOTIFICATIONS */
 #toastContainer {
   position: fixed;
-  bottom: 80px;
+  bottom: 90px;
   right: 20px;
   z-index: 9999;
   display: flex;
@@ -484,6 +484,35 @@ h2 { font-size: 18px; font-weight: 600; margin-top: 0; }
 }
 .cart-badge { background: black; color: white; padding: 3px 9px; border-radius: 12px; font-size: 12px; }
 
+/* 🌟 BOTÓN FLOTANTE DE VENTA RÁPIDA (FAB) */
+.quick-sale-fab {
+  position: fixed;
+  bottom: 80px;
+  right: 20px;
+  background: #a855f7; /* Tonalidad violeta Kiosy */
+  color: white;
+  padding: 12px 20px;
+  border-radius: 50px;
+  font-weight: 700;
+  font-size: 14px;
+  box-shadow: 0 8px 20px rgba(168, 85, 247, 0.4);
+  z-index: 95;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  transition: transform 0.2s, background 0.2s, box-shadow 0.2s;
+}
+.quick-sale-fab:hover {
+  background: #9333ea;
+  transform: translateY(-2px);
+  box-shadow: 0 12px 25px rgba(168, 85, 247, 0.6);
+}
+.quick-sale-fab:active {
+  transform: scale(0.96);
+}
+
 .business-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; margin-top: 15px; }
 .business-card {
   background: var(--panel); border: 1px solid var(--line);
@@ -572,6 +601,14 @@ body { -webkit-text-size-adjust: 100%; overflow-x: hidden; }
   .mobile-nav button svg { width:22px; height:22px; }
   .mobile-nav button.active { color:var(--blue); font-weight:700; background:transparent; }
 
+  /* Ajuste de posición del botón flotante en móvil para no tapar el menú inferior */
+  .quick-sale-fab {
+    bottom: calc(75px + env(safe-area-inset-bottom));
+    right: 16px;
+    padding: 10px 18px;
+    font-size: 13px;
+  }
+
   main { padding:16px 14px; }
   h1 { font-size:22px; }
   .sub { margin-bottom:16px; }
@@ -639,6 +676,70 @@ body { -webkit-text-size-adjust: 100%; overflow-x: hidden; }
 <!-- CONTENEDOR DE TOASTS -->
 <div id="toastContainer"></div>
 
+<!-- 🌟 BOTÓN FLOTANTE DE VENTA RÁPIDA (FAB) -->
+<button id="globalQuickSaleBtn" class="quick-sale-fab hidden" type="button" title="Registrar venta rápida">
+  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="9" cy="21" r="1"></circle><circle cx="20" cy="21" r="1"></circle><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path></svg>
+  Venta rápida
+</button>
+
+<!-- MODAL DE VENTA RÁPIDA AVANZADA -->
+<div id="quickSaleModal" class="modal-overlay hidden">
+  <div class="modal-content" style="max-width: 650px;">
+    <div class="sectionhead" style="margin-bottom:15px;">
+      <h2 style="margin:0;">⚡ Nueva venta rápida</h2>
+      <button type="button" id="closeQuickSaleModalBtn" class="secondary" style="padding:4px 10px;">✕</button>
+    </div>
+
+    <!-- Buscador y selector de productos -->
+    <div class="field">
+      <label>Buscar productos para agregar</label>
+      <input id="qsSearchInput" placeholder="🔎 Escribí el nombre o código del producto...">
+    </div>
+    
+    <div id="qsProductResults" style="max-height: 180px; overflow-y: auto; border: 1px solid var(--line); border-radius: var(--radius); margin-bottom: 15px; background: var(--bg);">
+      <!-- Se llena dinámicamente -->
+    </div>
+
+    <!-- Lista de productos seleccionados -->
+    <div class="field">
+      <label><b>Productos en el carrito de venta:</b></label>
+      <div id="qsCartList" style="max-height: 200px; overflow-y: auto; border: 1px solid var(--line); border-radius: var(--radius); padding: 10px; background: var(--bg);">
+        <div class="empty" style="padding: 20px;">No hay productos seleccionados.</div>
+      </div>
+    </div>
+
+    <!-- Totales -->
+    <div style="background:var(--bg); padding:12px; border-radius:var(--radius); margin-bottom:15px; display:flex; justify-content:space-between; align-items:center;">
+      <span style="font-weight:500;">Total general de la venta:</span>
+      <span id="qsModalTotal" class="green" style="font-size:22px; font-weight:800;">$0,00</span>
+    </div>
+
+    <!-- Formulario de Pago y Cliente -->
+    <form id="qsForm">
+      <div class="formgrid">
+        <div class="field">
+          <label>Método de pago *</label>
+          <select id="qsPaymentMethod" required>
+            <option value="Efectivo">Efectivo</option>
+            <option value="Transferencia / MP">Transferencia / Mercado Pago</option>
+            <option value="Tarjeta">Tarjeta</option>
+            <option value="Cuenta Corriente">Cuenta Corriente (Fiado)</option>
+          </select>
+        </div>
+        <div id="qsClientContainer" class="field hidden">
+          <label>Seleccionar cliente *</label>
+          <select id="qsClientSelect"></select>
+        </div>
+      </div>
+      <div class="field">
+        <label>Observaciones / Comentarios (Opcional)</label>
+        <textarea id="qsNotes" rows="2" placeholder="Detalles adicionales de la venta..."></textarea>
+      </div>
+      <button type="submit" id="qsConfirmBtn" style="width:100%; margin-top: 10px; background: #a855f7;">Confirmar venta</button>
+    </form>
+  </div>
+</div>
+
 <!-- MODAL DE CONFIRMACIÓN REUTILIZABLE -->
 <div id="confirmModal" class="modal-overlay hidden">
   <div class="modal-content" style="max-width:400px; text-align:center;">
@@ -651,7 +752,7 @@ body { -webkit-text-size-adjust: 100%; overflow-x: hidden; }
   </div>
 </div>
 
-<!-- MODAL DE VENTA AVANZADA -->
+<!-- MODAL DE VENTA DESDE STOCK (ORIGINAL) -->
 <div id="saleModal" class="modal-overlay hidden">
   <div class="modal-content">
     <div class="sectionhead" style="margin-bottom:15px;">
@@ -820,7 +921,7 @@ body { -webkit-text-size-adjust: 100%; overflow-x: hidden; }
   </button>
 </div>
 
-<!-- MODAL DEL CARRITO DE COMPRAS -->
+<!-- MODAL DEL CARRITO DE COMPRAS PÚBLICO -->
 <div id="cartModal" class="modal-overlay hidden">
   <div class="modal-content">
     <div class="sectionhead">
@@ -1218,6 +1319,9 @@ let paymentsUnsubscribe = null;
 let clientsUnsubscribe = null;
 let salesLimit = 200;
 
+// Estado para Venta Rápida
+let quickSaleItems = [];
+
 // Gráficos Chart.js
 let salesChartInstance = null;
 let donutChartInstance = null;
@@ -1297,7 +1401,7 @@ window.addEventListener("DOMContentLoaded", async () => {
   const catalogCode = urlParams.get("catalogo");
 
   if (catalogCode) {
-    hide("modeSelectScreen"); hide("authScreen"); hide("homeScreen"); hide("setup"); hide("app");
+    hide("modeSelectScreen"); hide("authScreen"); hide("homeScreen"); hide("setup"); hide("app"); hide("globalQuickSaleBtn");
     await loadPublicCatalog(catalogCode);
   } else {
     applyTheme("claro");
@@ -1391,7 +1495,7 @@ function renderPublicProducts() {
 }
 
 /* =========================
-   CARRITO Y WHATSAPP
+   CARRITO PÚBLICO Y WHATSAPP
 ========================= */
 function addToCart(pid) {
   const prod = products.find(p => p.id === pid);
@@ -1472,7 +1576,7 @@ const triggerLogout = async () => {
   clearListeners();
   if (appMode === "cloud") { try { await auth.signOut(); } catch(e){} }
   appMode = null; currentBusiness = null; products = []; sales = []; payments = []; clients = []; cart = [];
-  hide("app"); hide("setup"); hide("homeScreen"); hide("authScreen"); hide("headerAvatar"); hide("headerLogout");
+  hide("app"); hide("setup"); hide("homeScreen"); hide("authScreen"); hide("headerAvatar"); hide("headerLogout"); hide("globalQuickSaleBtn");
   show("modeSelectScreen");
   showToast("Sesión cerrada correctamente", "info");
 };
@@ -1530,7 +1634,7 @@ auth.onAuthStateChanged(async user => {
 
   if (!user) {
     if (appMode === "cloud") {
-      hide("app"); hide("setup"); hide("homeScreen"); hide("headerAvatar"); hide("headerLogout");
+      hide("app"); hide("setup"); hide("homeScreen"); hide("headerAvatar"); hide("headerLogout"); hide("globalQuickSaleBtn");
       show("authScreen");
     }
     return;
@@ -1561,7 +1665,7 @@ auth.onAuthStateChanged(async user => {
    HOME Y NEGOCIOS
 ========================= */
 function showHome() {
-  hide("authScreen"); hide("setup"); hide("app");
+  hide("authScreen"); hide("setup"); hide("app"); hide("globalQuickSaleBtn");
   hide("headerHome");
   show("homeScreen");
   renderBusinessList();
@@ -1636,7 +1740,6 @@ async function openBusiness(id) {
   currentBusinessId = id;
   currentBusiness = { id: snap.id, ...data };
 
-  // REQUISITO 6: Si el negocio ya existe pero no tiene catalogId y el usuario es el dueño, generarlo automáticamente
   if (!currentBusiness.catalogId && currentBusiness.ownerUid === currentUser.uid) {
     try {
       const catId = secureCode(12);
@@ -1660,6 +1763,7 @@ async function openBusiness(id) {
 function setupBusinessUI() {
   hide("authScreen"); hide("setup"); hide("homeScreen"); show("app");
   show("headerHome");
+  show("globalQuickSaleBtn"); // Mostrar botón flotante de Venta Rápida
   setText("welcome", currentBusiness.name);
   setText("storeSubInfo", currentBusiness.type || "Panel general");
   setText("displayStoreCode", currentBusiness.accessCode || "—");
@@ -1699,7 +1803,7 @@ function startBusinessListeners() {
     fillCategoryOptions();
     renderProducts();
     renderDashboard();
-    syncCatalogSoon(); // REQUISITO 2: Sincronización automática con debounce de 1500ms
+    syncCatalogSoon();
   });
 
   salesUnsubscribe = db.collection("businesses").doc(currentBusinessId).collection("sales").orderBy("createdAt", "desc").limit(salesLimit).onSnapshot(snap => {
@@ -1718,6 +1822,309 @@ function startBusinessListeners() {
     renderClients();
   });
 }
+
+/* ========================================================
+   IMPLEMENTACIÓN: VENTA RÁPIDA (GLOBAL FAB & MODAL)
+======================================================== */
+$("globalQuickSaleBtn").onclick = () => {
+  quickSaleItems = [];
+  $("qsSearchInput").value = "";
+  $("qsNotes").value = "";
+  $("qsPaymentMethod").value = "Efectivo";
+  $("qsClientContainer").classList.add("hidden");
+  
+  // Rellenar clientes
+  const clientSel = $("qsClientSelect");
+  clientSel.innerHTML = clients.map(c => `<option value="${c.id}">${clean(c.name)} (${c.phone})</option>`).join("");
+
+  renderQuickSaleResults("");
+  renderQuickSaleCart();
+  show("quickSaleModal");
+};
+
+$("closeQuickSaleModalBtn").onclick = () => hide("quickSaleModal");
+
+$("qsSearchInput")?.addEventListener("input", e => {
+  renderQuickSaleResults(e.target.value.toLowerCase().trim());
+});
+
+function renderQuickSaleResults(query) {
+  const container = $("qsProductResults");
+  if (!container) return;
+
+  const filtered = products.filter(p => {
+    const text = [p.name, p.model, p.code, p.category].join(" ").toLowerCase();
+    return text.includes(query);
+  });
+
+  if (!filtered.length) {
+    container.innerHTML = '<div class="empty" style="padding:15px;">No se encontraron productos.</div>';
+    return;
+  }
+
+  container.innerHTML = filtered.map(p => {
+    const qty = Number(p.quantity) || 0;
+    const isOut = qty <= 0;
+    return `
+      <div style="display:flex; align-items:center; justify-content:space-between; padding:8px 12px; border-bottom:1px solid var(--line); background:var(--panel);">
+        <div style="display:flex; align-items:center; gap:10px;">
+          <div style="width:36px; height:36px; border-radius:6px; background:var(--bg); display:flex; align-items:center; justify-content:center; overflow:hidden;">
+            ${p.image ? `<img src="${p.image}" style="width:100%; height:100%; object-fit:contain;">` : '📦'}
+          </div>
+          <div>
+            <b style="font-size:14px;">${clean(p.name)}</b>
+            <p style="margin:0; font-size:12px; color:var(--muted);">${money(p.price)} · Stock: <span class="${isOut ? 'danger' : 'green'}">${qty}</span></p>
+          </div>
+        </div>
+        <button type="button" data-qs-add="${p.id}" ${isOut ? 'disabled' : ''} style="padding:6px 12px; font-size:12px;">
+          ${isOut ? 'Sin stock' : '+ Agregar'}
+        </button>
+      </div>`;
+  }).join("");
+
+  container.querySelectorAll("[data-qs-add]").forEach(btn => {
+    btn.onclick = () => addProductToQuickSale(btn.dataset.qsAdd);
+  });
+}
+
+function addProductToQuickSale(pid) {
+  const prod = products.find(p => p.id === pid);
+  if (!prod) return;
+  const stock = Number(prod.quantity) || 0;
+  if (stock <= 0) return showToast("El producto no tiene stock disponible.", "error");
+
+  const existing = quickSaleItems.find(i => i.product.id === pid);
+  if (existing) {
+    if (existing.quantity < stock) {
+      existing.quantity++;
+    } else {
+      showToast("Alcanzaste el límite de stock disponible.", "error");
+    }
+  } else {
+    quickSaleItems.push({ product: prod, quantity: 1 });
+  }
+  renderQuickSaleCart();
+}
+
+function renderQuickSaleCart() {
+  const container = $("qsCartList");
+  if (!container) return;
+
+  if (!quickSaleItems.length) {
+    container.innerHTML = '<div class="empty" style="padding: 20px;">No hay productos seleccionados.</div>';
+    setText("qsModalTotal", money(0));
+    return;
+  }
+
+  let totalGeneral = 0;
+  container.innerHTML = quickSaleItems.map(item => {
+    const stock = Number(item.product.quantity) || 0;
+    const subtotal = item.quantity * item.product.price;
+    totalGeneral += subtotal;
+
+    return `
+      <div style="display:flex; align-items:center; justify-content:space-between; padding:8px 0; border-bottom:1px solid var(--line); gap:10px;">
+        <div style="display:flex; align-items:center; gap:8px; flex:1;">
+          <div style="width:32px; height:32px; border-radius:6px; background:var(--bg); display:flex; align-items:center; justify-content:center; overflow:hidden;">
+            ${item.product.image ? `<img src="${item.product.image}" style="width:100%; height:100%; object-fit:contain;">` : '📦'}
+          </div>
+          <div>
+            <b style="font-size:13px;">${clean(item.product.name)}</b>
+            <p style="margin:0; font-size:11px; color:var(--muted);">${money(item.product.price)} c/u</p>
+          </div>
+        </div>
+        <div style="display:flex; align-items:center; gap:6px;">
+          <button type="button" class="secondary" data-qs-minus="${item.product.id}" style="padding:2px 8px; font-size:12px;">-</button>
+          <input type="number" min="1" max="${stock}" value="${item.quantity}" data-qs-qty="${item.product.id}" style="width:48px; text-align:center; padding:4px; font-size:13px; font-weight:bold;">
+          <button type="button" class="secondary" data-qs-plus="${item.product.id}" style="padding:2px 8px; font-size:12px;">+</button>
+          <span style="font-weight:bold; font-size:13px; min-width:65px; text-align:right;">${money(subtotal)}</span>
+          <button type="button" class="danger" data-qs-remove="${item.product.id}" style="padding:4px 8px; font-size:11px;">✕</button>
+        </div>
+      </div>`;
+  }).join("");
+
+  setText("qsModalTotal", money(totalGeneral));
+
+  // Eventos de cantidad y eliminación en carrito rápido
+  container.querySelectorAll("[data-qs-minus]").forEach(b => b.onclick = () => updateQuickSaleQty(b.dataset.qsMinus, -1));
+  container.querySelectorAll("[data-qs-plus]").forEach(b => b.onclick = () => updateQuickSaleQty(b.dataset.qsPlus, 1));
+  container.querySelectorAll("[data-qs-remove]").forEach(b => b.onclick = () => removeQuickSaleItem(b.dataset.qsRemove));
+  container.querySelectorAll("[data-qs-qty]").forEach(input => {
+    input.onchange = e => setQuickSaleQtyExact(input.dataset.qsQty, Number(e.target.value));
+  });
+}
+
+function updateQuickSaleQty(pid, delta) {
+  const item = quickSaleItems.find(i => i.product.id === pid);
+  if (!item) return;
+  const stock = Number(item.product.quantity) || 0;
+  const newQty = item.quantity + delta;
+  if (newQty <= 0) {
+    removeQuickSaleItem(pid);
+  } else if (newQty > stock) {
+    showToast("No puedes superar el stock disponible.", "error");
+  } else {
+    item.quantity = newQty;
+    renderQuickSaleCart();
+  }
+}
+
+function setQuickSaleQtyExact(pid, qty) {
+  const item = quickSaleItems.find(i => i.product.id === pid);
+  if (!item) return;
+  const stock = Number(item.product.quantity) || 0;
+  if (isNaN(qty) || qty <= 0) {
+    removeQuickSaleItem(pid);
+  } else if (qty > stock) {
+    showToast(`Stock máximo disponible: ${stock}`, "error");
+    item.quantity = stock;
+    renderQuickSaleCart();
+  } else {
+    item.quantity = qty;
+    renderQuickSaleCart();
+  }
+}
+
+function removeQuickSaleItem(pid) {
+  quickSaleItems = quickSaleItems.filter(i => i.product.id !== pid);
+  renderQuickSaleCart();
+}
+
+$("qsPaymentMethod").onchange = e => {
+  const isFiado = e.target.value === "Cuenta Corriente";
+  $("qsClientContainer").classList.toggle("hidden", !isFiado);
+  if (isFiado && !clients.length) {
+    showToast("Debe registrar un cliente en la sección Clientes para usar Cuenta Corriente.", "info");
+  }
+};
+
+$("qsForm").onsubmit = async e => {
+  e.preventDefault();
+  if (!quickSaleItems.length) return showToast("Agregue al menos un producto a la venta.", "error");
+
+  const method = $("qsPaymentMethod").value;
+  const clientId = method === "Cuenta Corriente" ? $("qsClientSelect").value : null;
+  const notes = $("qsNotes").value.trim();
+
+  if (method === "Cuenta Corriente" && !clientId) {
+    return showToast("Debe seleccionar un cliente para registrar la deuda.", "error");
+  }
+
+  let total = 0;
+  let profit = 0;
+  const saleItemsFormatted = [];
+
+  for (const item of quickSaleItems) {
+    const prod = products.find(p => p.id === item.product.id);
+    if (!prod || (Number(prod.quantity) || 0) < item.quantity) {
+      return showToast(`Stock insuficiente para el producto: ${item.product.name}`, "error");
+    }
+    const sub = item.quantity * prod.price;
+    const prof = item.quantity * (prod.price - (Number(prod.cost) || 0));
+    total += sub;
+    profit += prof;
+    saleItemsFormatted.push({
+      productId: prod.id,
+      name: prod.name,
+      quantity: item.quantity,
+      unitPrice: prod.price
+    });
+  }
+
+  $("qsConfirmBtn").disabled = true;
+
+  try {
+    if (appMode === "local") {
+      // Descontar inventario local
+      for (const item of quickSaleItems) {
+        const prod = products.find(p => p.id === item.product.id);
+        if (prod) prod.quantity -= item.quantity;
+      }
+      localStorage.setItem(`stockea_local_products_${currentBusinessId}`, JSON.stringify(products));
+
+      // Actualizar deuda de cliente si aplica
+      if (clientId && method === "Cuenta Corriente") {
+        const client = clients.find(c => c.id === clientId);
+        if (client) {
+          client.debt = (Number(client.debt) || 0) + total;
+          localStorage.setItem(`stockea_local_clients_${currentBusinessId}`, JSON.stringify(clients));
+        }
+      }
+
+      const newSale = {
+        id: "sale_" + Date.now(),
+        items: saleItemsFormatted,
+        total,
+        profit,
+        paymentMethod: method,
+        clientId: clientId || null,
+        clientName: clientId ? clients.find(c => c.id === clientId)?.name || "" : "",
+        notes,
+        createdAt: Date.now()
+      };
+      sales.unshift(newSale);
+      localStorage.setItem(`stockea_local_sales_${currentBusinessId}`, JSON.stringify(sales));
+
+      hide("quickSaleModal");
+      renderProducts(); renderSales(); renderDashboard(); renderClients();
+      showToast("¡Venta registrada correctamente!");
+    } else {
+      // Transacción segura en Cloud Firestore
+      const clientRef = clientId ? db.collection("businesses").doc(currentBusinessId).collection("clients").doc(clientId) : null;
+      const saleRef = db.collection("businesses").doc(currentBusinessId).collection("sales").doc();
+
+      await db.runTransaction(async t => {
+        // Verificar stock de todos los productos en la transacción
+        for (const item of quickSaleItems) {
+          const pRef = db.collection("businesses").doc(currentBusinessId).collection("products").doc(item.product.id);
+          const pSnap = await t.get(pRef);
+          if (!pSnap.exists) throw new Error(`El producto ${item.product.name} ya no existe.`);
+          const currentQty = pSnap.data().quantity || 0;
+          if (currentQty < item.quantity) throw new Error(`Stock insuficiente para ${item.product.name}. Stock actual: ${currentQty}`);
+        }
+
+        // Si hay cliente para cuenta corriente, actualizar deuda
+        let clientName = "";
+        if (clientRef) {
+          const cSnap = await t.get(clientRef);
+          if (cSnap.exists) {
+            clientName = cSnap.data().name || "";
+            t.update(clientRef, { debt: (cSnap.data().debt || 0) + total });
+          }
+        }
+
+        // Descontar stock
+        for (const item of quickSaleItems) {
+          const pRef = db.collection("businesses").doc(currentBusinessId).collection("products").doc(item.product.id);
+          const pSnap = await t.get(pRef);
+          const currentQty = pSnap.data().quantity || 0;
+          t.update(pRef, { quantity: currentQty - item.quantity });
+        }
+
+        // Registrar venta
+        t.set(saleRef, {
+          items: saleItemsFormatted,
+          total,
+          profit,
+          paymentMethod: method,
+          clientId: clientId || null,
+          clientName,
+          notes,
+          createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+          soldBy: currentUser.uid
+        });
+      });
+
+      await updatePublicCatalogFirestore();
+      hide("quickSaleModal");
+      showToast("¡Venta registrada correctamente!");
+    }
+  } catch (err) {
+    showToast(err.message || "Error al procesar la venta rápida", "error");
+  } finally {
+    $("qsConfirmBtn").disabled = false;
+  }
+};
 
 /* =========================
    NAVEGACIÓN INTERNA
@@ -1935,7 +2342,7 @@ function confirmDeleteProduct(id) {
 }
 
 /* =========================
-   MODAL DE VENTA AVANZADA
+   MODAL DE VENTA DESDE STOCK (ORIGINAL)
 ========================= */
 let activeSaleProduct = null;
 function openSaleModal(pid) {
@@ -2021,7 +2428,7 @@ $("saleModalForm").onsubmit = async e => {
 
       hide("saleModal");
       renderProducts(); renderSales(); renderDashboard(); renderClients();
-      showToast("¡Venta registrada con éxito!");
+      showToast("¡Venta registrada correctamente!");
       return;
     }
 
@@ -2037,16 +2444,18 @@ $("saleModalForm").onsubmit = async e => {
 
       t.update(prodRef, { quantity: currentQty - qty });
 
+      let clientName = "";
       if (clientRef) {
         const cSnap = await t.get(clientRef);
         if (cSnap.exists) {
+          clientName = cSnap.data().name || "";
           t.update(clientRef, { debt: (cSnap.data().debt || 0) + total });
         }
       }
 
       t.set(saleRef, {
         items: [{ productId: activeSaleProduct.id, name: activeSaleProduct.name, quantity: qty, unitPrice: activeSaleProduct.price }],
-        total, profit, paymentMethod: method, clientId,
+        total, profit, paymentMethod: method, clientId, clientName,
         createdAt: firebase.firestore.FieldValue.serverTimestamp(),
         soldBy: currentUser.uid
       });
@@ -2054,7 +2463,7 @@ $("saleModalForm").onsubmit = async e => {
 
     await updatePublicCatalogFirestore();
     hide("saleModal");
-    showToast("¡Venta registrada con éxito!");
+    showToast("¡Venta registrada correctamente!");
   } catch(err) {
     showToast(err.message || "Error al registrar la venta", "error");
   }
@@ -2216,6 +2625,7 @@ function renderSales() {
     const dateText = time ? new Date(time).toLocaleString("es-AR") : "—";
     const itemsDesc = (s.items || []).map(i => `${i.quantity}x ${i.name}`).join(", ");
     const clientName = s.clientName ? ` · Cliente: ${s.clientName}` : '';
+    const notesText = s.notes ? ` · 📝 ${s.notes}` : '';
 
     let imgHTML = "📦";
     if (s.items && s.items.length > 0) {
@@ -2228,7 +2638,7 @@ function renderSales() {
         <div class="sale-item-thumb">${imgHTML}</div>
         <div style="flex:1; min-width:180px;">
           <b>${clean(itemsDesc)}</b>
-          <p>${dateText} · Pago: ${s.paymentMethod || 'Efectivo'}${clientName}</p>
+          <p>${dateText} · Pago: ${s.paymentMethod || 'Efectivo'}${clientName}${notesText}</p>
         </div>
         <div class="sale-actions">
           <div style="text-align:right;">
@@ -2583,7 +2993,6 @@ $("settingsForm").onsubmit = async e => {
       });
       currentBusiness = { ...currentBusiness, ...data };
       if (currentBusiness.catalogId) {
-        // REQUISITO 7: Actualizar también el doc en catalogos al modificar nombre o teléfono
         await db.collection("catalogos").doc(currentBusiness.catalogId).update({ name: data.name, phone: data.phone });
       }
     }
@@ -2649,7 +3058,6 @@ $("copyCatalogLinkBtn").onclick = async () => {
   }
 };
 
-// REQUISITO 3: Botón manual "🔄 Sincronizar catálogo"
 $("syncCatalogBtn").onclick = async () => {
   if (appMode === "local") {
     return showToast("Los negocios locales no disponen de catálogo público en línea.", "info");
@@ -2796,7 +3204,7 @@ function updateUIProfile() {
 }
 
 /* =========================
-   CATÁLOGO PÚBLICO FIRESTORE (REQUISITO 1 & 2)
+   CATÁLOGO PÚBLICO FIRESTORE
 ========================= */
 let syncCatalogTimer = null;
 function syncCatalogSoon() {
@@ -2809,21 +3217,16 @@ function syncCatalogSoon() {
 
 async function updatePublicCatalogFirestore() {
   if (appMode === "local" || !currentBusinessId) return;
-  if (!currentBusiness?.catalogId) {
-    showToast("Catálogo: El negocio no tiene un ID de catálogo asociado.", "info");
-    return;
-  }
+  if (!currentBusiness?.catalogId) return;
   try {
     const catId = currentBusiness.catalogId;
     const itemsCol = db.collection("catalogos").doc(catId).collection("items");
     const existingSnap = await itemsCol.get();
-    const existingIds = new Set(existingSnap.docs.map(d => d.id));
     const currentIds = new Set(products.map(p => p.id));
 
     let batch = db.batch();
     let opCount = 0;
 
-    // Borrar solo los items que ya no existen en products
     existingSnap.docs.forEach(docSnap => {
       if (!currentIds.has(docSnap.id)) {
         batch.delete(docSnap.ref);
@@ -2831,7 +3234,6 @@ async function updatePublicCatalogFirestore() {
       }
     });
 
-    // Copiar items actuales (NUNCA el costo)
     products.forEach(p => {
       const itemRef = itemsCol.doc(p.id);
       const payload = {
@@ -2851,7 +3253,6 @@ async function updatePublicCatalogFirestore() {
     }
   } catch (err) {
     console.error("Error al actualizar catálogo público:", err);
-    showToast("Catálogo: " + (err.code || err.message), "error");
   }
 }
 
@@ -2987,7 +3388,6 @@ $("createBizForm").onsubmit = async e => {
     const bRef = db.collection("businesses").doc();
     const batch = db.batch();
 
-    // REQUISITO 5: Incluir businessId, ownerUid, name y phone en el doc de catalogos
     batch.set(bRef, {
       name, owners, phone, type, categories, accessCode: code, catalogId,
       ownerUid: currentUser.uid, memberUids: [currentUser.uid], createdAt: firebase.firestore.FieldValue.serverTimestamp()
