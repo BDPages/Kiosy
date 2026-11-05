@@ -1,6 +1,6 @@
 {
-  "name": "Stockeá",
-  "short_name": "Stockeá",
+  "name": "Kiosy-Stock Manager",
+  "short_name": "Kiosy",
   "start_url": "./index.html",
   "display": "standalone",
   "background_color": "#0b1020",
