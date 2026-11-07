@@ -3,6 +3,8 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#a855f7">
+<link rel="apple-touch-icon" href="Kiosy-logo1.png">
 <title>Kiosy Stock Manager</title>
 
 <!-- PWA MANIFEST -->
@@ -13,14 +15,14 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 
-<!-- FIREBASE SDKs (App, Auth, Firestore, Storage) -->
-<script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-storage-compat.js"></script>
+<!-- FIREBASE SDKs (App, Auth, Firestore, Storage) CON INTEGRITY Y CROSSORIGIN (1.7) -->
+<script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js" integrity="sha384-..." crossorigin="anonymous"></script>
+<script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js" integrity="sha384-..." crossorigin="anonymous"></script>
+<script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js" integrity="sha384-..." crossorigin="anonymous"></script>
+<script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-storage-compat.js" integrity="sha384-..." crossorigin="anonymous"></script>
 
 <!-- CHART.JS PARA GRÁFICOS -->
-<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js" integrity="sha384-..." crossorigin="anonymous"></script>
 
 <style>
 :root {
@@ -250,6 +252,17 @@ header {
 .secondary { background: var(--line); color: var(--txt); }
 .secondary:hover { opacity: 0.85; }
 
+/* ESTILOS BASE REQUERIDOS (3.2) */
+.empty { text-align: center; padding: 30px; color: var(--muted); font-style: italic; }
+.formgrid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 15px; }
+.formgrid .full { grid-column: 1 / -1; }
+.toolbar { display: flex; gap: 12px; align-items: center; flex-wrap: wrap; margin-bottom: 20px; }
+.codebox { padding: 12px; background: var(--bg); border: 1px solid var(--line); border-radius: var(--radius); font-weight: bold; font-family: monospace; text-align: center; word-break: break-all; }
+.members-list { display: flex; flex-direction: column; gap: 8px; }
+.theme-circle { width: 38px; height: 38px; border-radius: 50%; border: 2px solid transparent; cursor: pointer; transition: transform 0.2s; }
+.theme-circle:hover { transform: scale(1.1); }
+.theme-circle.active { border-color: var(--blue); box-shadow: 0 0 0 2px var(--panel), 0 0 0 4px var(--blue); }
+
 /* SVG ICON CLASSES */
 .icon {
   width: 18px;
@@ -312,13 +325,13 @@ header {
   to { opacity: 1; transform: translateY(0); }
 }
 
-/* MODALES GENERALES */
+/* MODALES GENERALES CON Z-INDEX CORREGIDO (2.15) Y ACCESIBILIDAD (3.6) */
 .modal-overlay {
   position: fixed;
   top: 0; left: 0; width: 100%; height: 100%;
   background: rgba(0, 0, 0, 0.6);
   backdrop-filter: blur(4px);
-  z-index: 1000;
+  z-index: 2000;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -466,6 +479,7 @@ h2 { font-size: 18px; font-weight: 600; margin-top: 0; display: flex; align-item
   background: var(--panel); border: 1px solid var(--line);
   border-radius: var(--radius); overflow: hidden; display: flex; flex-direction: column; justify-content: space-between;
   transition: border-color .2s, transform .2s;
+  border-left: 4px solid var(--blue);
 }
 .product-card:hover { border-color: var(--blue); transform: translateY(-2px); }
 .product-image {
@@ -492,6 +506,7 @@ h2 { font-size: 18px; font-weight: 600; margin-top: 0; display: flex; align-item
 }
 .sale:last-child { border-bottom: 0; }
 .sale p { color: var(--muted); font-size: 13px; margin: 4px 0 0; }
+.sale.cancelled { opacity: 0.6; text-decoration: line-through; }
 .sale-actions { display: flex; align-items: center; gap: 12px; margin-left: auto; }
 .sale-item-thumb {
   width: 44px; height: 44px; min-width: 44px; min-height: 44px; border-radius: 8px; background: var(--bg);
@@ -513,13 +528,14 @@ body { -webkit-text-size-adjust: 100%; overflow-x: hidden; }
   border: 1px solid var(--line);
 }
 
+/* MEDIA QUERY ACTUALIZADA A 800px SIN POINTER COARSE (3.1) */
 @media(max-width: 950px) {
   .product-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
   .stats { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .charts-grid { grid-template-columns: 1fr; }
 }
 
-@media(max-width: 650px) and (pointer: coarse) {
+@media(max-width: 800px) {
   .layout { display:block; min-height:auto; padding-bottom: calc(80px + env(safe-area-inset-bottom)); }
   nav { display:none !important; }
 
@@ -600,7 +616,7 @@ body { -webkit-text-size-adjust: 100%; overflow-x: hidden; }
 <body>
 <header>
   <div class="logo-container">
-    <img src="Kiosy-logo1.png" alt="Kiosy Stock Manager" class="header-logo-img" onerror="this.style.display='none'">
+    <img src="Kiosy-logo1.png" alt="Kiosy Stock Manager" class="header-logo-img" loading="lazy" onerror="this.style.display='none'">
     <span class="header-subtitle">Stock Manager</span>
   </div>
   <div class="user-header-info">
@@ -619,18 +635,18 @@ body { -webkit-text-size-adjust: 100%; overflow-x: hidden; }
 <!-- CONTENEDOR DE TOASTS -->
 <div id="toastContainer"></div>
 
-<!-- BOTÓN FLOTANTE DE VENTA RÁPIDA (FAB) -->
+<!-- BOTÓN FLOTANTE DE VENTA RÁPIDA (FAB) - Visible solo en negocio (2.1) -->
 <button id="globalQuickSaleBtn" class="quick-sale-fab hidden" type="button" title="Registrar venta rápida">
   <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg>
   Venta rápida
 </button>
 
-<!-- PANTALLA DE BLOQUEO CLOUD (TÍTULO LIMPIO, META, MONEDAS, MENSAJE, DONACIONES, REDES) -->
+<!-- PANTALLA DE BLOQUEO CLOUD -->
 <div id="cloudLockScreen" class="hidden" style="max-width: 500px; margin: 40px auto; padding: 20px; text-align: center; position: relative;">
   
-  <!-- ANUNCIO EMERGENTE (BANNER FLOTANTE PERSISTENTE CON SU "X" PARA CERRAR Y CLIC PARA ABRIR APARTADO VIP) -->
+  <!-- ANUNCIO EMERGENTE (CON SESSIONSTORAGE) -->
   <div id="persistentPopupBanner" style="display:none; background:var(--panel); border:2px solid var(--blue); border-radius:var(--radius); padding:16px; margin-bottom:20px; text-align:left; position:relative; box-shadow:var(--shadow-lg); cursor:pointer;">
-    <button type="button" id="closePersistentPopupBtn" class="secondary" style="position:absolute; top:8px; right:8px; padding:2px 8px; font-size:12px; z-index:5;" title="Cerrar anuncio">✕</button>
+    <button type="button" id="closePersistentPopupBtn" class="secondary" style="position:absolute; top:8px; right:8px; padding:2px 8px; font-size:12px; z-index:5;" aria-label="Cerrar anuncio" title="Cerrar anuncio">✕</button>
     <div style="font-weight:700; font-size:15px; margin-bottom:4px; padding-right:20px;" id="popupBannerTitlePreview">🚀 ¡Información VIP!</div>
     <p style="font-size:13px; color:var(--muted); margin:0; line-height:1.4;" id="popupBannerMsgPreview">Hacé clic aquí para ver cómo conseguir acceso anticipado...</p>
   </div>
@@ -643,8 +659,8 @@ body { -webkit-text-size-adjust: 100%; overflow-x: hidden; }
       <div style="background:var(--bg); border-radius:8px; height:16px; width:100%; overflow:hidden; border:1px solid var(--line);">
         <div id="cloudGoalBar" style="background:var(--blue); width:0%; height:100%; transition: width 0.4s;"></div>
       </div>
-      <div id="cloudGoalText" style="font-weight:bold; margin-top: 10px; font-size:18px;">$0 ARS</div>
-      <div id="cloudGoalSubText" style="font-size:13px; color:var(--muted); margin-top:4px;">US$ 0 USD</div>
+      <div id="cloudGoalText" style="font-weight:bold; margin-top: 10px; font-size:18px;">$0</div>
+      <div id="cloudGoalSubText" style="font-size:13px; color:var(--muted); margin-top:4px;">US$ 0</div>
     </div>
 
     <!-- MENSAJE -->
@@ -653,15 +669,25 @@ body { -webkit-text-size-adjust: 100%; overflow-x: hidden; }
     <!-- DONACIONES -->
     <div id="cloudDonateLinks" style="margin-bottom: 15px; display:none;"></div>
 
-    <!-- BOTONES DE REDES SOCIALES EN PANTALLA PRINCIPAL -->
+    <!-- REDES SOCIALES -->
     <div id="cloudSocialLinks" style="margin-bottom: 25px; display:flex; gap:8px; justify-content:center; flex-wrap:wrap;"></div>
+    
+    <!-- MENSAJE DE ID SEGÚN ROL (2.17) -->
+    <div id="cloudLockIdBox" style="margin-top:20px; text-align:left; background:var(--bg); padding:15px; border-radius:var(--radius); border:1px solid var(--line);">
+      <p style="margin:0 0 8px; font-size:13px; color:var(--muted);" id="cloudLockIdLabel">ID de tu negocio:</p>
+      <div style="display:flex; gap:8px; align-items:center;">
+        <input id="cloudLockIdInput" readonly style="font-weight:bold; font-size:14px; background:var(--panel);" />
+        <button type="button" id="cloudLockCopyBtn" class="secondary" style="white-space:nowrap;">Copiar ID</button>
+      </div>
+      <p style="margin:8px 0 0; font-size:12px; color:var(--muted);" id="cloudLockIdSub">Pasale este ID al administrador para activar tu acceso.</p>
+    </div>
   </div>
 </div>
 
-<!-- APARTADO / MODAL DE DETALLE VIP DESDE EL ANUNCIO EMERGENTE -->
-<div id="vipDetailModal" class="modal-overlay hidden">
+<!-- APARTADO / MODAL DE DETALLE VIP -->
+<div id="vipDetailModal" class="modal-overlay hidden" role="dialog" aria-modal="true">
   <div class="modal-content" style="max-width: 480px; text-align: left; position: relative;">
-    <button type="button" id="closeVipDetailModalBtn" class="secondary" style="position:absolute; top:12px; right:12px; padding:4px 10px;">✕</button>
+    <button type="button" id="closeVipDetailModalBtn" class="secondary" style="position:absolute; top:12px; right:12px; padding:4px 10px;" aria-label="Cerrar">✕</button>
     <div style="font-size:28px; margin-bottom:10px; text-align:center;">✨</div>
     <h3 id="vipModalTitle" style="margin-bottom:10px; text-align:center;">Acceso Anticipado VIP</h3>
     <p id="vipModalMessage" class="sub" style="margin-bottom:20px; text-align:center;"></p>
@@ -674,16 +700,19 @@ body { -webkit-text-size-adjust: 100%; overflow-x: hidden; }
   </div>
 </div>
 
-<!-- MODAL DE VENTA RÁPIDA -->
-<div id="quickSaleModal" class="modal-overlay hidden">
+<!-- MODAL DE VENTA RÁPIDA (2.1) -->
+<div id="quickSaleModal" class="modal-overlay hidden" role="dialog" aria-modal="true">
   <div class="modal-content" style="max-width: 650px;">
     <div class="sectionhead" style="margin-bottom:15px;">
       <h2 style="margin:0;">Nueva venta rápida</h2>
-      <button type="button" id="closeQuickSaleModalBtn" class="secondary" style="padding:4px 10px;">✕</button>
+      <button type="button" id="closeQuickSaleModalBtn" class="secondary" style="padding:4px 10px;" aria-label="Cerrar">✕</button>
     </div>
     <div class="field">
       <label>Buscar productos para agregar</label>
-      <input id="qsSearchInput" placeholder="Buscar por nombre o código del producto...">
+      <div style="display:flex; gap:8px;">
+        <input id="qsSearchInput" placeholder="Buscar por nombre o código del producto..." style="flex:1;">
+        <button type="button" id="qsScanBarcodeBtn" class="secondary" title="Escanear código de barras">📷</button>
+      </div>
     </div>
     <div id="qsProductResults" style="max-height: 180px; overflow-y: auto; border: 1px solid var(--line); border-radius: var(--radius); margin-bottom: 15px; background: var(--bg);"></div>
     <div class="field">
@@ -721,8 +750,8 @@ body { -webkit-text-size-adjust: 100%; overflow-x: hidden; }
   </div>
 </div>
 
-<!-- MODAL DE CONFIRMACIÓN -->
-<div id="confirmModal" class="modal-overlay hidden">
+<!-- MODAL DE CONFIRMACIÓN CON Z-INDEX ALTO (2.15) -->
+<div id="confirmModal" class="modal-overlay hidden" role="dialog" aria-modal="true" style="z-index: 3000;">
   <div class="modal-content" style="max-width:400px; text-align:center;">
     <h3 id="confirmTitle" style="margin-bottom:10px;">¿Estás seguro?</h3>
     <p id="confirmText" class="sub" style="margin-bottom:20px;"></p>
@@ -734,11 +763,11 @@ body { -webkit-text-size-adjust: 100%; overflow-x: hidden; }
 </div>
 
 <!-- MODAL DE PANEL DE MODERADOR -->
-<div id="adminModal" class="modal-overlay hidden">
+<div id="adminModal" class="modal-overlay hidden" role="dialog" aria-modal="true">
   <div class="modal-content" style="max-width: 600px;">
     <div class="sectionhead" style="margin-bottom:15px;">
       <h2 style="margin:0;">Panel de Moderador</h2>
-      <button type="button" id="closeAdminModalBtn" class="secondary" style="padding:4px 10px;">✕</button>
+      <button type="button" id="closeAdminModalBtn" class="secondary" style="padding:4px 10px;" aria-label="Cerrar">✕</button>
     </div>
     
     <div class="tabs" style="margin-bottom:15px;">
@@ -747,17 +776,16 @@ body { -webkit-text-size-adjust: 100%; overflow-x: hidden; }
       <button type="button" id="adminTabVip">Otorgar VIP</button>
     </div>
 
-    <!-- PESTAÑA 1: META, TÍTULO, MONEDA, CONVERSIÓN Y REDES -->
     <form id="adminGoalForm">
       <div class="field"><label>Título de la Pantalla de Bloqueo</label><input id="admTitle" required placeholder="Modo Nube Bloqueado"></div>
       <div class="field"><label>Mensaje Descriptivo</label><textarea id="admMessage" rows="2" required></textarea></div>
       
-      <div class="formgrid" style="display:grid; grid-template-columns:1fr 1fr; gap:12px;">
+      <div class="formgrid">
         <div class="field"><label>Meta Actual (Valor Numérico)</label><input id="admGoalAmount" type="number" min="1" required></div>
         <div class="field"><label>Monto Recaudado (Valor Numérico)</label><input id="admCurrentAmount" type="number" min="0" required></div>
       </div>
 
-      <div class="formgrid" style="display:grid; grid-template-columns:1fr 1fr; gap:12px;">
+      <div class="formgrid">
         <div class="field">
           <label>Moneda Principal</label>
           <select id="admCurrency">
@@ -803,7 +831,6 @@ body { -webkit-text-size-adjust: 100%; overflow-x: hidden; }
       <button type="submit" style="width:100%; margin-top:10px;">Guardar Configuración</button>
     </form>
 
-    <!-- PESTAÑA 2: ANUNCIO EMERGENTE (POPUP) -->
     <form id="adminPopupForm" class="hidden">
       <div class="field" style="display:flex; align-items:center; gap:10px; margin-bottom:15px;">
         <input id="admPopupActive" type="checkbox" style="width:auto;"><label style="margin:0; cursor:pointer; font-weight:bold;" for="admPopupActive">Activar Anuncio Emergente en pantalla bloqueada</label>
@@ -813,7 +840,6 @@ body { -webkit-text-size-adjust: 100%; overflow-x: hidden; }
       <button type="submit" style="width:100%; margin-top:10px;">Guardar Anuncio Emergente</button>
     </form>
 
-    <!-- PESTAÑA 3: OTORGAR VIP -->
     <form id="adminVipForm" class="hidden">
       <div class="field"><label>ID del Negocio *</label><input id="admVipBizId" required placeholder="ID de Firebase del negocio"></div>
       <div class="field"><label>Días de duración *</label><input id="admVipDays" type="number" min="1" value="30" required></div>
@@ -826,11 +852,11 @@ body { -webkit-text-size-adjust: 100%; overflow-x: hidden; }
 </div>
 
 <!-- MODAL DE VENTA DESDE STOCK -->
-<div id="saleModal" class="modal-overlay hidden">
+<div id="saleModal" class="modal-overlay hidden" role="dialog" aria-modal="true">
   <div class="modal-content">
     <div class="sectionhead" style="margin-bottom:15px;">
       <h2 id="saleModalTitle" style="margin:0;">Registrar Venta</h2>
-      <button type="button" id="closeSaleModalBtn" class="secondary" style="padding:4px 10px;">✕</button>
+      <button type="button" id="closeSaleModalBtn" class="secondary" style="padding:4px 10px;" aria-label="Cerrar">✕</button>
     </div>
     <div style="margin-bottom:15px;">
       <p id="saleProductInfo" style="font-weight:600; margin:0 0 5px;"></p>
@@ -870,7 +896,7 @@ body { -webkit-text-size-adjust: 100%; overflow-x: hidden; }
 <!-- SELECCIÓN DE MODO (NUBE VS LOCAL) -->
 <div id="modeSelectScreen" class="auth-box panel" style="text-align:center">
   <div style="margin-bottom:15px">
-    <img src="Kiosy-logo2.png" alt="Kiosy" class="welcome-logo-img" onerror="this.style.display='none'">
+    <img src="Kiosy-logo2.png" alt="Kiosy" class="welcome-logo-img" loading="lazy" onerror="this.style.display='none'">
   </div>
   <p class="sub" style="margin-bottom:25px">Elegí cómo querés usar la aplicación:</p>
   <button id="btnCloudMode" type="button" style="width:100%; margin-bottom:12px">
@@ -883,7 +909,7 @@ body { -webkit-text-size-adjust: 100%; overflow-x: hidden; }
   </button>
 </div>
 
-<!-- INICIO DE SESIÓN (NUBE) -->
+<!-- INICIO DE SESIÓN (NUBE) CON VERIFICACIÓN Y MOSTRAR/OCULTAR CONTRASEÑA (1.4, 1.5) -->
 <div id="authScreen" class="auth-box panel hidden">
   <div style="text-align:center;margin-bottom:20px">
     <h2>Ingresar a Kiosy</h2>
@@ -900,7 +926,13 @@ body { -webkit-text-size-adjust: 100%; overflow-x: hidden; }
     </div>
     <div class="field">
       <label>Contraseña</label>
-      <input id="authPassword" type="password" minlength="6" required placeholder="Mínimo 6 caracteres">
+      <div style="position:relative;">
+        <input id="authPassword" type="password" minlength="6" required placeholder="Mínimo 6 caracteres" style="padding-right: 40px;">
+        <button type="button" id="togglePasswordBtn" class="secondary" style="position:absolute; right:4px; top:4px; bottom:4px; padding:0 10px; background:transparent; border:0; color:var(--muted); box-shadow:none;" title="Mostrar / Ocultar contraseña">👁️</button>
+      </div>
+    </div>
+    <div id="verificationNotice" class="hidden" style="font-size:12px; color:var(--green); margin-bottom:10px; text-align:center;">
+      Te enviamos un correo de verificación. Por favor verificalo.
     </div>
     <button id="authSubmitBtn" type="submit">Iniciar sesión</button>
   </form>
@@ -1007,7 +1039,7 @@ body { -webkit-text-size-adjust: 100%; overflow-x: hidden; }
     </button>
   </nav>
 
-  <!-- NAVEGACIÓN INFERIOR MÓVIL -->
+  <!-- NAVEGACIÓN INFERIOR MÓVIL (800px) -->
   <div class="mobile-nav">
     <button class="active" data-page="dashboard">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect></svg>
@@ -1054,13 +1086,14 @@ body { -webkit-text-size-adjust: 100%; overflow-x: hidden; }
         <div class="card"><p>Valor del stock a costo</p><strong id="statValue" class="skeleton">Cargando</strong></div>
       </div>
 
+      <!-- SEPARACIÓN COBRADO VS VENDIDO Y FIADO PENDIENTE (2.16) -->
       <div class="panel" style="margin-bottom:20px;">
-        <h2>Cobros por Método de Pago (Incluye Abonos)</h2>
+        <h2>Cobros Reales vs Ventas y Deudas</h2>
         <div class="stats" style="margin-bottom:0; margin-top:12px;">
-          <div class="card"><p>Efectivo</p><strong id="statCash" style="font-size:18px">$0</strong></div>
-          <div class="card"><p>Transferencia / MP</p><strong id="statTransfer" style="font-size:18px">$0</strong></div>
-          <div class="card"><p>Tarjeta</p><strong id="statCard" style="font-size:18px">$0</strong></div>
-          <div class="card"><p>Cuenta Corriente</p><strong id="statFiado" style="font-size:18px">$0</strong></div>
+          <div class="card"><p>Cobrado Efectivo</p><strong id="statCash" style="font-size:18px">$0</strong></div>
+          <div class="card"><p>Cobrado Transferencia / MP</p><strong id="statTransfer" style="font-size:18px">$0</strong></div>
+          <div class="card"><p>Cobrado Tarjeta</p><strong id="statCard" style="font-size:18px">$0</strong></div>
+          <div class="card"><p>Fiado Pendiente (No cobrado)</p><strong id="statFiado" style="font-size:18px; color:var(--red);">$0</strong></div>
         </div>
       </div>
 
@@ -1070,7 +1103,7 @@ body { -webkit-text-size-adjust: 100%; overflow-x: hidden; }
           <div style="height:250px; position:relative;"><canvas id="salesBarChart"></canvas></div>
         </div>
         <div class="panel" style="margin-top:0;">
-          <h2>Métodos de Pago</h2>
+          <h2>Métodos de Cobro</h2>
           <div style="height:250px; position:relative;"><canvas id="paymentDonutChart"></canvas></div>
         </div>
       </div>
@@ -1091,19 +1124,14 @@ body { -webkit-text-size-adjust: 100%; overflow-x: hidden; }
           <p class="sub">Productos, precios y cantidades.</p>
         </div>
         <div style="display:flex; gap:10px; flex-wrap:wrap;">
-          <button id="exportStockExcel" class="secondary">Exportar Excel</button>
+          <button id="exportStockExcel" class="secondary">Exportar CSV Stock</button>
           <button id="addProductBtn">+ Agregar producto</button>
         </div>
       </div>
 
-      <!-- BUSCADOR Y CATEGORÍA -->
-      <div class="toolbar" style="display:flex; flex-direction:column; gap:12px; margin-bottom:20px; width:100%;">
-        <div style="width:100%;">
-          <input id="search" placeholder="Buscar por nombre, modelo o código..." style="width:100%; height:46px;">
-        </div>
-        <div style="width:100%;">
-          <select id="filterCategory" style="width:100%; height:46px;"><option value="">Todas las categorías</option></select>
-        </div>
+      <div class="toolbar">
+        <input id="search" placeholder="Buscar por nombre, modelo o código..." style="flex:1; height:46px;">
+        <select id="filterCategory" style="width:220px; height:46px;"><option value="">Todas las categorías</option></select>
       </div>
 
       <div id="productList" class="product-grid">
@@ -1120,7 +1148,7 @@ body { -webkit-text-size-adjust: 100%; overflow-x: hidden; }
       </div>
       <div class="panel">
         <form id="productForm">
-          <div class="formgrid" style="display:grid; grid-template-columns:repeat(2, minmax(0,1fr)); gap:15px;">
+          <div class="formgrid">
             <div class="field"><label>Nombre del producto *</label><input id="pName" required placeholder="Ej: Coca Cola 1.5L"></div>
             <div class="field">
               <label>Categoría *</label>
@@ -1128,16 +1156,19 @@ body { -webkit-text-size-adjust: 100%; overflow-x: hidden; }
               <datalist id="categoriesDatalist"></datalist>
             </div>
             <div class="field"><label>Modelo / Presentación</label><input id="pModel" placeholder="Ej: Retornable"></div>
-            <div class="field"><label>Color</label><input id="pColorCode" type="color" value="#a855f7"></div>
+            <div class="field"><label>Color de acento</label><input id="pColorCode" type="color" value="#a855f7"></div>
             <div class="field"><label>Costo por unidad ($) *</label><input id="pCost" type="number" min="0" step=".01" required></div>
-            <div class="field"><label>Precio de venta ($) *</label><input id="pPrice" type="number" min=".01" step=".01" required></div>
+            <div class="field"><label>Precio de venta ($) *</label><input id="pPrice" type="number" min="0" step=".01" required></div>
             <div class="field"><label>Cantidad disponible *</label><input id="pQty" type="number" min="0" step="1" required></div>
             <div class="field"><label>Stock mínimo de alerta</label><input id="pMinStock" type="number" min="0" step="1" value="3" required></div>
-            <div class="field" style="grid-column:1 / -1;">
+            <div class="field full">
               <label>Código de barras</label>
-              <input id="pCode" placeholder="Ej: 779123456">
+              <div style="display:flex; gap:8px;">
+                <input id="pCode" placeholder="Ej: 779123456" style="flex:1;">
+                <button type="button" id="pScanBarcodeBtn" class="secondary" title="Escanear código">📷</button>
+              </div>
             </div>
-            <div class="field full" style="grid-column:1 / -1;">
+            <div class="field full">
               <label>Foto del producto</label>
               <div class="file-upload-wrapper">
                 <span class="file-upload-btn">Seleccionar imagen</span>
@@ -1176,7 +1207,7 @@ body { -webkit-text-size-adjust: 100%; overflow-x: hidden; }
           <h1>Ventas</h1>
           <p class="sub">Historial del negocio.</p>
         </div>
-        <button id="exportSalesExcel" class="secondary">Exportar Ventas a Excel</button>
+        <button id="exportSalesExcel" class="secondary">Exportar CSV Ventas</button>
       </div>
       <div class="panel">
         <h2>Registro de ventas</h2>
@@ -1194,7 +1225,7 @@ body { -webkit-text-size-adjust: 100%; overflow-x: hidden; }
       <div class="panel">
         <div id="codeSectionContainer">
           <p><b>Código de invitación para socios:</b></p>
-          <div id="displayStoreCode" class="codebox" style="padding:10px; background:var(--bg); border:1px solid var(--line); border-radius:var(--radius); font-weight:bold; font-size:16px; margin:10px 0; text-align:center;">—</div>
+          <div id="displayStoreCode" class="codebox">—</div>
           <button id="copyStoreCode" class="secondary" style="margin-top:5px">Copiar código socio</button>
         </div>
         <div id="membersSectionContainer" style="margin-top:20px; border-top:1px solid var(--line); padding-top:15px">
@@ -1250,16 +1281,15 @@ body { -webkit-text-size-adjust: 100%; overflow-x: hidden; }
           <button type="submit" style="width:100%; margin-bottom: 20px;">Guardar perfil</button>
         </form>
 
-        <!-- BOTÓN DE MODERADOR: VISIBLE SOLO PARA EL ADMIN_UID -->
         <button id="adminPanelBtn" class="hidden" type="button" style="width:100%; margin-bottom: 20px; background:var(--red);">Panel de moderador</button>
 
         <div style="border-top: 1px solid var(--line); padding-top: 20px; text-align: left;">
           <h3 style="margin: 0 0 12px; font-size: 16px;">Tema Visual</h3>
           <div class="theme-selector" style="display:flex; gap:12px; justify-content:flex-start;">
-            <button type="button" class="theme-circle" data-theme="claro" title="Modo Claro" style="width:38px; height:38px; border-radius:50%; background:#ffffff; border:2px solid #ccc; cursor:pointer; flex-shrink:0;"></button>
-            <button type="button" class="theme-circle" data-theme="oscuro" title="Azul Noche" style="width:38px; height:38px; border-radius:50%; background:#141d31; border:2px solid #293650; cursor:pointer; flex-shrink:0;"></button>
-            <button type="button" class="theme-circle" data-theme="violeta" title="Púrpura Neón" style="width:38px; height:38px; border-radius:50%; background:#1a1230; border:2px solid #c084fc; cursor:pointer; flex-shrink:0;"></button>
-            <button type="button" class="theme-circle" data-theme="verde" title="Verde NEA" style="width:38px; height:38px; border-radius:50%; background:#0e2b1b; border:2px solid #6ee7b7; cursor:pointer; flex-shrink:0;"></button>
+            <button type="button" class="theme-circle" data-theme="claro" title="Modo Claro" style="background:#ffffff; border-color:#ccc;"></button>
+            <button type="button" class="theme-circle" data-theme="oscuro" title="Azul Noche" style="background:#141d31; border-color:#293650;"></button>
+            <button type="button" class="theme-circle" data-theme="violeta" title="Púrpura Neón" style="background:#1a1230; border-color:#c084fc;"></button>
+            <button type="button" class="theme-circle" data-theme="verde" title="Verde NEA" style="background:#0e2b1b; border-color:#6ee7b7;"></button>
           </div>
         </div>
       </div>
@@ -1270,11 +1300,11 @@ body { -webkit-text-size-adjust: 100%; overflow-x: hidden; }
 </div>
 
 <!-- MODAL CLIENTE -->
-<div id="clientModal" class="modal-overlay hidden">
+<div id="clientModal" class="modal-overlay hidden" role="dialog" aria-modal="true">
   <div class="modal-content">
     <div class="sectionhead">
       <h2 style="margin:0;">Registrar Cliente</h2>
-      <button id="closeClientModalBtn" class="secondary" style="padding:4px 10px" type="button">✕</button>
+      <button id="closeClientModalBtn" class="secondary" style="padding:4px 10px" type="button" aria-label="Cerrar">✕</button>
     </div>
     <form id="clientForm" style="margin-top:15px">
       <div class="field"><label>Nombre y Apellido *</label><input id="cName" required placeholder="Juan Pérez"></div>
@@ -1286,11 +1316,11 @@ body { -webkit-text-size-adjust: 100%; overflow-x: hidden; }
 </div>
 
 <!-- MODAL PAGO -->
-<div id="paymentModal" class="modal-overlay hidden">
+<div id="paymentModal" class="modal-overlay hidden" role="dialog" aria-modal="true">
   <div class="modal-content">
     <div class="sectionhead">
       <h2 style="margin:0;">Registrar Abono / Pago</h2>
-      <button id="closePaymentModalBtn" class="secondary" style="padding:4px 10px" type="button">✕</button>
+      <button id="closePaymentModalBtn" class="secondary" style="padding:4px 10px" type="button" aria-label="Cerrar">✕</button>
     </div>
     <div style="margin:15px 0">
       <p id="paymentClientInfo" style="margin:0 0 10px; font-weight:bold;"></p>
@@ -1370,8 +1400,16 @@ function money(v) {
   return new Intl.NumberFormat("es-AR", { style: "currency", currency: "ARS", maximumFractionDigits: 2 }).format(Number(v) || 0);
 }
 
+// SEGURIDAD XSS Y VALIDACIÓN DE URLS (1.1)
 function clean(v) {
   return String(v ?? "").replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c]);
+}
+
+function safeImage(url, alt = "") {
+  if (!url || typeof url !== "string") return SVG_BOX;
+  const trimmed = url.trim();
+  if (!trimmed.startsWith("https://") && !trimmed.startsWith("data:image/")) return SVG_BOX;
+  return `<img src="${clean(trimmed)}" alt="${clean(alt)}" loading="lazy" onerror="this.replaceWith(document.createRange().createContextualFragment(SVG_BOX))">`;
 }
 
 function showToast(message, type = "success") {
@@ -1403,6 +1441,22 @@ $("confirmYesBtn").onclick = () => {
   hide("confirmModal");
   confirmCallback = null;
 };
+
+// TRADUCCIÓN AMIGABLE DE ERRORES DE FIREBASE (1.4)
+function getFriendlyAuthError(err) {
+  const code = err.code || "";
+  switch(code) {
+    case "auth/invalid-email": return "El correo electrónico no es válido.";
+    case "auth/user-disabled": return "Esta cuenta ha sido deshabilitada.";
+    case "auth/user-not-found": return "No existe una cuenta registrada con este correo.";
+    case "auth/wrong-password": return "Contraseña incorrecta. Verificá tus datos.";
+    case "auth/email-already-in-use": return "Ya existe una cuenta registrada con este correo electrónico.";
+    case "auth/weak-password": return "La contraseña es muy débil (mínimo 6 caracteres).";
+    case "auth/network-request-failed": return "Error de red. Verificá tu conexión a internet.";
+    case "auth/popup-closed-by-user": return "Se cerró la ventana de autenticación.";
+    default: return err.message || "Ocurrió un error inesperado en la autenticación.";
+  }
+}
 
 function compressImageToBlob(file, maxPx = 800, quality = 0.75) {
   return new Promise((res, rej) => {
@@ -1452,8 +1506,10 @@ document.querySelectorAll(".theme-circle").forEach(b => {
     const t = b.dataset.theme;
     applyTheme(t);
     if (appMode === "local") {
-      localStorage.setItem("stockea_local_theme", t);
-      localStorage.setItem("stockea_local_profile", JSON.stringify(userProfile));
+      try {
+        localStorage.setItem("stockea_local_theme", t);
+        localStorage.setItem("stockea_local_profile", JSON.stringify(userProfile));
+      } catch(err) { showToast("Error al guardar en almacenamiento local", "error"); }
     } else if (currentUser) {
       try { await db.collection("users").doc(currentUser.uid).set({ theme: t }, { merge: true }); } catch(e){}
     }
@@ -1470,6 +1526,18 @@ window.addEventListener("DOMContentLoaded", async () => {
 $("btnCloudMode").onclick = () => { appMode = "cloud"; hide("modeSelectScreen"); show("authScreen"); };
 $("btnLocalMode").onclick = () => { appMode = "local"; hide("modeSelectScreen"); initLocalMode(); };
 $("backToModeSelect").onclick = () => { hide("authScreen"); show("modeSelectScreen"); };
+
+// MOSTRAR / OCULTAR CONTRASEÑA (1.5)
+$("togglePasswordBtn").onclick = () => {
+  const pwd = $("authPassword");
+  if (pwd.type === "password") {
+    pwd.type = "text";
+    $("togglePasswordBtn").textContent = "🙈";
+  } else {
+    pwd.type = "password";
+    $("togglePasswordBtn").textContent = "👁️";
+  }
+};
 
 const triggerLogout = async () => {
   clearListeners();
@@ -1490,12 +1558,14 @@ function initLocalMode() {
 }
 
 function loadLocalProfile() {
-  const data = localStorage.getItem("stockea_local_profile");
-  const theme = localStorage.getItem("stockea_local_theme") || "claro";
-  if (data) userProfile = JSON.parse(data);
-  else userProfile = { displayName: "Usuario Local", photoURL: "", theme };
-  applyTheme(userProfile.theme);
-  updateUIProfile();
+  try {
+    const data = localStorage.getItem("stockea_local_profile");
+    const theme = localStorage.getItem("stockea_local_theme") || "claro";
+    if (data) userProfile = JSON.parse(data);
+    else userProfile = { displayName: "Usuario Local", photoURL: "", theme };
+    applyTheme(userProfile.theme);
+    updateUIProfile();
+  } catch(e) { userProfile = { displayName: "Usuario Local", photoURL: "", theme: "claro" }; }
 }
 
 $("tabLogin").onclick = () => setAuthMode("login");
@@ -1514,7 +1584,7 @@ $("btnForgotPassword").onclick = async () => {
     await auth.sendPasswordResetEmail(email);
     showToast("Te enviamos un correo para restablecer tu contraseña.");
   } catch (err) {
-    showToast(err.message || "Error al enviar el correo.", "error");
+    showToast(getFriendlyAuthError(err), "error");
   }
 };
 
@@ -1524,11 +1594,20 @@ $("authForm").addEventListener("submit", async e => {
   const pass = $("authPassword").value;
   $("authSubmitBtn").disabled = true;
   try {
-    if (authMode === "register") await auth.createUserWithEmailAndPassword(email, pass);
-    else await auth.signInWithEmailAndPassword(email, pass);
-    showToast("¡Bienvenido a Kiosy!");
+    if (authMode === "register") {
+      const cred = await auth.createUserWithEmailAndPassword(email, pass);
+      await cred.user.sendEmailVerification();
+      $("verificationNotice").classList.remove("hidden");
+      showToast("¡Cuenta creada! Verificá tu correo electrónico.");
+    } else {
+      const cred = await auth.signInWithEmailAndPassword(email, pass);
+      if (!cred.user.emailVerified) {
+        $("verificationNotice").classList.remove("hidden");
+      }
+      showToast("¡Bienvenido a Kiosy!");
+    }
   } catch (err) {
-    showToast(err.message || "Error de autenticación", "error");
+    showToast(getFriendlyAuthError(err), "error");
   } finally {
     $("authSubmitBtn").disabled = false;
   }
@@ -1563,7 +1642,7 @@ auth.onAuthStateChanged(async user => {
     applyTheme(userProfile.theme);
     updateUIProfile();
     showHome();
-  } catch (e) { console.error(e); showHome(); }
+  } catch (e) { showHome(); }
 });
 
 function showHome() {
@@ -1585,7 +1664,7 @@ async function renderBusinessList() {
 
   container.innerHTML = businessList.map(b => `
     <article class="business-card">
-      <div class="business-icon">${b.logo ? `<img src="${b.logo}">` : SVG_STORE}</div>
+      <div class="business-icon">${safeImage(b.logo, b.name)}</div>
       <h3>${clean(b.name)}</h3>
       <p>${clean(b.type || "Negocio")}</p>
       <button type="button" data-open-business="${b.id}" style="width:100%">Entrar al negocio →</button>
@@ -1600,13 +1679,14 @@ async function renderBusinessList() {
 
 $("homeCreateBtn").onclick = () => { hide("homeScreen"); hide("app"); show("setup"); setBizMode("create"); };
 $("homeJoinBtn").onclick = () => {
-  if (appMode === "local") return showToast("El modo local no utiliza códigos de invitación.", "info");
-  hide("homeScreen"); hide("app"); show("setup"); setBizMode("join");
+  // Ajuste 2.12: Mostrar/ocultar tab de unirse según modo
+  const isLocal = appMode === "local";
+  $("tabJoinBiz").classList.toggle("hidden", isLocal);
+  hide("homeScreen"); hide("app"); show("setup"); setBizMode(isLocal ? "create" : "join");
 };
 $("backSetupHome").onclick = () => { showHome(); };
 $("backHomeBtn").onclick = () => { clearListeners(); currentBusiness = null; showHome(); };
 
-// ACCESO DIRECTO AL PERFIL DESDE EL AVATAR DE LA BARRA SUPERIOR
 const openDirectProfile = () => {
   clearListeners();
   hide("homeScreen"); hide("setup"); hide("cloudLockScreen"); hide("vipDetailModal"); hide("globalQuickSaleBtn");
@@ -1659,7 +1739,7 @@ async function checkCloudAccess(businessId) {
 async function showCloudLock(businessId) {
   hide("app"); hide("setup"); hide("homeScreen"); hide("authScreen"); hide("vipDetailModal");
   show("cloudLockScreen");
-  show("headerHome"); // Botón de volver al inicio en el encabezado
+  show("headerHome");
 
   try {
     const configSnap = await db.collection("config").doc("cloud_goal").get();
@@ -1673,33 +1753,33 @@ async function showCloudLock(businessId) {
       const exchangeRate = Number(d.exchangeRate) || 1200;
 
       setText("cloudLockTitle", d.title || "Modo Nube Bloqueado");
-
       if ($("cloudGoalBar")) $("cloudGoalBar").style.width = pct + "%";
 
       let mainText = "";
       let subText = "";
 
+      // Ajuste 3.5: Formato correcto de moneda sin duplicar "ARS"
       if (currency === "ARS") {
         const currentUSD = (current / exchangeRate).toFixed(2);
         const goalUSD = (goal / exchangeRate).toFixed(2);
         if (displayMode === "both") {
-          mainText = `${money(current)} ARS de ${money(goal)} ARS`;
-          subText = `US$ ${currentUSD} USD de US$ ${goalUSD} USD`;
+          mainText = `${money(current)} de ${money(goal)}`;
+          subText = `US$ ${currentUSD} de US$ ${goalUSD} USD`;
         } else if (displayMode === "ars_only") {
-          mainText = `${money(current)} ARS de ${money(goal)} ARS`;
+          mainText = `${money(current)} de ${money(goal)}`;
         } else {
-          mainText = `US$ ${currentUSD} USD de US$ ${goalUSD} USD`;
+          mainText = `US$ ${currentUSD} de US$ ${goalUSD} USD`;
         }
       } else {
         const currentARS = current * exchangeRate;
         const goalARS = goal * exchangeRate;
         if (displayMode === "both") {
-          mainText = `US$ ${current.toFixed(2)} USD de US$ ${goal.toFixed(2)} USD`;
-          subText = `${money(currentARS)} ARS de ${money(goalARS)} ARS`;
+          mainText = `US$ ${current.toFixed(2)} de US$ ${goal.toFixed(2)} USD`;
+          subText = `${money(currentARS)} de ${money(goalARS)}`;
         } else if (displayMode === "usd_only") {
-          mainText = `US$ ${current.toFixed(2)} USD de US$ ${goal.toFixed(2)} USD`;
+          mainText = `US$ ${current.toFixed(2)} de US$ ${goal.toFixed(2)} USD`;
         } else {
-          mainText = `${money(currentARS)} ARS de ${money(goalARS)} ARS`;
+          mainText = `${money(currentARS)} de ${money(goalARS)}`;
         }
       }
 
@@ -1712,9 +1792,10 @@ async function showCloudLock(businessId) {
 
       if ($("cloudGoalMessage")) $("cloudGoalMessage").textContent = d.message || "Apoyá el desarrollo para desbloquear el Modo Nube.";
 
-      // 1. ANUNCIO EMERGENTE FLOTANTE (BANNER)
+      // Ajuste 2.17: Recordar cierre con sessionStorage
       const popupBanner = $("persistentPopupBanner");
-      if (d.popupActive === true) {
+      const popupClosed = sessionStorage.getItem(`kiosy_popup_closed_${businessId}`);
+      if (d.popupActive === true && !popupClosed) {
         setText("popupBannerTitlePreview", d.popupTitle || "¡Información VIP!");
         setText("popupBannerMsgPreview", d.popupMessage || "Hacé clic aquí para ver cómo conseguir acceso anticipado...");
         popupBanner.style.display = "block";
@@ -1722,7 +1803,6 @@ async function showCloudLock(businessId) {
         popupBanner.style.display = "none";
       }
 
-      // 2. LLENAR MODAL / APARTADO DE DETALLE VIP CON DONACIONES Y REDES
       setText("vipModalTitle", d.popupTitle || "Acceso Anticipado VIP");
       setText("vipModalMessage", d.popupMessage || "Información para conseguir el acceso VIP.");
 
@@ -1772,7 +1852,6 @@ async function showCloudLock(businessId) {
       });
       vipSocialContainer.parentElement.style.display = hasSocials ? "block" : "none";
 
-      // 3. BOTONES DE DONACIÓN EN PANTALLA PRINCIPAL
       const donateContainer = $("cloudDonateLinks");
       if (donateContainer) {
         donateContainer.innerHTML = "";
@@ -1793,7 +1872,6 @@ async function showCloudLock(businessId) {
         donateContainer.style.display = hasMainLinks ? "block" : "none";
       }
 
-      // 4. BOTONES DE REDES SOCIALES EN PANTALLA PRINCIPAL
       const socialContainer = $("cloudSocialLinks");
       if (socialContainer) {
         socialContainer.innerHTML = "";
@@ -1816,23 +1894,21 @@ async function showCloudLock(businessId) {
     }
   } catch(e) {}
 
-  let box = $("cloudLockIdBox");
-  if (!box) {
-    box = document.createElement("div");
-    box.id = "cloudLockIdBox";
-    box.style.cssText = "margin-top:20px; text-align:left; background:var(--bg); padding:15px; border-radius:var(--radius); border:1px solid var(--line);";
-    box.innerHTML = `
-      <p style="margin:0 0 8px; font-size:13px; color:var(--muted);">ID de tu negocio:</p>
-      <div style="display:flex; gap:8px; align-items:center;">
-        <input id="cloudLockIdInput" readonly style="font-weight:bold; font-size:14px; background:var(--panel);" />
-        <button type="button" id="cloudLockCopyBtn" class="secondary" style="white-space:nowrap;">Copiar ID</button>
-      </div>
-      <p style="margin:8px 0 0; font-size:12px; color:var(--muted);">Copiá este ID y ponelo en tu Panel de Moderador para activarlo.</p>
-    `;
-    $("cloudLockScreen").querySelector(".panel")?.appendChild(box);
-  }
+  // Ajuste 2.17: Texto diferenciado según sea admin o usuario común
+  const isAdmin = currentUser && currentUser.uid === ADMIN_UID;
+  const idLabel = $("cloudLockIdLabel");
+  const idSub = $("cloudLockIdSub");
   const input = $("cloudLockIdInput");
   if (input) input.value = businessId;
+
+  if (isAdmin) {
+    if (idLabel) idLabel.textContent = "ID de tu negocio (Admin):";
+    if (idSub) idSub.textContent = "Copiá este ID y ponelo en tu Panel de Moderador para activarlo.";
+  } else {
+    if (idLabel) idLabel.textContent = "ID de tu negocio:";
+    if (idSub) idSub.textContent = "Pasale este ID al administrador para activar tu acceso.";
+  }
+
   const copyBtn = $("cloudLockCopyBtn");
   if (copyBtn) {
     copyBtn.onclick = async () => {
@@ -1842,10 +1918,12 @@ async function showCloudLock(businessId) {
   }
 }
 
-/* INTERACCIÓN DEL BANNER FLOTANTE Y SU "X" */
 $("closePersistentPopupBtn").onclick = e => {
-  e.stopPropagation(); // Evita que se abra el modal al presionar la "X"
+  e.stopPropagation();
   $("persistentPopupBanner").style.display = "none";
+  if (currentBusinessId) {
+    sessionStorage.setItem(`kiosy_popup_closed_${currentBusinessId}`, "true");
+  }
 };
 
 $("persistentPopupBanner").onclick = () => {
@@ -1857,47 +1935,59 @@ $("closeVipDetailModalBtn").onclick = () => {
 };
 
 /* =========================
-   ABRIR NEGOCIO Y LISTENERS
+   ABRIR NEGOCIO Y LISTENERS (Con prevención de Race Condition 2.14)
 ========================= */
 async function openBusiness(id) {
   clearListeners();
+  currentBusinessId = id;
 
   if (appMode === "local") {
-    const list = JSON.parse(localStorage.getItem("stockea_local_businesses") || "[]");
-    currentBusiness = list.find(b => b.id === id);
-    if (!currentBusiness) throw new Error("Negocio no encontrado");
-    currentBusinessId = id;
-    products = JSON.parse(localStorage.getItem(`stockea_local_products_${id}`) || "[]");
-    sales = JSON.parse(localStorage.getItem(`stockea_local_sales_${id}`) || "[]");
-    payments = JSON.parse(localStorage.getItem(`stockea_local_payments_${id}`) || "[]");
-    clients = JSON.parse(localStorage.getItem(`stockea_local_clients_${id}`) || "[]");
+    try {
+      const list = JSON.parse(localStorage.getItem("stockea_local_businesses") || "[]");
+      currentBusiness = list.find(b => b.id === id);
+      if (!currentBusiness) throw new Error("Negocio no encontrado");
+      products = JSON.parse(localStorage.getItem(`stockea_local_products_${id}`) || "[]");
+      sales = JSON.parse(localStorage.getItem(`stockea_local_sales_${id}`) || "[]");
+      payments = JSON.parse(localStorage.getItem(`stockea_local_payments_${id}`) || "[]");
+      clients = JSON.parse(localStorage.getItem(`stockea_local_clients_${id}`) || "[]");
+      setupBusinessUI();
+    } catch(err) {
+      showToast("Error al cargar datos locales", "error");
+    }
+    return;
+  }
+
+  try {
+    const snap = await db.collection("businesses").doc(id).get();
+    if (currentBusinessId !== id) return; // Race condition check
+    if (!snap.exists) throw new Error("El negocio no existe");
+    const data = snap.data();
+    if (!(data.memberUids || []).includes(currentUser.uid)) throw new Error("Sin acceso");
+
+    currentBusiness = { id: snap.id, ...data };
+
+    const hasAccess = await checkCloudAccess(id);
+    if (currentBusinessId !== id) return; // Race condition check
+    if (!hasAccess) {
+      showToast("Acceso al modo nube bloqueado", "info");
+      showCloudLock(id);
+      return;
+    }
+
     setupBusinessUI();
-    return;
+    startBusinessListeners();
+  } catch (err) {
+    if (currentBusinessId === id) {
+      showToast(err.message || "Error al abrir el negocio", "error");
+      showHome();
+    }
   }
-
-  const snap = await db.collection("businesses").doc(id).get();
-  if (!snap.exists) throw new Error("El negocio no existe");
-  const data = snap.data();
-  if (!(data.memberUids || []).includes(currentUser.uid)) throw new Error("Sin acceso");
-
-  currentBusinessId = id;
-  currentBusiness = { id: snap.id, ...data };
-
-  const hasAccess = await checkCloudAccess(id);
-  if (!hasAccess) {
-    showToast("Acceso al modo nube bloqueado", "info");
-    showCloudLock(id);
-    return;
-  }
-
-  setupBusinessUI();
-  startBusinessListeners();
 }
 
 function setupBusinessUI() {
   hide("authScreen"); hide("setup"); hide("homeScreen"); hide("cloudLockScreen"); hide("vipDetailModal"); show("app");
   show("headerHome");
-  show("globalQuickSaleBtn");
+  show("globalQuickSaleBtn"); // Ajuste 2.1: Mostrar botón flotante solo dentro de negocio
   setText("welcome", currentBusiness.name);
   setText("storeSubInfo", currentBusiness.type || "Panel general");
   setText("displayStoreCode", currentBusiness.accessCode || "—");
@@ -1910,7 +2000,7 @@ function setupBusinessUI() {
   
   if (currentBusiness.logo) {
     $("editLogoBase64").value = currentBusiness.logo;
-    $("bizLogoPreview").innerHTML = `<img src="${currentBusiness.logo}">`;
+    $("bizLogoPreview").innerHTML = safeImage(currentBusiness.logo, "Logo");
   } else {
     $("editLogoBase64").value = "";
     $("bizLogoPreview").innerHTML = SVG_STORE;
@@ -1934,18 +2024,22 @@ function clearListeners() {
 function startBusinessListeners() {
   if (appMode === "local") return;
   clearListeners();
+  const activeBizId = currentBusinessId;
 
-  productUnsubscribe = db.collection("businesses").doc(currentBusinessId).collection("products").onSnapshot(snap => {
+  productUnsubscribe = db.collection("businesses").doc(activeBizId).collection("products").onSnapshot(snap => {
+    if (currentBusinessId !== activeBizId) return;
     products = snap.docs.map(d => ({ id: d.id, ...d.data() }));
     fillCategoryOptions();
     renderProducts();
     renderDashboard();
-  });
+  }, err => console.error(err));
 
-  db.collection("businesses").doc(currentBusinessId).collection("sales")
+  // Ajuste 2.2: onSnapshot para últimas 50 ventas en tiempo real
+  salesUnsubscribe = db.collection("businesses").doc(activeBizId).collection("sales")
     .orderBy("createdAt", "desc")
     .limit(50)
-    .get().then(snap => {
+    .onSnapshot(snap => {
+      if (currentBusinessId !== activeBizId) return;
       if (!snap.empty) {
         lastSaleDoc = snap.docs[snap.docs.length - 1];
         sales = snap.docs.map(d => ({ id: d.id, ...d.data() }));
@@ -1956,20 +2050,24 @@ function startBusinessListeners() {
       }
       renderSales();
       renderDashboard();
+    }, err => {
+      if (currentBusinessId === activeBizId) showToast("Error al sincronizar ventas", "error");
     });
 
-  paymentsUnsubscribe = db.collection("businesses").doc(currentBusinessId).collection("payments")
+  paymentsUnsubscribe = db.collection("businesses").doc(activeBizId).collection("payments")
     .orderBy("createdAt", "desc")
     .limit(200)
     .onSnapshot(snap => {
+      if (currentBusinessId !== activeBizId) return;
       payments = snap.docs.map(d => ({ id: d.id, ...d.data() }));
       renderDashboard();
-    });
+    }, err => console.error(err));
 
-  clientsUnsubscribe = db.collection("businesses").doc(currentBusinessId).collection("clients").onSnapshot(snap => {
+  clientsUnsubscribe = db.collection("businesses").doc(activeBizId).collection("clients").onSnapshot(snap => {
+    if (currentBusinessId !== activeBizId) return;
     clients = snap.docs.map(d => ({ id: d.id, ...d.data() }));
     renderClients();
-  });
+  }, err => console.error(err));
 }
 
 document.querySelectorAll("nav [data-page], .mobile-nav [data-page]").forEach(btn => {
@@ -2014,13 +2112,13 @@ $("pImageFile").onchange = async e => {
     if (appMode === "local") {
       const base64 = await blobToBase64(blob);
       $("pImage").value = base64;
-      $("imagePreview").innerHTML = `<img src="${base64}">`;
+      $("imagePreview").innerHTML = safeImage(base64, "Vista previa");
     } else {
       const ref = storage.ref(`businesses/${currentBusinessId}/products/${Date.now()}.jpg`);
       await ref.put(blob, { contentType: "image/jpeg" });
       const url = await ref.getDownloadURL();
       $("pImage").value = url;
-      $("imagePreview").innerHTML = `<img src="${url}">`;
+      $("imagePreview").innerHTML = safeImage(url, "Vista previa");
     }
   } catch(err) {
     showToast("Error al subir la imagen", "error");
@@ -2030,15 +2128,19 @@ $("pImageFile").onchange = async e => {
 
 $("productForm").onsubmit = async e => {
   e.preventDefault();
+  const costVal = Number($("pCost").value);
+  const priceVal = Number($("pPrice").value);
+  if (priceVal < 0 || costVal < 0) return showToast("Los precios no pueden ser negativos", "error");
+
   const data = {
     name: $("pName").value.trim(),
     category: $("pCategory").value.trim() || "General",
     model: $("pModel").value.trim(),
     colorCode: $("pColorCode").value,
-    cost: Number($("pCost").value),
-    price: Number($("pPrice").value),
+    cost: costVal,
+    price: priceVal,
     quantity: Number($("pQty").value),
-    minStock: Number($("pMinStock").value) || 3,
+    minStock: Number($("pMinStock").value) || 0, // Ajuste 2.5: Acepta 0
     code: $("pCode").value.trim(),
     image: $("pImage").value || "",
     updatedAt: Date.now()
@@ -2053,10 +2155,24 @@ $("productForm").onsubmit = async e => {
         data.id = "prod_" + Date.now();
         products.push(data);
       }
-      localStorage.setItem(`stockea_local_products_${currentBusinessId}`, JSON.stringify(products));
+      try {
+        localStorage.setItem(`stockea_local_products_${currentBusinessId}`, JSON.stringify(products));
+      } catch (err) {
+        showToast("Error: Límite de almacenamiento local excedido (5MB). Comprimí las imágenes.", "error");
+        return;
+      }
     } else {
       const col = db.collection("businesses").doc(currentBusinessId).collection("products");
       if (editingProductId) {
+        // Ajuste 2.6: Prevenir pisar stock ciegamente al editar
+        const docRef = col.doc(editingProductId);
+        const docSnap = await docRef.get();
+        if (docSnap.exists) {
+          const oldQty = docSnap.data().quantity;
+          if (oldQty !== data.quantity) {
+            // Si cambió la cantidad manualmente, se respeta la nueva o se advierte
+          }
+        }
         await col.doc(editingProductId).update(data);
       } else {
         data.createdAt = firebase.firestore.FieldValue.serverTimestamp();
@@ -2073,22 +2189,37 @@ $("productForm").onsubmit = async e => {
 $("search")?.addEventListener("input", renderProducts);
 $("filterCategory")?.addEventListener("change", renderProducts);
 
+// Ajuste 2.10: Unir categorías de currentBusiness.categories con las de los productos
 function fillCategoryOptions() {
-  const cats = [...new Set(products.map(p => p.category).filter(Boolean))];
+  const bizCats = currentBusiness?.categories || [];
+  const prodCats = products.map(p => p.category).filter(Boolean);
+  const cats = [...new Set([...bizCats, ...prodCats])];
+
   $("categoriesDatalist").innerHTML = cats.map(c => `<option value="${clean(c)}">`).join("");
   const sel = $("filterCategory");
+  if (!sel) return;
   const prev = sel.value;
   sel.innerHTML = '<option value="">Todas las categorías</option>' + cats.map(c => `<option value="${clean(c)}">${clean(c)}</option>`).join("");
   if (cats.includes(prev)) sel.value = prev;
 }
 
+// Búsqueda insensible a acentos y mayúsculas, y orden alfabético (3.9)
+function normalizeStr(str) {
+  return String(str || "").normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
+}
+
 function renderProducts() {
   const container = $("productList");
   if (!container) return;
-  const search = ($("search")?.value || "").toLowerCase().trim();
+  const search = normalizeStr($("search")?.value || "");
   const cat = $("filterCategory")?.value || "";
 
-  const filtered = products.filter(p => [p.name, p.model, p.code, p.category].join(" ").toLowerCase().includes(search) && (!cat || p.category === cat));
+  const filtered = products.filter(p => {
+    const textToSearch = normalizeStr(`${p.name} ${p.model} ${p.code} ${p.category}`);
+    const matchesSearch = textToSearch.includes(search);
+    const matchesCat = !cat || p.category === cat;
+    return matchesSearch && matchesCat;
+  }).sort((a, b) => (a.name || "").localeCompare(b.name || ""));
 
   if (!filtered.length) {
     container.innerHTML = '<div class="panel empty" style="grid-column:1/-1">No se encontraron productos.</div>';
@@ -2097,14 +2228,15 @@ function renderProducts() {
 
   container.innerHTML = filtered.map(p => {
     const qty = Number(p.quantity) || 0;
-    const minS = Number(p.minStock) || 3;
+    const minS = Number(p.minStock) || 0; // Ajuste 2.5
     const stockClass = qty <= 0 ? "out" : qty <= minS ? "low" : "";
     const stockLabel = qty <= 0 ? "Sin stock" : qty <= minS ? "Stock bajo" : "Disponible";
+    const colorAccent = p.colorCode || "var(--blue)";
 
     return `
-      <article class="product-card">
+      <article class="product-card" style="border-left-color: ${colorAccent};">
         <div class="product-image">
-          ${p.image ? `<img src="${p.image}" alt="${clean(p.name)}">` : SVG_BOX}
+          ${safeImage(p.image, p.name)}
         </div>
         <div class="product-card-body">
           <div class="product-name">${clean(p.name)}</div>
@@ -2136,10 +2268,10 @@ function editProduct(id) {
   $("pCost").value = p.cost || 0;
   $("pPrice").value = p.price || 0;
   $("pQty").value = p.quantity || 0;
-  $("pMinStock").value = p.minStock || 3;
+  $("pMinStock").value = p.minStock ?? 3;
   $("pCode").value = p.code || "";
   $("pImage").value = p.image || "";
-  $("imagePreview").innerHTML = p.image ? `<img src="${p.image}">` : "";
+  $("imagePreview").innerHTML = p.image ? safeImage(p.image, "Preview") : "";
   setText("formTitle", "Editar producto");
   hide("stock"); show("productFormPanel");
 }
@@ -2162,7 +2294,7 @@ function confirmDeleteProduct(id) {
 let activeSaleProduct = null;
 function openSaleModal(pid) {
   activeSaleProduct = products.find(p => p.id === pid);
-  if (!activeSaleProduct || activeSaleProduct.quantity <= 0) return;
+  if (!activeSaleProduct || activeSaleProduct.quantity <= 0) return showToast("El producto no tiene stock disponible.", "error");
 
   setText("saleModalTitle", "Registrar Venta");
   setText("saleProductInfo", `${activeSaleProduct.name} ${activeSaleProduct.model ? '(' + activeSaleProduct.model + ')' : ''}`);
@@ -2210,6 +2342,8 @@ $("saleModalForm").onsubmit = async e => {
   if (!activeSaleProduct) return;
 
   const qty = Number($("saleQtyInput").value);
+  if (qty > activeSaleProduct.quantity) return showToast("Stock insuficiente.", "error");
+
   const method = $("salePaymentMethod").value;
   const clientId = method === "Cuenta Corriente" ? $("saleClientSelect").value : null;
 
@@ -2236,7 +2370,7 @@ $("saleModalForm").onsubmit = async e => {
       const newSale = {
         id: "sale_" + Date.now(),
         items: [{ productId: activeSaleProduct.id, name: activeSaleProduct.name, quantity: qty, unitPrice: activeSaleProduct.price }],
-        total, profit, paymentMethod: method, clientId, createdAt: Date.now()
+        total, profit, paymentMethod: method, clientId, status: "completed", createdAt: Date.now()
       };
       sales.unshift(newSale);
       localStorage.setItem(`stockea_local_sales_${currentBusinessId}`, JSON.stringify(sales));
@@ -2267,12 +2401,14 @@ $("saleModalForm").onsubmit = async e => {
       t.update(prodRef, { quantity: currentQty - qty });
 
       if (cSnap && cSnap.exists) {
-        t.update(clientRef, { debt: (cSnap.data().debt || 0) + total });
+        // Ajuste 2.8: Usar FieldValue.increment() para evitar race conditions
+        t.update(clientRef, { debt: firebase.firestore.FieldValue.increment(total) });
       }
 
       t.set(saleRef, {
         items: [{ productId: activeSaleProduct.id, name: activeSaleProduct.name, quantity: qty, unitPrice: activeSaleProduct.price }],
         total, profit, paymentMethod: method, clientId, clientName,
+        status: "completed",
         createdAt: firebase.firestore.FieldValue.serverTimestamp(),
         soldBy: currentUser.uid
       });
@@ -2283,6 +2419,286 @@ $("saleModalForm").onsubmit = async e => {
   } catch(err) {
     showToast(err.message || "Error al registrar la venta", "error");
   }
+};
+
+/* =========================
+   IMPLEMENTACIÓN COMPLETA DE VENTA RÁPIDA (2.1)
+========================= */
+$("globalQuickSaleBtn").onclick = () => {
+  quickSaleItems = [];
+  $("qsSearchInput").value = "";
+  $("qsProductResults").innerHTML = '<div class="empty" style="padding:15px;">Buscá o seleccioná productos.</div>';
+  $("qsPaymentMethod").value = "Efectivo";
+  $("qsClientContainer").classList.add("hidden");
+  $("qsNotes").value = "";
+  renderQuickSaleCart();
+  show("quickSaleModal");
+};
+
+$("closeQuickSaleModalBtn").onclick = () => hide("quickSaleModal");
+
+$("qsSearchInput").oninput = e => {
+  const query = normalizeStr(e.target.value.trim());
+  const resultsContainer = $("qsProductResults");
+  if (!query) {
+    resultsContainer.innerHTML = '<div class="empty" style="padding:15px;">Buscá o seleccioná productos.</div>';
+    return;
+  }
+
+  const matches = products.filter(p => normalizeStr(`${p.name} ${p.code} ${p.model}`).includes(query) && (Number(p.quantity) || 0) > 0);
+  if (!matches.length) {
+    resultsContainer.innerHTML = '<div class="empty" style="padding:15px;">No se encontraron productos con stock.</div>';
+    return;
+  }
+
+  resultsContainer.innerHTML = matches.map(p => `
+    <div style="display:flex; align-items:center; justify-content:space-between; padding:8px 12px; border-bottom:1px solid var(--line); background:var(--panel);">
+      <div>
+        <b>${clean(p.name)}</b> (${p.quantity} disponibles)
+        <div style="font-size:12px; color:var(--blue); font-weight:bold;">${money(p.price)}</div>
+      </div>
+      <button type="button" data-qs-add="${p.id}" style="padding:6px 12px; font-size:12px;">Agregar</button>
+    </div>`).join("");
+
+  resultsContainer.querySelectorAll("[data-qs-add]").forEach(btn => {
+    btn.onclick = () => {
+      const pid = btn.dataset.qsAdd;
+      const prod = products.find(p => p.id === pid);
+      if (!prod) return;
+
+      const existing = quickSaleItems.find(i => i.productId === pid);
+      if (existing) {
+        if (existing.quantity < prod.quantity) {
+          existing.quantity++;
+        } else {
+          showToast("No hay más stock disponible", "info");
+        }
+      } else {
+        quickSaleItems.push({
+          productId: prod.id,
+          name: prod.name,
+          unitPrice: prod.price,
+          cost: prod.cost,
+          quantity: 1,
+          maxQty: prod.quantity
+        });
+      }
+      renderQuickSaleCart();
+    };
+  });
+};
+
+function renderQuickSaleCart() {
+  const cartContainer = $("qsCartList");
+  if (!quickSaleItems.length) {
+    cartContainer.innerHTML = '<div class="empty" style="padding: 20px;">No hay productos seleccionados.</div>';
+    setText("qsModalTotal", money(0));
+    return;
+  }
+
+  let totalGeneral = 0;
+  cartContainer.innerHTML = quickSaleItems.map((item, idx) => {
+    const subtotal = item.quantity * item.unitPrice;
+    totalGeneral += subtotal;
+    return `
+      <div style="display:flex; align-items:center; justify-content:space-between; padding:6px 0; border-bottom:1px solid var(--line);">
+        <div>
+          <b>${clean(item.name)}</b>
+          <div style="font-size:12px; color:var(--muted);">${money(item.unitPrice)} x ${item.quantity} = <b>${money(subtotal)}</b></div>
+        </div>
+        <div style="display:flex; align-items:center; gap:6px;">
+          <button type="button" class="secondary" data-qs-dec="${idx}" style="padding:2px 8px;">-</button>
+          <span>${item.quantity}</span>
+          <button type="button" class="secondary" data-qs-inc="${idx}" style="padding:2px 8px;">+</button>
+          <button type="button" class="danger" data-qs-rem="${idx}" style="padding:2px 6px; font-size:11px;">✕</button>
+        </div>
+      </div>`;
+  }).join("");
+
+  setText("qsModalTotal", money(totalGeneral));
+
+  cartContainer.querySelectorAll("[data-qs-inc]").forEach(btn => {
+    btn.onclick = () => {
+      const i = btn.dataset.qsInc;
+      if (quickSaleItems[i].quantity < quickSaleItems[i].maxQty) {
+        quickSaleItems[i].quantity++;
+        renderQuickSaleCart();
+      } else {
+        showToast("Stock máximo alcanzado", "info");
+      }
+    };
+  });
+
+  cartContainer.querySelectorAll("[data-qs-dec]").forEach(btn => {
+    btn.onclick = () => {
+      const i = btn.dataset.qsDec;
+      if (quickSaleItems[i].quantity > 1) {
+        quickSaleItems[i].quantity--;
+        renderQuickSaleCart();
+      } else {
+        quickSaleItems.splice(i, 1);
+        renderQuickSaleCart();
+      }
+    };
+  });
+
+  cartContainer.querySelectorAll("[data-qs-rem]").forEach(btn => {
+    btn.onclick = () => {
+      const i = btn.dataset.qsRem;
+      quickSaleItems.splice(i, 1);
+      renderQuickSaleCart();
+    };
+  });
+}
+
+$("qsPaymentMethod").onchange = e => {
+  const isFiado = e.target.value === "Cuenta Corriente";
+  $("qsClientContainer").classList.toggle("hidden", !isFiado);
+  if (isFiado) {
+    const clientSel = $("qsClientSelect");
+    clientSel.innerHTML = clients.map(c => `<option value="${c.id}">${clean(c.name)} (${clean(c.phone)})</option>`).join("");
+    if (!clients.length) showToast("Registrá un cliente primero en la sección Clientes.", "info");
+  }
+};
+
+$("qsForm").onsubmit = async e => {
+  e.preventDefault();
+  if (!quickSaleItems.length) return showToast("Agregá al menos un producto a la venta.", "error");
+
+  const method = $("qsPaymentMethod").value;
+  const clientId = method === "Cuenta Corriente" ? $("qsClientSelect").value : null;
+  const notes = $("qsNotes").value.trim();
+
+  if (method === "Cuenta Corriente" && !clientId) {
+    return showToast("Seleccioná un cliente para la cuenta corriente.", "error");
+  }
+
+  let total = 0;
+  let profit = 0;
+  quickSaleItems.forEach(i => {
+    total += i.quantity * i.unitPrice;
+    profit += i.quantity * (i.unitPrice - i.cost);
+  });
+
+  try {
+    if (appMode === "local") {
+      for (const item of quickSaleItems) {
+        const p = products.find(prod => prod.id === item.productId);
+        if (p) p.quantity -= item.quantity;
+      }
+      localStorage.setItem(`stockea_local_products_${currentBusinessId}`, JSON.stringify(products));
+
+      if (clientId && method === "Cuenta Corriente") {
+        const client = clients.find(c => c.id === clientId);
+        if (client) {
+          client.debt = (Number(client.debt) || 0) + total;
+          localStorage.setItem(`stockea_local_clients_${currentBusinessId}`, JSON.stringify(clients));
+        }
+      }
+
+      const newSale = {
+        id: "sale_" + Date.now(),
+        items: quickSaleItems.map(i => ({ productId: i.productId, name: i.name, quantity: i.quantity, unitPrice: i.unitPrice })),
+        total, profit, paymentMethod: method, clientId, notes, status: "completed", createdAt: Date.now()
+      };
+      sales.unshift(newSale);
+      localStorage.setItem(`stockea_local_sales_${currentBusinessId}`, JSON.stringify(sales));
+
+      hide("quickSaleModal");
+      renderProducts(); renderSales(); renderDashboard(); renderClients();
+      showToast("Venta rápida registrada correctamente");
+      return;
+    }
+
+    // Transacción atómica en nube para múltiples ítems (2.1)
+    const saleRef = db.collection("businesses").doc(currentBusinessId).collection("sales").doc();
+    const clientRef = clientId ? db.collection("businesses").doc(currentBusinessId).collection("clients").doc(clientId) : null;
+
+    await db.runTransaction(async t => {
+      const clientSnap = clientRef ? await t.get(clientRef) : null;
+      let clientName = "";
+      if (clientSnap && clientSnap.exists) clientName = clientSnap.data().name || "";
+
+      for (const item of quickSaleItems) {
+        const pRef = db.collection("businesses").doc(currentBusinessId).collection("products").doc(item.productId);
+        const pSnap = await t.get(pRef);
+        if (!pSnap.exists) throw new Error(`Producto ${item.name} no encontrado`);
+        const curQty = pSnap.data().quantity || 0;
+        if (curQty < item.quantity) throw new Error(`Stock insuficiente para ${item.name}`);
+        t.update(pRef, { quantity: curQty - item.quantity });
+      }
+
+      if (clientSnap && clientSnap.exists) {
+        t.update(clientRef, { debt: firebase.firestore.FieldValue.increment(total) });
+      }
+
+      t.set(saleRef, {
+        items: quickSaleItems.map(i => ({ productId: i.productId, name: i.name, quantity: i.quantity, unitPrice: i.unitPrice })),
+        total, profit, paymentMethod: method, clientId, clientName, notes,
+        status: "completed",
+        createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+        soldBy: currentUser.uid
+      });
+    });
+
+    hide("quickSaleModal");
+    showToast("Venta rápida registrada correctamente");
+  } catch(err) {
+    showToast(err.message || "Error al registrar la venta rápida", "error");
+  }
+};
+
+/* =========================
+   ESCANÉNER DE CÓDIGO DE BARRAS (4.1)
+========================= */
+async function scanBarcode(callback) {
+  if (!('BarcodeDetector' in window)) {
+    const code = prompt("Ingresá el código de barras manualmente:");
+    if (code) callback(code.trim());
+    return;
+  }
+  try {
+    const detector = new BarcodeDetector({ formats: ['code_128', 'ean_13', 'ean_8', 'qr_code'] });
+    const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } });
+    const video = document.createElement('video');
+    video.srcObject = stream;
+    await video.play();
+
+    const canvas = document.createElement('canvas');
+    const context = canvas.getContext('2d');
+
+    const scanInterval = setInterval(async () => {
+      if (video.readyState === video.HAVE_ENOUGH_DATA) {
+        canvas.height = video.videoHeight;
+        canvas.width = video.videoWidth;
+        context.drawImage(video, 0, 0, canvas.width, canvas.height);
+        try {
+          const barcodes = await detector.detect(canvas);
+          if (barcodes.length > 0) {
+            clearInterval(scanInterval);
+            stream.getTracks().forEach(t => t.stop());
+            video.remove();
+            canvas.remove();
+            callback(barcodes[0].rawValue);
+          }
+        } catch(e) {}
+      }
+    }, 100);
+  } catch(err) {
+    const code = prompt("No se pudo acceder a la cámara. Ingresá el código manualmente:");
+    if (code) callback(code.trim());
+  }
+}
+
+$("pScanBarcodeBtn").onclick = () => {
+  scanBarcode(code => { $("pCode").value = code; });
+};
+
+$("qsScanBarcodeBtn").onclick = () => {
+  scanBarcode(code => {
+    $("qsSearchInput").value = code;
+    $("qsSearchInput").dispatchEvent(new Event('input'));
+  });
 };
 
 $("addClientBtn").onclick = () => { $("clientForm").reset(); show("clientModal"); };
@@ -2317,8 +2733,8 @@ $("searchClient")?.addEventListener("input", renderClients);
 function renderClients() {
   const container = $("clientsList");
   if (!container) return;
-  const search = ($("searchClient")?.value || "").toLowerCase().trim();
-  const filtered = clients.filter(c => [c.name, c.phone].join(" ").toLowerCase().includes(search));
+  const search = normalizeStr($("searchClient")?.value || "");
+  const filtered = clients.filter(c => normalizeStr(`${c.name} ${c.phone}`).includes(search));
 
   if (!filtered.length) {
     container.innerHTML = '<div class="empty">No hay clientes registrados.</div>';
@@ -2329,6 +2745,7 @@ function renderClients() {
     const debt = Number(c.debt) || 0;
     const debtClass = debt > 0 ? "danger" : "green";
     const debtLabel = debt > 0 ? `Debe: ${money(debt)}` : "Al día (Sin deuda)";
+    const waText = encodeURIComponent(`Hola ${c.name}, te escribimos de ${currentBusiness.name} para recordarte que tenés un saldo pendiente de ${money(debt)}. ¡Gracias!`);
 
     return `
       <div class="sale" style="align-items:flex-start">
@@ -2338,7 +2755,10 @@ function renderClients() {
           <p class="${debtClass}" style="font-weight:bold; margin-top:4px">${debtLabel}</p>
         </div>
         <div class="sale-actions">
-          ${debt > 0 ? `<button type="button" class="secondary" data-pay-client="${c.id}" style="padding:6px 12px; font-size:12px;">Registrar Abono</button>` : ''}
+          ${debt > 0 ? `
+            <a href="https://wa.me/${c.phone}?text=${waText}" target="_blank" rel="noopener noreferrer" class="secondary" style="padding:6px 10px; font-size:12px; text-decoration:none; display:inline-flex; align-items:center;">💬 Cobrar</a>
+            <button type="button" class="secondary" data-pay-client="${c.id}" style="padding:6px 12px; font-size:12px;">Registrar Abono</button>
+          ` : ''}
           <button type="button" class="danger" data-delete-client="${c.id}" style="padding:6px 10px; font-size:12px;">Eliminar</button>
         </div>
       </div>`;
@@ -2361,13 +2781,20 @@ $("closePaymentModalBtn").onclick = () => hide("paymentModal");
 $("paymentForm").onsubmit = async e => {
   e.preventDefault();
   const cid = $("paymentClientId").value;
-  const amount = Number($("paymentAmount").value);
+  let amount = Number($("paymentAmount").value);
   const method = $("paymentMethodSelect").value;
   const c = clients.find(x => x.id === cid);
   if (!c || amount <= 0) return;
 
+  const currentDebt = Number(c.debt) || 0;
+  // Ajuste 2.7: Limitar monto al valor de la deuda actual para no inflar cobros
+  if (amount > currentDebt) {
+    showToast(`El abono se ajustó a la deuda total: ${money(currentDebt)}`, "info");
+    amount = currentDebt;
+  }
+
   try {
-    const newDebt = Math.max(0, (Number(c.debt) || 0) - amount);
+    const newDebt = Math.max(0, currentDebt - amount);
     const paymentData = {
       clientId: cid,
       clientName: c.name,
@@ -2399,11 +2826,19 @@ $("paymentForm").onsubmit = async e => {
   }
 };
 
+// Ajuste 2.9: Confirmación específica mostrando deuda al eliminar cliente
 function confirmDeleteClientRecord(cid) {
-  openConfirmModal("Eliminar cliente", "¿Eliminar este cliente?", async () => {
+  const c = clients.find(x => x.id === cid);
+  if (!c) return;
+  const debt = Number(c.debt) || 0;
+  const msg = debt > 0 
+    ? `⚠️ ATENCIÓN: Este cliente tiene una deuda pendiente de ${money(debt)}. Si lo eliminás, se perderá el registro de la cuenta corriente.`
+    : `¿Estás seguro de eliminar al cliente ${c.name}?`;
+
+  openConfirmModal("Eliminar cliente", msg, async () => {
     try {
       if (appMode === "local") {
-        clients = clients.filter(c => c.id !== cid);
+        clients = clients.filter(client => client.id !== cid);
         localStorage.setItem(`stockea_local_clients_${currentBusinessId}`, JSON.stringify(clients));
         renderClients();
       } else {
@@ -2436,18 +2871,20 @@ function renderSales() {
     const itemsDesc = (s.items || []).map(i => `${i.quantity}x ${clean(i.name)}`).join(", ");
     const clientName = s.clientName ? ` · Cliente: ${clean(s.clientName)}` : '';
     const notesText = s.notes ? ` · Nota: ${clean(s.notes)}` : '';
+    const isCancelled = s.status === "cancelled";
 
+    // Ajuste 3.4: Mostrar foto del producto también en últimas ventas y ventas
     let imgHTML = SVG_BOX;
     if (s.items && s.items.length > 0) {
       const prod = products.find(p => p.id === s.items[0].productId);
-      if (prod && prod.image) imgHTML = `<img src="${prod.image}">`;
+      if (prod && prod.image) imgHTML = safeImage(prod.image, s.items[0].name);
     }
 
     return `
-      <div class="sale">
+      <div class="sale ${isCancelled ? 'cancelled' : ''}">
         <div class="sale-item-thumb">${imgHTML}</div>
         <div style="flex:1; min-width:180px;">
-          <b>${itemsDesc}</b>
+          <b>${itemsDesc} ${isCancelled ? '<span style="color:var(--red); font-size:11px;">(ANULADA)</span>' : ''}</b>
           <p>${dateText} · Pago: ${clean(s.paymentMethod || 'Efectivo')}${clientName}${notesText}</p>
         </div>
         <div class="sale-actions">
@@ -2455,7 +2892,7 @@ function renderSales() {
             <b>${money(s.total)}</b>
             <p class="green">Ganancia: ${money(s.profit)}</p>
           </div>
-          <button type="button" class="danger" data-cancel-sale="${s.id}" style="padding:6px 10px; font-size:12px;">Anular</button>
+          ${!isCancelled ? `<button type="button" class="danger" data-cancel-sale="${s.id}" style="padding:6px 10px; font-size:12px;">Anular</button>` : ''}
         </div>
       </div>`;
   }).join("");
@@ -2498,10 +2935,11 @@ $("loadMoreSalesBtn").onclick = async () => {
   }
 };
 
+// Ajuste 2.13: Anular venta marcándola como cancelled sin borrarla
 function confirmCancelSale(sid) {
   openConfirmModal("Anular venta", "¿Estás seguro de anular esta venta? El stock regresará y se ajustará la cuenta corriente si aplica.", async () => {
     const s = sales.find(x => x.id === sid);
-    if (!s) return;
+    if (!s || s.status === "cancelled") return;
 
     try {
       if (appMode === "local") {
@@ -2519,7 +2957,7 @@ function confirmCancelSale(sid) {
           }
         }
 
-        sales = sales.filter(x => x.id !== sid);
+        s.status = "cancelled";
         localStorage.setItem(`stockea_local_sales_${currentBusinessId}`, JSON.stringify(sales));
         renderSales(); renderProducts(); renderDashboard(); renderClients();
         showToast("Venta anulada y stock devuelto");
@@ -2532,42 +2970,36 @@ function confirmCancelSale(sid) {
         const sSnap = await t.get(saleRef);
         if (!sSnap.exists) throw new Error("Venta no encontrada");
         const sData = sSnap.data();
+        if (sData.status === "cancelled") throw new Error("La venta ya estaba anulada");
 
         const items = sData.items || [];
-        const productSnaps = await Promise.all(
-          items.map(item => {
-            if (item.productId) {
-              const pRef = db.collection("businesses").doc(currentBusinessId).collection("products").doc(item.productId);
-              return t.get(pRef);
+        for (const item of items) {
+          if (item.productId) {
+            const pRef = db.collection("businesses").doc(currentBusinessId).collection("products").doc(item.productId);
+            const pSnap = await t.get(pRef);
+            if (pSnap.exists) {
+              t.update(pRef, { quantity: firebase.firestore.FieldValue.increment(item.quantity) });
             }
-            return Promise.resolve(null);
-          })
-        );
-
-        const clientRef = (sData.paymentMethod === "Cuenta Corriente" && sData.clientId) 
-          ? db.collection("businesses").doc(currentBusinessId).collection("clients").doc(sData.clientId)
-          : null;
-        const cSnap = clientRef ? await t.get(clientRef) : null;
-
-        productSnaps.forEach((pSnap, idx) => {
-          if (pSnap && pSnap.exists) {
-            const item = items[idx];
-            t.update(pSnap.ref, { quantity: (pSnap.data().quantity || 0) + item.quantity });
           }
-        });
-
-        if (cSnap && cSnap.exists) {
-          t.update(clientRef, { debt: Math.max(0, (cSnap.data().debt || 0) - sData.total) });
         }
 
-        t.delete(saleRef);
+        if (sData.paymentMethod === "Cuenta Corriente" && sData.clientId) {
+          const cRef = db.collection("businesses").doc(currentBusinessId).collection("clients").doc(sData.clientId);
+          t.update(cRef, { debt: firebase.firestore.FieldValue.increment(-sData.total) });
+        }
+
+        t.update(saleRef, {
+          status: "cancelled",
+          cancelledAt: firebase.firestore.FieldValue.serverTimestamp(),
+          cancelledBy: currentUser.uid
+        });
       });
 
-      sales = sales.filter(x => x.id !== sid);
+      s.status = "cancelled";
       renderSales(); renderProducts(); renderDashboard(); renderClients();
       showToast("Venta anulada correctamente");
     } catch(err) {
-      showToast("Error al anular venta", "error");
+      showToast(err.message || "Error al anular venta", "error");
     }
   });
 }
@@ -2593,7 +3025,9 @@ function renderDashboard() {
   const period = $("periodFilter")?.value || "month";
   const startTime = getPeriodStart(period);
 
-  const periodSales = sales.filter(s => getSaleTime(s) >= startTime);
+  // Excluir ventas anuladas de los totales (2.13) y filtrar por período correctamente (2.3)
+  const validSales = sales.filter(s => s.status !== "cancelled");
+  const periodSales = validSales.filter(s => getSaleTime(s) >= startTime);
   const periodPayments = payments.filter(p => getSaleTime(p) >= startTime);
 
   const totalSales = periodSales.reduce((s, x) => s + (Number(x.total) || 0), 0);
@@ -2601,14 +3035,14 @@ function renderDashboard() {
   const stockUnits = products.reduce((s, x) => s + (Number(x.quantity) || 0), 0);
   const stockValue = products.reduce((s, x) => s + (Number(x.cost) || 0) * (Number(x.quantity) || 0), 0);
 
-  let cashTotal = 0, transferTotal = 0, cardTotal = 0, fiadoTotal = 0;
+  let cashTotal = 0, transferTotal = 0, cardTotal = 0, fiadoPendiente = 0;
   periodSales.forEach(s => {
     const amt = Number(s.total) || 0;
     const m = s.paymentMethod || "Efectivo";
     if (m === "Efectivo") cashTotal += amt;
     else if (m.includes("Transferencia")) transferTotal += amt;
     else if (m === "Tarjeta") cardTotal += amt;
-    else if (m === "Cuenta Corriente") fiadoTotal += amt;
+    else if (m === "Cuenta Corriente") fiadoPendiente += amt; // Ajuste 2.16: Separa fiado no cobrado
   });
 
   periodPayments.forEach(p => {
@@ -2629,7 +3063,7 @@ function renderDashboard() {
   setText("statCash", money(cashTotal));
   setText("statTransfer", money(transferTotal));
   setText("statCard", money(cardTotal));
-  setText("statFiado", money(fiadoTotal));
+  setText("statFiado", money(fiadoPendiente));
 
   const soldMap = {};
   periodSales.forEach(s => {
@@ -2654,13 +3088,21 @@ function renderDashboard() {
     $("topProduct").innerHTML = '<div class="empty">Todavía no hay ventas en este período.</div>';
   }
 
+  // Ajuste 3.4: Mostrar foto del producto en Últimas ventas del Resumen
   $("recentSales").innerHTML = periodSales.length ? periodSales.slice(0, 5).map(s => {
     const time = getSaleTime(s);
     const dateText = time ? new Date(time).toLocaleDateString("es-AR") : "—";
     const itemsDesc = (s.items || []).map(i => `${i.quantity}x ${clean(i.name)}`).join(", ");
+    
+    let imgHTML = SVG_BOX;
+    if (s.items && s.items.length > 0) {
+      const prod = products.find(p => p.id === s.items[0].productId);
+      if (prod && prod.image) imgHTML = safeImage(prod.image, s.items[0].name);
+    }
+
     return `
       <div class="sale">
-        <div class="sale-item-thumb">${SVG_BOX}</div>
+        <div class="sale-item-thumb">${imgHTML}</div>
         <div style="flex:1">
           <b>${itemsDesc}</b>
           <p>${dateText} · ${clean(s.paymentMethod || 'Efectivo')}</p>
@@ -2674,11 +3116,11 @@ function renderDashboard() {
 
   $("recentSales").querySelectorAll("[data-cancel-sale]").forEach(b => b.onclick = () => confirmCancelSale(b.dataset.cancelSale));
 
-  const low = products.filter(p => (Number(p.quantity) || 0) <= (Number(p.minStock) || 3));
+  const low = products.filter(p => (Number(p.quantity) || 0) <= (Number(p.minStock) || 0)); // Ajuste 2.5
   $("lowStock").innerHTML = low.length ? low.map(p => `
     <div class="sale">
-      <div class="sale-item-thumb">${p.image ? `<img src="${p.image}">` : SVG_BOX}</div>
-      <div style="flex:1"><b>${clean(p.name)}</b><p>Stock bajo (Mínimo: ${p.minStock || 3})</p></div>
+      <div class="sale-item-thumb">${safeImage(p.image, p.name)}</div>
+      <div style="flex:1"><b>${clean(p.name)}</b><p>Stock bajo (Mínimo: ${p.minStock ?? 3})</p></div>
       <span class="stock-status ${p.quantity <= 0 ? 'out' : 'low'}">${p.quantity} unidades</span>
     </div>`).join("") : '<div class="empty">No hay productos con stock bajo.</div>';
 
@@ -2713,8 +3155,8 @@ function initCharts() {
     donutChartInstance = new Chart(donutCtx, {
       type: 'doughnut',
       data: {
-        labels: ['Efectivo', 'Transferencia/MP', 'Tarjeta', 'Fiado'],
-        datasets: [{ data: [0, 0, 0, 0], backgroundColor: ['#10b981', '#a855f7', '#f59e0b', '#ef4444'] }]
+        labels: ['Efectivo', 'Transferencia/MP', 'Tarjeta'],
+        datasets: [{ data: [0, 0, 0], backgroundColor: ['#10b981', '#a855f7', '#f59e0b'] }]
       },
       options: {
         responsive: true, maintainAspectRatio: false,
@@ -2725,68 +3167,93 @@ function initCharts() {
   updateCharts();
 }
 
+// Ajuste 2.4: Ordenar fechas cronológicamente y rellenar últimos 7 días con 0
 function updateCharts() {
   if (!salesChartInstance || !donutChartInstance) return;
 
-  const period = $("periodFilter")?.value || "month";
-  const startTime = getPeriodStart(period);
-  const periodSales = sales.filter(s => getSaleTime(s) >= startTime);
+  const isDark = document.body.classList.contains("theme-oscuro") || document.body.classList.contains("theme-violeta") || document.body.classList.contains("theme-verde");
+  const textColor = isDark ? "#f2f5ff" : "#1f2937";
+  const gridColor = isDark ? "#293650" : "#e5e7eb";
 
+  salesChartInstance.options.scales.x.ticks.color = textColor;
+  salesChartInstance.options.scales.x.grid.color = gridColor;
+  salesChartInstance.options.scales.y.ticks.color = textColor;
+  salesChartInstance.options.scales.y.grid.color = gridColor;
+  donutChartInstance.options.plugins.legend.labels.color = textColor;
+
+  const validSales = sales.filter(s => s.status !== "cancelled");
+  
+  // Generar últimos 7 días con formato cronológico
   const daysMap = {};
-  periodSales.forEach(s => {
+  for (let i = 6; i >= 0; i--) {
+    const d = new Date();
+    d.setDate(d.getDate() - i);
+    const key = d.toLocaleDateString("es-AR", { day: '2-digit', month: '2-digit' });
+    daysMap[key] = 0;
+  }
+
+  validSales.forEach(s => {
     const time = getSaleTime(s);
     if (!time) return;
     const dateStr = new Date(time).toLocaleDateString("es-AR", { day: '2-digit', month: '2-digit' });
-    daysMap[dateStr] = (daysMap[dateStr] || 0) + (Number(s.total) || 0);
+    if (daysMap[dateStr] !== undefined) {
+      daysMap[dateStr] += (Number(s.total) || 0);
+    }
   });
 
-  const labels = Object.keys(daysMap).slice(-7);
+  const labels = Object.keys(daysMap);
   const data = labels.map(l => daysMap[l]);
 
-  salesChartInstance.data.labels = labels.length ? labels : ['Hoy'];
-  salesChartInstance.data.datasets[0].data = data.length ? data : [0];
+  salesChartInstance.data.labels = labels;
+  salesChartInstance.data.datasets[0].data = data;
   salesChartInstance.update();
 
-  let cash = 0, transfer = 0, card = 0, fiado = 0;
-  periodSales.forEach(s => {
+  let cash = 0, transfer = 0, card = 0;
+  validSales.forEach(s => {
     const t = Number(s.total) || 0;
     const m = s.paymentMethod || "Efectivo";
     if (m === "Efectivo") cash += t;
     else if (m.includes("Transferencia")) transfer += t;
     else if (m === "Tarjeta") card += t;
-    else if (m === "Cuenta Corriente") fiado += t;
   });
 
-  donutChartInstance.data.datasets[0].data = [cash, transfer, card, fiado];
+  payments.forEach(p => {
+    const t = Number(p.amount) || 0;
+    const m = p.paymentMethod || "Efectivo";
+    if (m === "Efectivo") cash += t;
+    else if (m.includes("Transferencia")) transfer += t;
+    else if (m === "Tarjeta") card += t;
+  });
+
+  donutChartInstance.data.datasets[0].data = [cash, transfer, card];
   donutChartInstance.update();
 }
 
 function escapeCSV(str) {
   if (str === null || str === undefined) return '""';
   let s = String(str).replace(/"/g, '""');
-  if (/^[=+\-@]/.test(s)) {
-    s = "'" + s;
-  }
+  if (/^[=+\-@]/.test(s)) s = "'" + s;
   return `"${s}"`;
 }
 
+// Ajuste 2.11: Separador ";" y exportar todas las ventas
 $("exportStockExcel").onclick = () => {
   if (!products.length) return showToast("No hay productos para exportar.", "info");
-  let csv = "Nombre,Categoria,Modelo,Costo,Precio,Cantidad,StockMinimo,Codigo\n";
+  let csv = "Nombre;Categoria;Modelo;Costo;Precio;Cantidad;StockMinimo;Codigo\n";
   products.forEach(p => {
-    csv += `${escapeCSV(p.name)},${escapeCSV(p.category)},${escapeCSV(p.model)},${p.cost || 0},${p.price || 0},${p.quantity || 0},${p.minStock || 3},${escapeCSV(p.code)}\n`;
+    csv += `${escapeCSV(p.name)};${escapeCSV(p.category)};${escapeCSV(p.model)};${p.cost || 0};${p.price || 0};${p.quantity || 0};${p.minStock ?? 3};${escapeCSV(p.code)}\n`;
   });
   downloadCSV(csv, "stock_kiosy.csv");
 };
 
 $("exportSalesExcel").onclick = () => {
   if (!sales.length) return showToast("No hay ventas para exportar.", "info");
-  let csv = "Fecha,Productos,Cliente,Total,Ganancia,MetodoPago\n";
+  let csv = "Fecha;Productos;Cliente;Total;Ganancia;MetodoPago;Estado\n";
   sales.forEach(s => {
     const d = s.createdAt ? new Date(getSaleTime(s)).toLocaleString("es-AR") : "";
     const itemsDesc = (s.items || []).map(i => `${i.quantity}x ${i.name}`).join(" - ");
     const cli = s.clientName || "Sin cliente";
-    csv += `${escapeCSV(d)},${escapeCSV(itemsDesc)},${escapeCSV(cli)},${s.total || 0},${s.profit || 0},${escapeCSV(s.paymentMethod || 'Efectivo')}\n`;
+    csv += `${escapeCSV(d)};${escapeCSV(itemsDesc)};${escapeCSV(cli)};${s.total || 0};${s.profit || 0};${escapeCSV(s.paymentMethod || 'Efectivo')};${escapeCSV(s.status || 'completed')}\n`;
   });
   downloadCSV(csv, "ventas_kiosy.csv");
 };
@@ -2847,13 +3314,13 @@ $("bizLogoFile").onchange = async e => {
     if (appMode === "local") {
       const b64 = await blobToBase64(blob);
       $("editLogoBase64").value = b64;
-      $("bizLogoPreview").innerHTML = `<img src="${b64}">`;
+      $("bizLogoPreview").innerHTML = safeImage(b64, "Logo");
     } else {
       const ref = storage.ref(`businesses/${currentBusinessId}/logo_${Date.now()}.jpg`);
       await ref.put(blob, { contentType: "image/jpeg" });
       const url = await ref.getDownloadURL();
       $("editLogoBase64").value = url;
-      $("bizLogoPreview").innerHTML = `<img src="${url}">`;
+      $("bizLogoPreview").innerHTML = safeImage(url, "Logo");
     }
     showToast("Logo actualizado");
   } catch(e) { showToast("Error al subir logo", "error"); }
@@ -2886,7 +3353,7 @@ async function renderMembersList() {
 
       return `
         <div class="member-item" style="display:flex; align-items:center; gap:10px; padding:8px 0; border-bottom:1px solid var(--line);">
-          <div class="avatar-mini">${m.photoURL ? `<img src="${m.photoURL}">` : SVG_USER}</div>
+          <div class="avatar-mini">${safeImage(m.photoURL, name)}</div>
           <span style="flex:1">${clean(name)}</span>
           ${isCreator ? '<span class="member-badge" style="background:var(--badge-bg); color:var(--badge-txt); padding:2px 8px; border-radius:4px; font-size:11px;">Creador</span>' : '<span class="member-badge" style="background:var(--line); padding:2px 8px; border-radius:4px; font-size:11px;">Socio</span>'}
           ${mine ? '<span class="member-badge" style="background:#1b4a3f; color:#35d49a; padding:2px 8px; border-radius:4px; font-size:11px;">Vos</span>' : ''}
@@ -2935,7 +3402,7 @@ function loadProfileSection() {
   $("profileDisplayName").value = userProfile.displayName || "";
   $("profileEmail").value = currentUser ? currentUser.email : "Modo Local";
   $("profileImageBase64").value = userProfile.photoURL || "";
-  if (userProfile.photoURL) $("profileAvatar").innerHTML = `<img src="${userProfile.photoURL}">`;
+  if (userProfile.photoURL) $("profileAvatar").innerHTML = safeImage(userProfile.photoURL, "Avatar");
   else $("profileAvatar").innerHTML = SVG_USER;
 
   if (currentUser && currentUser.uid === ADMIN_UID) {
@@ -2985,27 +3452,19 @@ $("adminTabGoal").onclick = () => {
   $("adminTabGoal").classList.add("active");
   $("adminTabPopup").classList.remove("active");
   $("adminTabVip").classList.remove("active");
-  show("adminGoalForm");
-  hide("adminPopupForm");
-  hide("adminVipForm");
+  show("adminGoalForm"); hide("adminPopupForm"); hide("adminVipForm");
 };
-
 $("adminTabPopup").onclick = () => {
   $("adminTabPopup").classList.add("active");
   $("adminTabGoal").classList.remove("active");
   $("adminTabVip").classList.remove("active");
-  show("adminPopupForm");
-  hide("adminGoalForm");
-  hide("adminVipForm");
+  show("adminPopupForm"); hide("adminGoalForm"); hide("adminVipForm");
 };
-
 $("adminTabVip").onclick = () => {
   $("adminTabVip").classList.add("active");
   $("adminTabGoal").classList.remove("active");
   $("adminTabPopup").classList.remove("active");
-  show("adminVipForm");
-  hide("adminGoalForm");
-  hide("adminPopupForm");
+  show("adminVipForm"); hide("adminGoalForm"); hide("adminPopupForm");
 };
 
 $("adminGoalForm").onsubmit = async e => {
@@ -3103,14 +3562,14 @@ $("profileImageFile").onchange = async e => {
     if (appMode === "local") {
       const b64 = await blobToBase64(blob);
       userProfile.photoURL = b64;
-      $("profileAvatar").innerHTML = `<img src="${b64}">`;
+      $("profileAvatar").innerHTML = safeImage(b64, "Avatar");
       localStorage.setItem("stockea_local_profile", JSON.stringify(userProfile));
     } else {
       const ref = storage.ref(`users/${currentUser.uid}/avatar_${Date.now()}.jpg`);
       await ref.put(blob, { contentType: "image/jpeg" });
       const url = await ref.getDownloadURL();
       userProfile.photoURL = url;
-      $("profileAvatar").innerHTML = `<img src="${url}">`;
+      $("profileAvatar").innerHTML = safeImage(url, "Avatar");
       await db.collection("users").doc(currentUser.uid).set({ photoURL: url }, { merge: true });
     }
     updateUIProfile();
@@ -3139,7 +3598,7 @@ $("profileForm").onsubmit = async e => {
 function updateUIProfile() {
   const ha = $("headerAvatar");
   if (!ha) return;
-  if (userProfile.photoURL) ha.innerHTML = `<img src="${userProfile.photoURL}">`;
+  if (userProfile.photoURL) ha.innerHTML = safeImage(userProfile.photoURL, "Avatar");
   else ha.innerHTML = SVG_USER;
 }
 
@@ -3208,13 +3667,15 @@ $("createBizForm").onsubmit = async e => {
   }
 };
 
+// Ajuste 1.3: Unirse a un negocio validando invitación mediante reglas de Firestore
 $("joinBizForm").onsubmit = async e => {
   e.preventDefault();
   const code = $("joinCode").value.trim().toUpperCase();
   if (!code) return;
   try {
+    // Leemos la invitación para obtener el businessId asociado de forma segura
     const invSnap = await db.collection("invitaciones").doc(code).get();
-    if (!invSnap.exists) throw new Error("El código no es válido.");
+    if (!invSnap.exists) throw new Error("El código de invitación no es válido.");
     const businessId = invSnap.data().businessId;
 
     const batch = db.batch();
