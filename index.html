@@ -625,29 +625,39 @@ body { -webkit-text-size-adjust: 100%; overflow-x: hidden; }
   Venta rápida
 </button>
 
-<!-- PANTALLA DE BLOQUEO CLOUD (ESTRUCTURA REORDENADA CON META Y DONACIONES AL FINAL) -->
+<!-- PANTALLA DE BLOQUEO CLOUD (TÍTULO LIMPIO, META, MONEDAS, MENSAJE, DONACIONES, REDES) -->
 <div id="cloudLockScreen" class="hidden" style="max-width: 500px; margin: 40px auto; padding: 20px; text-align: center;">
   <div class="panel">
-    <h2>Acceso Anticipado / Modo Nube Bloqueado</h2>
+    <h2 id="cloudLockTitle" style="margin-bottom:15px;">Modo Nube Bloqueado</h2>
     
-    <!-- 1. META GLOBAL (ARRIBA) -->
-    <div style="margin: 20px 0 10px;">
+    <!-- META GLOBAL -->
+    <div style="margin: 15px 0 10px;">
       <div style="background:var(--bg); border-radius:8px; height:16px; width:100%; overflow:hidden; border:1px solid var(--line);">
         <div id="cloudGoalBar" style="background:var(--blue); width:0%; height:100%; transition: width 0.4s;"></div>
       </div>
-      <p id="cloudGoalText" style="font-weight:bold; margin-top: 8px; margin-bottom:0;">$0 de $0</p>
+      <div id="cloudGoalText" style="font-weight:bold; margin-top: 10px; font-size:18px;">$0 ARS</div>
+      <div id="cloudGoalSubText" style="font-size:13px; color:var(--muted); margin-top:4px;">US$ 0 USD</div>
     </div>
 
-    <!-- 2. MENSAJE -->
+    <!-- MENSAJE -->
     <p id="cloudGoalMessage" class="sub" style="margin: 15px 0 20px;">Apoyá el desarrollo para desbloquear el Modo Nube.</p>
 
-    <!-- 3. DONACIONES -->
-    <div id="cloudDonateLinks" style="margin-bottom: 25px; display:none;"></div>
+    <!-- DONACIONES -->
+    <div id="cloudDonateLinks" style="margin-bottom: 15px; display:none;"></div>
 
-    <div style="display:flex; gap:10px;">
-      <button type="button" id="cloudLockProfileBtn" class="secondary" style="flex:1;">Ir a mi perfil / VIP</button>
-      <button type="button" id="cloudLockBackBtn" class="secondary" style="flex:1;">Volver al inicio</button>
-    </div>
+    <!-- BOTONES DE REDES SOCIALES -->
+    <div id="cloudSocialLinks" style="margin-bottom: 25px; display:flex; gap:8px; justify-content:center; flex-wrap:wrap;"></div>
+  </div>
+</div>
+
+<!-- VENTANA EMERGENTE / ANUNCIO FLOTANTE (POPUP) -->
+<div id="cloudPopupBanner" class="modal-overlay hidden" style="background: rgba(0,0,0,0.7);">
+  <div class="modal-content" style="text-align:center; border: 2px solid var(--blue); position:relative;">
+    <button type="button" id="closePopupBannerBtn" class="secondary" style="position:absolute; top:12px; right:12px; padding:4px 10px;">✕</button>
+    <div style="font-size:32px; margin-bottom:10px;">🚀</div>
+    <h3 id="popupBannerTitle" style="margin-bottom:10px;">¡Aviso Importante!</h3>
+    <p id="popupBannerMessage" class="sub" style="margin-bottom:20px;"></p>
+    <div id="popupBannerButtons" style="display:flex; flex-direction:column; gap:10px;"></div>
   </div>
 </div>
 
@@ -719,27 +729,80 @@ body { -webkit-text-size-adjust: 100%; overflow-x: hidden; }
     </div>
     
     <div class="tabs" style="margin-bottom:15px;">
-      <button type="button" id="adminTabGoal" class="active">Meta Cloud</button>
+      <button type="button" id="adminTabGoal" class="active">Meta, Monedas y Redes</button>
+      <button type="button" id="adminTabPopup">Anuncio Emergente</button>
       <button type="button" id="adminTabVip">Otorgar VIP</button>
     </div>
 
+    <!-- PESTAÑA 1: META, TÍTULO, MONEDA, CONVERSIÓN Y REDES -->
     <form id="adminGoalForm">
-      <div class="field"><label>Título</label><input id="admTitle" required></div>
-      <div class="field"><label>Mensaje</label><textarea id="admMessage" rows="2" required></textarea></div>
-      <div class="formgrid">
-        <div class="field"><label>Meta ($)</label><input id="admGoalAmount" type="number" min="1" required></div>
-        <div class="field"><label>Actual ($)</label><input id="admCurrentAmount" type="number" min="0" required></div>
+      <div class="field"><label>Título de la Pantalla de Bloqueo</label><input id="admTitle" required placeholder="Modo Nube Bloqueado"></div>
+      <div class="field"><label>Mensaje Descriptivo</label><textarea id="admMessage" rows="2" required></textarea></div>
+      
+      <div class="formgrid" style="display:grid; grid-template-columns:1fr 1fr; gap:12px;">
+        <div class="field"><label>Meta Actual (Valor Numérico)</label><input id="admGoalAmount" type="number" min="1" required></div>
+        <div class="field"><label>Monto Recaudado (Valor Numérico)</label><input id="admCurrentAmount" type="number" min="0" required></div>
       </div>
-      <div class="field"><label>Moneda</label><input id="admCurrency" value="ARS" required></div>
+
+      <div class="formgrid" style="display:grid; grid-template-columns:1fr 1fr; gap:12px;">
+        <div class="field">
+          <label>Moneda Principal</label>
+          <select id="admCurrency">
+            <option value="ARS">Pesos Argentinos (ARS)</option>
+            <option value="USD">Dólares (USD)</option>
+          </select>
+        </div>
+        <div class="field">
+          <label>Visualización de Moneda</label>
+          <select id="admDisplayMode">
+            <option value="both">Mostrar Pesos y Dólares (Convertido)</option>
+            <option value="ars_only">Solo Pesos (ARS)</option>
+            <option value="usd_only">Solo Dólares (USD)</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="field"><label>Tasa de Cambio (1 USD en ARS o valor de referencia)</label><input id="admExchangeRate" type="number" min="1" value="1200" required></div>
+
       <div class="field" style="display:flex; align-items:center; gap:10px;">
         <input id="admUnlocked" type="checkbox" style="width:auto;"><label style="margin:0; cursor:pointer;" for="admUnlocked">Desbloquear modo Nube para todos</label>
       </div>
+
+      <h3 style="font-size:15px; margin: 15px 0 10px; border-top:1px solid var(--line); padding-top:10px;">Links de Donación</h3>
       <div class="field"><label>Cafecito URL (https://...)</label><input id="admCafecito" placeholder="https://cafecito.app/..."></div>
       <div class="field"><label>Ko-fi URL (https://...)</label><input id="admKofi" placeholder="https://ko-fi.com/..."></div>
       <div class="field"><label>Patreon URL (https://...)</label><input id="admPatreon" placeholder="https://patreon.com/..."></div>
-      <button type="submit" style="width:100%; margin-top:10px;">Guardar Meta</button>
+
+      <h3 style="font-size:15px; margin: 15px 0 10px; border-top:1px solid var(--line); padding-top:10px;">Botones de Redes Sociales / Contacto</h3>
+      <div class="formgrid">
+        <div class="field"><label>Red 1 - Nombre</label><input id="admSocialName1" placeholder="Ej: Instagram"></div>
+        <div class="field"><label>Red 1 - URL (https://...)</label><input id="admSocialUrl1" placeholder="https://instagram.com/..."></div>
+      </div>
+      <div class="formgrid">
+        <div class="field"><label>Red 2 - Nombre</label><input id="admSocialName2" placeholder="Ej: Facebook"></div>
+        <div class="field"><label>Red 2 - URL (https://...)</label><input id="admSocialUrl2" placeholder="https://facebook.com/..."></div>
+      </div>
+      <div class="formgrid">
+        <div class="field"><label>Red 3 - Nombre</label><input id="admSocialName3" placeholder="Ej: WhatsApp"></div>
+        <div class="field"><label>Red 3 - URL (https://...)</label><input id="admSocialUrl3" placeholder="https://wa.me/..."></div>
+      </div>
+
+      <button type="submit" style="width:100%; margin-top:10px;">Guardar Configuración</button>
     </form>
 
+    <!-- PESTAÑA 2: ANUNCIO EMERGENTE (POPUP) -->
+    <form id="adminPopupForm" class="hidden">
+      <div class="field" style="display:flex; align-items:center; gap:10px; margin-bottom:15px;">
+        <input id="admPopupActive" type="checkbox" style="width:auto;"><label style="margin:0; cursor:pointer; font-weight:bold;" for="admPopupActive">Activar Anuncio Emergente en pantalla bloqueada</label>
+      </div>
+      <div class="field"><label>Título del Anuncio</label><input id="admPopupTitle" placeholder="¡Acceso VIP Disponible!"></div>
+      <div class="field"><label>Mensaje del Anuncio</label><textarea id="admPopupMessage" rows="3" placeholder="Conseguí tu acceso anticipado al modo nube ahora mismo..."></textarea></div>
+      <div class="field"><label>Texto del Botón del Anuncio</label><input id="admPopupButtonText" placeholder="¡Quiero mi acceso!"></div>
+      <div class="field"><label>Enlace del Botón del Anuncio (https://... o WhatsApp)</label><input id="admPopupButtonUrl" placeholder="https://wa.me/549..."></div>
+      <button type="submit" style="width:100%; margin-top:10px;">Guardar Anuncio Emergente</button>
+    </form>
+
+    <!-- PESTAÑA 3: OTORGAR VIP -->
     <form id="adminVipForm" class="hidden">
       <div class="field"><label>ID del Negocio *</label><input id="admVipBizId" required placeholder="ID de Firebase del negocio"></div>
       <div class="field"><label>Días de duración *</label><input id="admVipDays" type="number" min="1" value="30" required></div>
@@ -1022,7 +1085,7 @@ body { -webkit-text-size-adjust: 100%; overflow-x: hidden; }
         </div>
       </div>
 
-      <!-- BUSCADOR Y CATEGORÍA (REORDENADOS Y ANCHO COMPLETO SIN CAMARITA) -->
+      <!-- BUSCADOR Y CATEGORÍA (ANCHO COMPLETO SIN CAMARITA) -->
       <div class="toolbar" style="display:flex; flex-direction:column; gap:12px; margin-bottom:20px; width:100%;">
         <div style="width:100%;">
           <input id="search" placeholder="Buscar por nombre, modelo o código..." style="width:100%; height:46px;">
@@ -1156,7 +1219,7 @@ body { -webkit-text-size-adjust: 100%; overflow-x: hidden; }
       </div>
     </section>
 
-    <!-- PERFIL Y TEMA (FOTO DE PERFIL CORREGIDA) -->
+    <!-- PERFIL Y TEMA -->
     <section id="profile" class="hidden">
       <h1>Mi perfil y configuración</h1>
       <p class="sub">Personalizá tu cuenta, foto, tema visual y panel de moderador.</p>
@@ -1401,7 +1464,7 @@ const triggerLogout = async () => {
   clearListeners();
   if (appMode === "cloud") { try { await auth.signOut(); } catch(e){} }
   appMode = null; currentBusiness = null; products = []; sales = []; payments = []; clients = [];
-  hide("app"); hide("setup"); hide("homeScreen"); hide("authScreen"); hide("cloudLockScreen"); hide("headerAvatar"); hide("headerLogout"); hide("globalQuickSaleBtn");
+  hide("app"); hide("setup"); hide("homeScreen"); hide("authScreen"); hide("cloudLockScreen"); hide("cloudPopupBanner"); hide("headerAvatar"); hide("headerLogout"); hide("globalQuickSaleBtn");
   show("modeSelectScreen");
   showToast("Sesión cerrada correctamente", "info");
 };
@@ -1466,14 +1529,14 @@ auth.onAuthStateChanged(async user => {
 
   if (!user) {
     if (appMode === "cloud") {
-      hide("app"); hide("setup"); hide("homeScreen"); hide("cloudLockScreen"); hide("headerAvatar"); hide("headerLogout"); hide("globalQuickSaleBtn");
+      hide("app"); hide("setup"); hide("homeScreen"); hide("cloudLockScreen"); hide("cloudPopupBanner"); hide("headerAvatar"); hide("headerLogout"); hide("globalQuickSaleBtn");
       show("authScreen");
     }
     return;
   }
 
   appMode = "cloud";
-  hide("authScreen"); hide("modeSelectScreen"); hide("cloudLockScreen");
+  hide("authScreen"); hide("modeSelectScreen"); hide("cloudLockScreen"); hide("cloudPopupBanner");
   show("headerLogout"); show("headerAvatar");
 
   try {
@@ -1493,7 +1556,7 @@ auth.onAuthStateChanged(async user => {
 });
 
 function showHome() {
-  hide("authScreen"); hide("setup"); hide("app"); hide("cloudLockScreen"); hide("globalQuickSaleBtn");
+  hide("authScreen"); hide("setup"); hide("app"); hide("cloudLockScreen"); hide("cloudPopupBanner"); hide("globalQuickSaleBtn");
   hide("headerHome");
   show("homeScreen");
   renderBusinessList();
@@ -1535,7 +1598,7 @@ $("backHomeBtn").onclick = () => { clearListeners(); currentBusiness = null; sho
 // ACCESO DIRECTO AL PERFIL DESDE EL AVATAR DE LA BARRA SUPERIOR
 const openDirectProfile = () => {
   clearListeners();
-  hide("homeScreen"); hide("setup"); hide("cloudLockScreen"); hide("globalQuickSaleBtn");
+  hide("homeScreen"); hide("setup"); hide("cloudLockScreen"); hide("cloudPopupBanner"); hide("globalQuickSaleBtn");
   show("app");
   hide("dashboard"); hide("stock"); hide("productFormPanel"); hide("sales"); hide("clients"); hide("settings");
   show("profile");
@@ -1583,8 +1646,9 @@ async function checkCloudAccess(businessId) {
 }
 
 async function showCloudLock(businessId) {
-  hide("app"); hide("setup"); hide("homeScreen"); hide("authScreen"); hide("modeSelectScreen");
+  hide("app"); hide("setup"); hide("homeScreen"); hide("authScreen"); hide("cloudPopupBanner");
   show("cloudLockScreen");
+  show("headerHome"); // Botón de volver al inicio en el encabezado
 
   try {
     const configSnap = await db.collection("config").doc("cloud_goal").get();
@@ -1593,11 +1657,52 @@ async function showCloudLock(businessId) {
       const goal = Number(d.goalAmount) || 1;
       const current = Number(d.currentAmount) || 0;
       const pct = Math.min(100, (current / goal) * 100);
+      const currency = d.currency || "ARS";
+      const displayMode = d.displayMode || "both";
+      const exchangeRate = Number(d.exchangeRate) || 1200;
+
+      setText("cloudLockTitle", d.title || "Modo Nube Bloqueado");
 
       if ($("cloudGoalBar")) $("cloudGoalBar").style.width = pct + "%";
-      if ($("cloudGoalText")) $("cloudGoalText").textContent = `${money(current)} de ${money(goal)}`;
+
+      // Formatear montos con moneda y cálculo de dólares
+      let mainText = "";
+      let subText = "";
+
+      if (currency === "ARS") {
+        const currentUSD = (current / exchangeRate).toFixed(2);
+        const goalUSD = (goal / exchangeRate).toFixed(2);
+        if (displayMode === "both") {
+          mainText = `${money(current)} ARS de ${money(goal)} ARS`;
+          subText = `US$ ${currentUSD} USD de US$ ${goalUSD} USD`;
+        } else if (displayMode === "ars_only") {
+          mainText = `${money(current)} ARS de ${money(goal)} ARS`;
+        } else {
+          mainText = `US$ ${currentUSD} USD de US$ ${goalUSD} USD`;
+        }
+      } else {
+        const currentARS = current * exchangeRate;
+        const goalARS = goal * exchangeRate;
+        if (displayMode === "both") {
+          mainText = `US$ ${current.toFixed(2)} USD de US$ ${goal.toFixed(2)} USD`;
+          subText = `${money(currentARS)} ARS de ${money(goalARS)} ARS`;
+        } else if (displayMode === "usd_only") {
+          mainText = `US$ ${current.toFixed(2)} USD de US$ ${goal.toFixed(2)} USD`;
+        } else {
+          mainText = `${money(currentARS)} ARS de ${money(goalARS)} ARS`;
+        }
+      }
+
+      setText("cloudGoalText", mainText);
+      const subEl = $("cloudGoalSubText");
+      if (subEl) {
+        subEl.textContent = subText;
+        subEl.style.display = subText ? "block" : "none";
+      }
+
       if ($("cloudGoalMessage")) $("cloudGoalMessage").textContent = d.message || "Apoyá el desarrollo para desbloquear el Modo Nube.";
 
+      // Renderizar links de donación
       const donateContainer = $("cloudDonateLinks");
       if (donateContainer) {
         donateContainer.innerHTML = "";
@@ -1615,12 +1720,57 @@ async function showCloudLock(businessId) {
             a.target = "_blank";
             a.rel = "noopener noreferrer";
             a.className = "secondary";
-            a.style.cssText = "display:inline-block; padding:10px 16px; margin:4px; text-decoration:none; font-weight:600;";
+            a.style.cssText = "display:inline-block; padding:8px 14px; margin:4px; text-decoration:none; font-weight:600; font-size:13px;";
             a.textContent = `Donar en ${l.name}`;
             donateContainer.appendChild(a);
           }
         });
         donateContainer.style.display = hasLinks ? "block" : "none";
+      }
+
+      // Renderizar botones de redes sociales
+      const socialContainer = $("cloudSocialLinks");
+      if (socialContainer) {
+        socialContainer.innerHTML = "";
+        const socials = [
+          { name: d.socialName1, url: d.socialUrl1 },
+          { name: d.socialName2, url: d.socialUrl2 },
+          { name: d.socialName3, url: d.socialUrl3 }
+        ];
+        let hasSocials = false;
+        socials.forEach(s => {
+          if (s.name && s.url && typeof s.url === "string" && s.url.startsWith("https://")) {
+            hasSocials = true;
+            const a = document.createElement("a");
+            a.href = s.url;
+            a.target = "_blank";
+            a.rel = "noopener noreferrer";
+            a.className = "secondary";
+            a.style.cssText = "display:inline-block; padding:8px 14px; text-decoration:none; font-weight:600; font-size:13px;";
+            a.textContent = s.name;
+            socialContainer.appendChild(a);
+          }
+        });
+        socialContainer.style.display = hasSocials ? "flex" : "none";
+      }
+
+      // Mostrar Anuncio Emergente si está configurado y activo
+      if (d.popupActive === true && d.popupTitle && d.popupMessage) {
+        setText("popupBannerTitle", d.popupTitle);
+        setText("popupBannerMessage", d.popupMessage);
+        const popupBtnContainer = $("popupBannerButtons");
+        popupBtnContainer.innerHTML = "";
+        if (d.popupBtnText && d.popupBtnUrl) {
+          const pb = document.createElement("a");
+          pb.href = d.popupBtnUrl;
+          pb.target = "_blank";
+          pb.rel = "noopener noreferrer";
+          pb.className = "button";
+          pb.style.cssText = "display:block; width:100%; text-decoration:none; padding:12px; font-weight:bold; background:var(--blue); color:#fff; border-radius:var(--radius); text-align:center;";
+          pb.textContent = d.popupBtnText;
+          popupBtnContainer.appendChild(pb);
+        }
+        show("cloudPopupBanner");
       }
     }
   } catch(e) {}
@@ -1636,7 +1786,7 @@ async function showCloudLock(businessId) {
         <input id="cloudLockIdInput" readonly style="font-weight:bold; font-size:14px; background:var(--panel);" />
         <button type="button" id="cloudLockCopyBtn" class="secondary" style="white-space:nowrap;">Copiar ID</button>
       </div>
-      <p style="margin:8px 0 0; font-size:12px; color:var(--muted);">Copiá este ID y ponelo en tu Panel de Moderador (en tu Perfil) para activarlo.</p>
+      <p style="margin:8px 0 0; font-size:12px; color:var(--muted);">Copiá este ID y ponelo en tu Panel de Moderador para activarlo.</p>
     `;
     $("cloudLockScreen").querySelector(".panel")?.appendChild(box);
   }
@@ -1651,15 +1801,7 @@ async function showCloudLock(businessId) {
   }
 }
 
-$("cloudLockBackBtn").onclick = () => {
-  hide("cloudLockScreen");
-  showHome();
-};
-
-$("cloudLockProfileBtn").onclick = () => {
-  hide("cloudLockScreen");
-  openDirectProfile();
-};
+$("closePopupBannerBtn").onclick = () => hide("cloudPopupBanner");
 
 /* =========================
    ABRIR NEGOCIO Y LISTENERS
@@ -1690,7 +1832,7 @@ async function openBusiness(id) {
 
   const hasAccess = await checkCloudAccess(id);
   if (!hasAccess) {
-    showToast("Obtené el acceso anticipado al Modo Nube", "info");
+    showToast("Acceso al modo nube bloqueado", "info");
     showCloudLock(id);
     return;
   }
@@ -1700,7 +1842,7 @@ async function openBusiness(id) {
 }
 
 function setupBusinessUI() {
-  hide("authScreen"); hide("setup"); hide("homeScreen"); hide("cloudLockScreen"); show("app");
+  hide("authScreen"); hide("setup"); hide("homeScreen"); hide("cloudLockScreen"); hide("cloudPopupBanner"); show("app");
   show("headerHome");
   show("globalQuickSaleBtn");
   setText("welcome", currentBusiness.name);
@@ -2756,15 +2898,30 @@ $("adminPanelBtn").onclick = async () => {
     const doc = await db.collection("config").doc("cloud_goal").get();
     if (doc.exists) {
       const d = doc.data();
-      $("admTitle").value = d.title || "";
+      $("admTitle").value = d.title || "Modo Nube Bloqueado";
       $("admMessage").value = d.message || "";
       $("admGoalAmount").value = d.goalAmount || 10000;
       $("admCurrentAmount").value = d.currentAmount || 0;
       $("admCurrency").value = d.currency || "ARS";
+      $("admDisplayMode").value = d.displayMode || "both";
+      $("admExchangeRate").value = d.exchangeRate || 1200;
       $("admUnlocked").checked = !!d.unlocked;
       $("admCafecito").value = d.cafecitoUrl || "";
       $("admKofi").value = d.kofiUrl || "";
       $("admPatreon").value = d.patreonUrl || "";
+
+      $("admSocialName1").value = d.socialName1 || "";
+      $("admSocialUrl1").value = d.socialUrl1 || "";
+      $("admSocialName2").value = d.socialName2 || "";
+      $("admSocialUrl2").value = d.socialUrl2 || "";
+      $("admSocialName3").value = d.socialName3 || "";
+      $("admSocialUrl3").value = d.socialUrl3 || "";
+
+      $("admPopupActive").checked = !!d.popupActive;
+      $("admPopupTitle").value = d.popupTitle || "";
+      $("admPopupMessage").value = d.popupMessage || "";
+      $("admPopupButtonText").value = d.popupBtnText || "";
+      $("admPopupButtonUrl").value = d.popupBtnUrl || "";
     }
   } catch(e) {
     showToast("Error al cargar configuración de meta", "error");
@@ -2775,16 +2932,29 @@ $("closeAdminModalBtn").onclick = () => hide("adminModal");
 
 $("adminTabGoal").onclick = () => {
   $("adminTabGoal").classList.add("active");
+  $("adminTabPopup").classList.remove("active");
   $("adminTabVip").classList.remove("active");
   show("adminGoalForm");
+  hide("adminPopupForm");
+  hide("adminVipForm");
+};
+
+$("adminTabPopup").onclick = () => {
+  $("adminTabPopup").classList.add("active");
+  $("adminTabGoal").classList.remove("active");
+  $("adminTabVip").classList.remove("active");
+  show("adminPopupForm");
+  hide("adminGoalForm");
   hide("adminVipForm");
 };
 
 $("adminTabVip").onclick = () => {
   $("adminTabVip").classList.add("active");
   $("adminTabGoal").classList.remove("active");
+  $("adminTabPopup").classList.remove("active");
   show("adminVipForm");
   hide("adminGoalForm");
+  hide("adminPopupForm");
 };
 
 $("adminGoalForm").onsubmit = async e => {
@@ -2793,28 +2963,51 @@ $("adminGoalForm").onsubmit = async e => {
   const kof = $("admKofi").value.trim();
   const pat = $("admPatreon").value.trim();
 
-  if ((caf && !caf.startsWith("https://")) || (kof && !kof.startsWith("https://")) || (pat && !pat.startsWith("https://"))) {
-    return showToast("Los enlaces de donación deben comenzar con https://", "error");
-  }
-
   const payload = {
     title: $("admTitle").value.trim(),
     message: $("admMessage").value.trim(),
     goalAmount: Number($("admGoalAmount").value),
     currentAmount: Number($("admCurrentAmount").value),
-    currency: $("admCurrency").value.trim(),
+    currency: $("admCurrency").value,
+    displayMode: $("admDisplayMode").value,
+    exchangeRate: Number($("admExchangeRate").value) || 1200,
     unlocked: $("admUnlocked").checked,
     cafecitoUrl: caf,
     kofiUrl: kof,
-    patreonUrl: pat
+    patreonUrl: pat,
+    socialName1: $("admSocialName1").value.trim(),
+    socialUrl1: $("admSocialUrl1").value.trim(),
+    socialName2: $("admSocialName2").value.trim(),
+    socialUrl2: $("admSocialUrl2").value.trim(),
+    socialName3: $("admSocialName3").value.trim(),
+    socialUrl3: $("admSocialUrl3").value.trim()
   };
 
   try {
     await db.collection("config").doc("cloud_goal").set(payload, { merge: true });
-    showToast("Meta actualizada correctamente");
+    showToast("Configuración guardada correctamente");
     hide("adminModal");
   } catch(err) {
-    showToast("Error al guardar la meta", "error");
+    showToast("Error al guardar", "error");
+  }
+};
+
+$("adminPopupForm").onsubmit = async e => {
+  e.preventDefault();
+  const payload = {
+    popupActive: $("admPopupActive").checked,
+    popupTitle: $("admPopupTitle").value.trim(),
+    popupMessage: $("admPopupMessage").value.trim(),
+    popupBtnText: $("admPopupButtonText").value.trim(),
+    popupBtnUrl: $("admPopupButtonUrl").value.trim()
+  };
+
+  try {
+    await db.collection("config").doc("cloud_goal").set(payload, { merge: true });
+    showToast("Anuncio emergente actualizado correctamente");
+    hide("adminModal");
+  } catch(err) {
+    showToast("Error al guardar anuncio", "error");
   }
 };
 
