@@ -1382,7 +1382,6 @@ let paymentsUnsubscribe = null;
 let clientsUnsubscribe = null;
 let lastSaleDoc = null;
 let hasMoreSales = false;
-let quickSaleItems = [];
 let salesChartInstance = null;
 let donutChartInstance = null;
 
@@ -2422,233 +2421,6 @@ $("saleModalForm").onsubmit = async e => {
 };
 
 /* =========================
-   IMPLEMENTACIÓN COMPLETA DE VENTA RÁPIDA (2.1)
-========================= */
-$("globalQuickSaleBtn").onclick = () => {
-  quickSaleItems = [];
-  $("qsSearchInput").value = "";
-  $("qsProductResults").innerHTML = '<div class="empty" style="padding:15px;">Buscá o seleccioná productos.</div>';
-  $("qsPaymentMethod").value = "Efectivo";
-  $("qsClientContainer").classList.add("hidden");
-  $("qsNotes").value = "";
-  renderQuickSaleCart();
-  show("quickSaleModal");
-};
-
-$("closeQuickSaleModalBtn").onclick = () => hide("quickSaleModal");
-
-$("qsSearchInput").oninput = e => {
-  const query = normalizeStr(e.target.value.trim());
-  const resultsContainer = $("qsProductResults");
-  if (!query) {
-    resultsContainer.innerHTML = '<div class="empty" style="padding:15px;">Buscá o seleccioná productos.</div>';
-    return;
-  }
-
-  const matches = products.filter(p => normalizeStr(`${p.name} ${p.code} ${p.model}`).includes(query) && (Number(p.quantity) || 0) > 0);
-  if (!matches.length) {
-    resultsContainer.innerHTML = '<div class="empty" style="padding:15px;">No se encontraron productos con stock.</div>';
-    return;
-  }
-
-  resultsContainer.innerHTML = matches.map(p => `
-    <div style="display:flex; align-items:center; justify-content:space-between; padding:8px 12px; border-bottom:1px solid var(--line); background:var(--panel);">
-      <div>
-        <b>${clean(p.name)}</b> (${p.quantity} disponibles)
-        <div style="font-size:12px; color:var(--blue); font-weight:bold;">${money(p.price)}</div>
-      </div>
-      <button type="button" data-qs-add="${p.id}" style="padding:6px 12px; font-size:12px;">Agregar</button>
-    </div>`).join("");
-
-  resultsContainer.querySelectorAll("[data-qs-add]").forEach(btn => {
-    btn.onclick = () => {
-      const pid = btn.dataset.qsAdd;
-      const prod = products.find(p => p.id === pid);
-      if (!prod) return;
-
-      const existing = quickSaleItems.find(i => i.productId === pid);
-      if (existing) {
-        if (existing.quantity < prod.quantity) {
-          existing.quantity++;
-        } else {
-          showToast("No hay más stock disponible", "info");
-        }
-      } else {
-        quickSaleItems.push({
-          productId: prod.id,
-          name: prod.name,
-          unitPrice: prod.price,
-          cost: prod.cost,
-          quantity: 1,
-          maxQty: prod.quantity
-        });
-      }
-      renderQuickSaleCart();
-    };
-  });
-};
-
-function renderQuickSaleCart() {
-  const cartContainer = $("qsCartList");
-  if (!quickSaleItems.length) {
-    cartContainer.innerHTML = '<div class="empty" style="padding: 20px;">No hay productos seleccionados.</div>';
-    setText("qsModalTotal", money(0));
-    return;
-  }
-
-  let totalGeneral = 0;
-  cartContainer.innerHTML = quickSaleItems.map((item, idx) => {
-    const subtotal = item.quantity * item.unitPrice;
-    totalGeneral += subtotal;
-    return `
-      <div style="display:flex; align-items:center; justify-content:space-between; padding:6px 0; border-bottom:1px solid var(--line);">
-        <div>
-          <b>${clean(item.name)}</b>
-          <div style="font-size:12px; color:var(--muted);">${money(item.unitPrice)} x ${item.quantity} = <b>${money(subtotal)}</b></div>
-        </div>
-        <div style="display:flex; align-items:center; gap:6px;">
-          <button type="button" class="secondary" data-qs-dec="${idx}" style="padding:2px 8px;">-</button>
-          <span>${item.quantity}</span>
-          <button type="button" class="secondary" data-qs-inc="${idx}" style="padding:2px 8px;">+</button>
-          <button type="button" class="danger" data-qs-rem="${idx}" style="padding:2px 6px; font-size:11px;">✕</button>
-        </div>
-      </div>`;
-  }).join("");
-
-  setText("qsModalTotal", money(totalGeneral));
-
-  cartContainer.querySelectorAll("[data-qs-inc]").forEach(btn => {
-    btn.onclick = () => {
-      const i = btn.dataset.qsInc;
-      if (quickSaleItems[i].quantity < quickSaleItems[i].maxQty) {
-        quickSaleItems[i].quantity++;
-        renderQuickSaleCart();
-      } else {
-        showToast("Stock máximo alcanzado", "info");
-      }
-    };
-  });
-
-  cartContainer.querySelectorAll("[data-qs-dec]").forEach(btn => {
-    btn.onclick = () => {
-      const i = btn.dataset.qsDec;
-      if (quickSaleItems[i].quantity > 1) {
-        quickSaleItems[i].quantity--;
-        renderQuickSaleCart();
-      } else {
-        quickSaleItems.splice(i, 1);
-        renderQuickSaleCart();
-      }
-    };
-  });
-
-  cartContainer.querySelectorAll("[data-qs-rem]").forEach(btn => {
-    btn.onclick = () => {
-      const i = btn.dataset.qsRem;
-      quickSaleItems.splice(i, 1);
-      renderQuickSaleCart();
-    };
-  });
-}
-
-$("qsPaymentMethod").onchange = e => {
-  const isFiado = e.target.value === "Cuenta Corriente";
-  $("qsClientContainer").classList.toggle("hidden", !isFiado);
-  if (isFiado) {
-    const clientSel = $("qsClientSelect");
-    clientSel.innerHTML = clients.map(c => `<option value="${c.id}">${clean(c.name)} (${clean(c.phone)})</option>`).join("");
-    if (!clients.length) showToast("Registrá un cliente primero en la sección Clientes.", "info");
-  }
-};
-
-$("qsForm").onsubmit = async e => {
-  e.preventDefault();
-  if (!quickSaleItems.length) return showToast("Agregá al menos un producto a la venta.", "error");
-
-  const method = $("qsPaymentMethod").value;
-  const clientId = method === "Cuenta Corriente" ? $("qsClientSelect").value : null;
-  const notes = $("qsNotes").value.trim();
-
-  if (method === "Cuenta Corriente" && !clientId) {
-    return showToast("Seleccioná un cliente para la cuenta corriente.", "error");
-  }
-
-  let total = 0;
-  let profit = 0;
-  quickSaleItems.forEach(i => {
-    total += i.quantity * i.unitPrice;
-    profit += i.quantity * (i.unitPrice - i.cost);
-  });
-
-  try {
-    if (appMode === "local") {
-      for (const item of quickSaleItems) {
-        const p = products.find(prod => prod.id === item.productId);
-        if (p) p.quantity -= item.quantity;
-      }
-      localStorage.setItem(`stockea_local_products_${currentBusinessId}`, JSON.stringify(products));
-
-      if (clientId && method === "Cuenta Corriente") {
-        const client = clients.find(c => c.id === clientId);
-        if (client) {
-          client.debt = (Number(client.debt) || 0) + total;
-          localStorage.setItem(`stockea_local_clients_${currentBusinessId}`, JSON.stringify(clients));
-        }
-      }
-
-      const newSale = {
-        id: "sale_" + Date.now(),
-        items: quickSaleItems.map(i => ({ productId: i.productId, name: i.name, quantity: i.quantity, unitPrice: i.unitPrice })),
-        total, profit, paymentMethod: method, clientId, notes, status: "completed", createdAt: Date.now()
-      };
-      sales.unshift(newSale);
-      localStorage.setItem(`stockea_local_sales_${currentBusinessId}`, JSON.stringify(sales));
-
-      hide("quickSaleModal");
-      renderProducts(); renderSales(); renderDashboard(); renderClients();
-      showToast("Venta rápida registrada correctamente");
-      return;
-    }
-
-    // Transacción atómica en nube para múltiples ítems (2.1)
-    const saleRef = db.collection("businesses").doc(currentBusinessId).collection("sales").doc();
-    const clientRef = clientId ? db.collection("businesses").doc(currentBusinessId).collection("clients").doc(clientId) : null;
-
-    await db.runTransaction(async t => {
-      const clientSnap = clientRef ? await t.get(clientRef) : null;
-      let clientName = "";
-      if (clientSnap && clientSnap.exists) clientName = clientSnap.data().name || "";
-
-      for (const item of quickSaleItems) {
-        const pRef = db.collection("businesses").doc(currentBusinessId).collection("products").doc(item.productId);
-        const pSnap = await t.get(pRef);
-        if (!pSnap.exists) throw new Error(`Producto ${item.name} no encontrado`);
-        const curQty = pSnap.data().quantity || 0;
-        if (curQty < item.quantity) throw new Error(`Stock insuficiente para ${item.name}`);
-        t.update(pRef, { quantity: curQty - item.quantity });
-      }
-
-      if (clientSnap && clientSnap.exists) {
-        t.update(clientRef, { debt: firebase.firestore.FieldValue.increment(total) });
-      }
-
-      t.set(saleRef, {
-        items: quickSaleItems.map(i => ({ productId: i.productId, name: i.name, quantity: i.quantity, unitPrice: i.unitPrice })),
-        total, profit, paymentMethod: method, clientId, clientName, notes,
-        status: "completed",
-        createdAt: firebase.firestore.FieldValue.serverTimestamp(),
-        soldBy: currentUser.uid
-      });
-    });
-
-    hide("quickSaleModal");
-    showToast("Venta rápida registrada correctamente");
-  } catch(err) {
-    showToast(err.message || "Error al registrar la venta rápida", "error");
-  }
-};
-
-/* =========================
    ESCANÉNER DE CÓDIGO DE BARRAS (4.1)
 ========================= */
 async function scanBarcode(callback) {
@@ -2692,13 +2464,6 @@ async function scanBarcode(callback) {
 
 $("pScanBarcodeBtn").onclick = () => {
   scanBarcode(code => { $("pCode").value = code; });
-};
-
-$("qsScanBarcodeBtn").onclick = () => {
-  scanBarcode(code => {
-    $("qsSearchInput").value = code;
-    $("qsSearchInput").dispatchEvent(new Event('input'));
-  });
 };
 
 $("addClientBtn").onclick = () => { $("clientForm").reset(); show("clientModal"); };
@@ -3690,6 +3455,208 @@ $("joinBizForm").onsubmit = async e => {
     showHome(); showToast("¡Te uniste al negocio exitosamente!");
   } catch(err) {
     showToast(err.message || "Error al unirse al negocio", "error");
+  }
+};
+
+/* =========================
+   VENTA RÁPIDA (carrito)
+========================= */
+let qsCart = []; // [{ productId, qty }]
+
+function qsNorm(s) {
+  return String(s || "").toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+}
+
+function openQuickSale() {
+  if (!currentBusinessId) return;
+  qsCart = [];
+  $("qsForm").reset();
+  $("qsSearchInput").value = "";
+  $("qsClientContainer").classList.add("hidden");
+  $("qsClientSelect").innerHTML = clients
+    .map(c => `<option value="${clean(c.id)}">${clean(c.name)} (${clean(c.phone)})</option>`)
+    .join("");
+  qsRenderResults();
+  qsRenderCart();
+  show("quickSaleModal");
+}
+
+function qsRenderResults() {
+  const q = qsNorm($("qsSearchInput").value.trim());
+  const list = products
+    .filter(p => (Number(p.quantity) || 0) > 0 &&
+      (!q || qsNorm([p.name, p.model, p.code, p.category].join(" ")).includes(q)))
+    .sort((a, b) => String(a.name).localeCompare(String(b.name)))
+    .slice(0, 30);
+
+  const box = $("qsProductResults");
+  if (!list.length) {
+    box.innerHTML = '<div class="empty" style="padding:14px;">No hay productos disponibles.</div>';
+    return;
+  }
+  box.innerHTML = list.map(p => `
+    <div style="display:flex;align-items:center;gap:10px;padding:10px 12px;border-bottom:1px solid var(--line);">
+      <div style="flex:1;min-width:0;">
+        <div style="font-weight:600;font-size:14px;">${clean(p.name)}</div>
+        <div style="font-size:12px;color:var(--muted);">${money(p.price)} · Stock: ${Number(p.quantity) || 0}</div>
+      </div>
+      <button type="button" data-qs-add="${clean(p.id)}" style="padding:6px 12px;font-size:12px;">+ Agregar</button>
+    </div>`).join("");
+  box.querySelectorAll("[data-qs-add]").forEach(b => b.onclick = () => qsAdd(b.dataset.qsAdd));
+}
+
+function qsAdd(pid) {
+  const p = products.find(x => x.id === pid);
+  if (!p) return;
+  const stock = Number(p.quantity) || 0;
+  const item = qsCart.find(i => i.productId === pid);
+  if (item) {
+    if (item.qty >= stock) return showToast("No hay más stock de ese producto.", "info");
+    item.qty++;
+  } else {
+    qsCart.push({ productId: pid, qty: 1 });
+  }
+  qsRenderCart();
+}
+
+function qsRenderCart() {
+  const box = $("qsCartList");
+  qsCart = qsCart.filter(i => products.some(p => p.id === i.productId));
+
+  if (!qsCart.length) {
+    box.innerHTML = '<div class="empty" style="padding:20px;">No hay productos seleccionados.</div>';
+    setText("qsModalTotal", money(0));
+    return;
+  }
+
+  let total = 0;
+  box.innerHTML = qsCart.map(i => {
+    const p = products.find(x => x.id === i.productId);
+    const sub = i.qty * (Number(p.price) || 0);
+    total += sub;
+    return `
+      <div style="display:flex;align-items:center;gap:8px;padding:8px 0;border-bottom:1px solid var(--line);flex-wrap:wrap;">
+        <div style="flex:1;min-width:120px;">
+          <div style="font-weight:600;font-size:14px;">${clean(p.name)}</div>
+          <div style="font-size:12px;color:var(--muted);">${money(p.price)} c/u</div>
+        </div>
+        <button type="button" class="secondary" data-qs-minus="${clean(p.id)}" style="padding:4px 10px;">-</button>
+        <b style="min-width:22px;text-align:center;">${i.qty}</b>
+        <button type="button" class="secondary" data-qs-plus="${clean(p.id)}" style="padding:4px 10px;">+</button>
+        <b style="min-width:80px;text-align:right;">${money(sub)}</b>
+        <button type="button" class="danger" data-qs-del="${clean(p.id)}" style="padding:4px 8px;" aria-label="Quitar">✕</button>
+      </div>`;
+  }).join("");
+  setText("qsModalTotal", money(total));
+
+  box.querySelectorAll("[data-qs-plus]").forEach(b => b.onclick = () => qsAdd(b.dataset.qsPlus));
+  box.querySelectorAll("[data-qs-minus]").forEach(b => {
+    b.onclick = () => {
+      const it = qsCart.find(i => i.productId === b.dataset.qsMinus);
+      if (!it) return;
+      it.qty--;
+      if (it.qty <= 0) qsCart = qsCart.filter(i => i !== it);
+      qsRenderCart();
+    };
+  });
+  box.querySelectorAll("[data-qs-del]").forEach(b => {
+    b.onclick = () => {
+      qsCart = qsCart.filter(i => i.productId !== b.dataset.qsDel);
+      qsRenderCart();
+    };
+  });
+}
+
+$("globalQuickSaleBtn").onclick = openQuickSale;
+$("closeQuickSaleModalBtn").onclick = () => hide("quickSaleModal");
+$("qsSearchInput").oninput = qsRenderResults;
+
+$("qsPaymentMethod").onchange = e => {
+  const fiado = e.target.value === "Cuenta Corriente";
+  $("qsClientContainer").classList.toggle("hidden", !fiado);
+  if (fiado && !clients.length) showToast("Registrá un cliente primero en la sección Clientes.", "info");
+};
+
+$("qsForm").onsubmit = async e => {
+  e.preventDefault();
+  if (!qsCart.length) return showToast("Agregá al menos un producto.", "error");
+
+  const method = $("qsPaymentMethod").value;
+  const clientId = method === "Cuenta Corriente" ? $("qsClientSelect").value : null;
+  if (method === "Cuenta Corriente" && !clientId) {
+    return showToast("Seleccioná un cliente para la cuenta corriente.", "error");
+  }
+  const notes = $("qsNotes").value.trim();
+  const btn = $("qsConfirmBtn");
+  btn.disabled = true;
+
+  try {
+    const lines = qsCart.map(i => ({ p: products.find(x => x.id === i.productId), qty: i.qty }));
+    for (const l of lines) {
+      if (!l.p) throw new Error("Un producto ya no existe.");
+      if ((Number(l.p.quantity) || 0) < l.qty) throw new Error(`Stock insuficiente de ${l.p.name}.`);
+    }
+
+    const items = lines.map(l => ({
+      productId: l.p.id, name: l.p.name, quantity: l.qty, unitPrice: Number(l.p.price) || 0
+    }));
+    const total = lines.reduce((s, l) => s + l.qty * (Number(l.p.price) || 0), 0);
+    const profit = lines.reduce((s, l) => s + l.qty * ((Number(l.p.price) || 0) - (Number(l.p.cost) || 0)), 0);
+    const clientName = clientId ? (clients.find(c => c.id === clientId)?.name || "") : "";
+
+    if (appMode === "local") {
+      lines.forEach(l => { l.p.quantity = (Number(l.p.quantity) || 0) - l.qty; });
+      localStorage.setItem(`stockea_local_products_${currentBusinessId}`, JSON.stringify(products));
+
+      if (clientId) {
+        const cli = clients.find(c => c.id === clientId);
+        if (cli) {
+          cli.debt = (Number(cli.debt) || 0) + total;
+          localStorage.setItem(`stockea_local_clients_${currentBusinessId}`, JSON.stringify(clients));
+        }
+      }
+      sales.unshift({
+        id: "sale_" + Date.now(), items, total, profit,
+        paymentMethod: method, clientId, clientName, notes, createdAt: Date.now()
+      });
+      localStorage.setItem(`stockea_local_sales_${currentBusinessId}`, JSON.stringify(sales));
+    } else {
+      const base = db.collection("businesses").doc(currentBusinessId);
+      const saleRef = base.collection("sales").doc();
+      const clientRef = clientId ? base.collection("clients").doc(clientId) : null;
+
+      await db.runTransaction(async t => {
+        // Firestore: primero TODAS las lecturas, después las escrituras
+        const pSnaps = await Promise.all(lines.map(l => t.get(base.collection("products").doc(l.p.id))));
+        const cSnap = clientRef ? await t.get(clientRef) : null;
+
+        pSnaps.forEach((s, idx) => {
+          if (!s.exists) throw new Error(`${lines[idx].p.name} ya no existe.`);
+          if ((s.data().quantity || 0) < lines[idx].qty) throw new Error(`Stock insuficiente de ${lines[idx].p.name}.`);
+        });
+
+        pSnaps.forEach((s, idx) => t.update(s.ref, { quantity: (s.data().quantity || 0) - lines[idx].qty }));
+        if (cSnap && cSnap.exists) t.update(clientRef, { debt: (cSnap.data().debt || 0) + total });
+
+        t.set(saleRef, {
+          items, total, profit, paymentMethod: method, clientId, clientName, notes,
+          createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+          soldBy: currentUser.uid
+        });
+      });
+
+      // Las ventas se cargan una sola vez, así que la sumamos a mano para que se vea al instante
+      sales.unshift({ id: saleRef.id, items, total, profit, paymentMethod: method, clientId, clientName, notes, createdAt: Date.now() });
+    }
+
+    qsCart = [];
+    hide("quickSaleModal");
+    renderProducts(); renderSales(); renderDashboard(); renderClients();
+    showToast("Venta registrada correctamente");
+  } catch (err) {
+    showToast(err.message || "Error al registrar la venta", "error");
+  } finally {
+    btn.disabled = false;
   }
 };
 </script>
