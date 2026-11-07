@@ -205,6 +205,7 @@ header {
   border: 2px solid var(--blue);
   cursor: pointer;
   color: var(--muted);
+  flex-shrink: 0;
 }
 .avatar-mini img { width: 100%; height: 100%; object-fit: cover; }
 
@@ -371,7 +372,7 @@ header {
 }
 
 #setup { max-width: 550px; margin: 40px auto; padding: 30px; }
-.layout { display: flex; min-height: calc(100vh - 68px); }
+.layout { display: flex; min-height: calc(100vh - 68px); width: 100%; }
 
 nav {
   width: 240px;
@@ -400,7 +401,10 @@ nav button.active {
   font-weight: 600;
 }
 
-main { padding: 30px; width: 100%; max-width: 1300px; margin: auto; }
+/* NAVEGACIÓN MÓVIL (OCULTA POR DEFECTO EN ESCRITORIO / MODO ESCRITORIO) */
+.mobile-nav { display: none; }
+
+main { padding: 30px; width: 100%; max-width: 1300px; margin: auto; flex: 1; }
 h1 { margin: 0 0 6px; font-size: 26px; font-weight: 700; }
 h2 { font-size: 18px; font-weight: 600; margin-top: 0; display: flex; align-items: center; gap: 8px; }
 .sub { margin: 0 0 24px; color: var(--muted); font-size: 14px; }
@@ -423,8 +427,8 @@ h2 { font-size: 18px; font-weight: 600; margin-top: 0; display: flex; align-item
 
 .quick-sale-fab {
   position: fixed;
-  bottom: 80px;
-  right: 20px;
+  bottom: 30px;
+  right: 30px;
   background: var(--blue);
   color: white;
   padding: 12px 20px;
@@ -469,9 +473,9 @@ h2 { font-size: 18px; font-weight: 600; margin-top: 0; display: flex; align-item
 }
 .product-card:hover { border-color: var(--blue); transform: translateY(-2px); }
 .product-image {
-  height: 160px; background: rgba(0,0,0,0.03); display: flex; align-items: center; justify-content: center; overflow: hidden; padding: 8px;
+  height: 160px; max-height: 160px; background: rgba(0,0,0,0.03); display: flex; align-items: center; justify-content: center; overflow: hidden; padding: 8px;
 }
-.product-image img { width: 100%; height: 100%; object-fit: contain; border-radius: 8px; }
+.product-image img { max-width: 100%; max-height: 100%; width: auto; height: auto; object-fit: contain; border-radius: 8px; }
 .product-card-body { padding: 14px; flex: 1; }
 .product-name { font-size: 15px; font-weight: 700; margin-bottom: 6px; }
 .product-price { font-size: 20px; font-weight: 800; color: var(--blue); }
@@ -494,14 +498,25 @@ h2 { font-size: 18px; font-weight: 600; margin-top: 0; display: flex; align-item
 .sale p { color: var(--muted); font-size: 13px; margin: 4px 0 0; }
 .sale-actions { display: flex; align-items: center; gap: 12px; margin-left: auto; }
 .sale-item-thumb {
-  width: 44px; height: 44px; border-radius: 8px; background: var(--bg);
+  width: 44px; height: 44px; min-width: 44px; min-height: 44px; border-radius: 8px; background: var(--bg);
   border: 1px solid var(--line); display: flex; align-items: center; justify-content: center; overflow: hidden; flex-shrink: 0;
 }
-.sale-item-thumb img { width: 100%; height: 100%; object-fit: contain; }
+.sale-item-thumb img { max-width: 100%; max-height: 100%; width: auto; height: auto; object-fit: contain; }
 
 .charts-grid { display:grid; grid-template-columns:2fr 1fr; gap:20px; margin-bottom:20px; }
 button { touch-action: manipulation; }
 body { -webkit-text-size-adjust: 100%; overflow-x: hidden; }
+
+/* ESTILOS ESPECÍFICOS PARA PREVISUALIZACIÓN DE IMÁGENES EN FORMULARIOS */
+#imagePreview img, .business-logo-preview img {
+  max-width: 140px;
+  max-height: 140px;
+  width: auto;
+  height: auto;
+  object-fit: contain;
+  border-radius: 8px;
+  border: 1px solid var(--line);
+}
 
 @media(max-width: 950px) {
   .product-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
@@ -509,16 +524,17 @@ body { -webkit-text-size-adjust: 100%; overflow-x: hidden; }
   .charts-grid { grid-template-columns: 1fr; }
 }
 
-@media(max-width: 650px) {
+/* MEDIA QUERY ESTRICTA PARA CELULARES REALES (EXCLUYE MODO ESCRITORIO DEL NAVEGADOR) */
+@media(max-width: 650px) and (pointer: coarse) {
   .layout { display:block; min-height:auto; padding-bottom: calc(80px + env(safe-area-inset-bottom)); }
-  nav { display:none; }
+  nav { display:none !important; }
 
   header { padding: 10px 14px; padding-top: calc(10px + env(safe-area-inset-top)); min-height:60px; }
   .header-subtitle { display:none; }
   #headerLogout { font-size:0 !important; gap:0; padding:8px 10px !important; }
 
   .mobile-nav {
-    display:flex; position:fixed; bottom:0; left:0; width:100%;
+    display:flex !important; position:fixed; bottom:0; left:0; width:100%;
     height: calc(64px + env(safe-area-inset-bottom));
     padding: 0 6px env(safe-area-inset-bottom);
     background:var(--panel); border-top:1px solid var(--line);
@@ -540,7 +556,7 @@ body { -webkit-text-size-adjust: 100%; overflow-x: hidden; }
     font-size: 13px;
   }
 
-  main { padding:16px 14px; }
+  main { padding:16px 14px; max-width: none; }
   h1 { font-size:22px; }
   .sub { margin-bottom:16px; }
   .panel, .card { padding:14px; }
@@ -558,7 +574,7 @@ body { -webkit-text-size-adjust: 100%; overflow-x: hidden; }
   #periodFilter { max-width:none !important; width:100%; }
 
   .product-grid { grid-template-columns:repeat(2, minmax(0,1fr)); gap:10px; }
-  .product-image { height:120px; }
+  .product-image { height:120px; max-height:120px; }
   .product-card-body { padding:10px; }
   .product-name { font-size:14px; }
   .product-price { font-size:18px; }
@@ -594,10 +610,6 @@ body { -webkit-text-size-adjust: 100%; overflow-x: hidden; }
     <span class="header-subtitle">Stock Manager</span>
   </div>
   <div class="user-header-info">
-    <button id="headerProfileBtn" class="secondary hidden" style="font-size:12px; padding:6px 12px;">
-      <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
-      Mi Perfil
-    </button>
     <button id="headerHome" class="secondary hidden" style="font-size:12px; padding:6px 12px;">
       <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg>
       Inicio
@@ -833,7 +845,6 @@ body { -webkit-text-size-adjust: 100%; overflow-x: hidden; }
         <h1 id="homeTitleText">Mis Negocios</h1>
         <p class="sub" style="margin:0;">Administrá todos tus emprendimientos desde un solo lugar.</p>
       </div>
-      <button id="homeProfileBtn" class="secondary" type="button" style="padding:8px 14px;">Mi Perfil / Panel</button>
     </div>
     <div id="businessList" class="business-grid">
       <div class="card skeleton" style="height:120px;"></div>
@@ -922,7 +933,7 @@ body { -webkit-text-size-adjust: 100%; overflow-x: hidden; }
     </button>
   </nav>
 
-  <!-- NAVEGACIÓN INFERIOR MÓVIL -->
+  <!-- NAVEGACIÓN INFERIOR MÓVIL (EXCLUSIVA PARA CELULARES TÁCTILES REALES) -->
   <div class="mobile-nav">
     <button class="active" data-page="dashboard">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect></svg>
@@ -990,11 +1001,11 @@ body { -webkit-text-size-adjust: 100%; overflow-x: hidden; }
         </div>
       </div>
 
-      <div class="panel">
+      <div class="panel" style="margin-bottom:20px;">
         <h2>Producto estrella (Más vendido)</h2>
         <div id="topProduct" class="empty">Todavía no hay ventas.</div>
       </div>
-      <div class="panel"><h2>Últimas ventas</h2><div id="recentSales"></div></div>
+      <div class="panel" style="margin-bottom:20px;"><h2>Últimas ventas</h2><div id="recentSales"></div></div>
       <div class="panel"><h2>Stock bajo</h2><div id="lowStock"></div></div>
     </section>
 
@@ -1010,12 +1021,12 @@ body { -webkit-text-size-adjust: 100%; overflow-x: hidden; }
           <button id="addProductBtn">+ Agregar producto</button>
         </div>
       </div>
-      <div class="toolbar">
-        <div style="display:flex; gap:6px; align-items:center;">
+      <div class="toolbar" style="display:flex; gap:10px; margin-bottom:20px;">
+        <div style="display:flex; gap:6px; align-items:center; flex:1;">
           <input id="search" placeholder="Buscar por nombre, modelo o código..." style="flex:1;">
           <button type="button" id="searchScanCameraBtn" class="secondary" title="Escanear con cámara" style="padding:0 14px; height:48px;">📷</button>
         </div>
-        <select id="filterCategory"><option value="">Todas las categorías</option></select>
+        <select id="filterCategory" style="max-width:220px;"><option value="">Todas las categorías</option></select>
       </div>
       <div id="productList" class="product-grid">
         <div class="card skeleton" style="height:220px;"></div>
@@ -1031,7 +1042,7 @@ body { -webkit-text-size-adjust: 100%; overflow-x: hidden; }
       </div>
       <div class="panel">
         <form id="productForm">
-          <div class="formgrid">
+          <div class="formgrid" style="display:grid; grid-template-columns:1fr 1fr; gap:15px;">
             <div class="field"><label>Nombre del producto *</label><input id="pName" required placeholder="Ej: Coca Cola 1.5L"></div>
             <div class="field">
               <label>Categoría *</label>
@@ -1051,14 +1062,14 @@ body { -webkit-text-size-adjust: 100%; overflow-x: hidden; }
                 <button type="button" id="scanCameraBtn" class="secondary" title="Escanear" style="padding:0 14px;">📷</button>
               </div>
             </div>
-            <div class="field full">
+            <div class="field full" style="grid-column:1 / -1;">
               <label>Foto del producto</label>
               <div class="file-upload-wrapper">
                 <span class="file-upload-btn">Seleccionar imagen</span>
                 <input id="pImageFile" type="file" accept="image/*">
               </div>
               <input id="pImage" type="hidden">
-              <div id="imagePreview"></div>
+              <div id="imagePreview" style="margin-top:10px;"></div>
             </div>
           </div>
           <button type="submit" style="width:100%; margin-top:15px">Guardar producto</button>
@@ -1075,8 +1086,8 @@ body { -webkit-text-size-adjust: 100%; overflow-x: hidden; }
         </div>
         <button id="addClientBtn">+ Nuevo cliente</button>
       </div>
-      <div class="toolbar">
-        <input id="searchClient" placeholder="Buscar cliente por nombre o teléfono..." style="grid-column: 1 / -1;">
+      <div class="toolbar" style="margin-bottom:15px;">
+        <input id="searchClient" placeholder="Buscar cliente por nombre o teléfono..." style="width:100%;">
       </div>
       <div class="panel" style="margin-top:10px">
         <div id="clientsList"><div class="empty">No hay clientes registrados.</div></div>
@@ -1108,8 +1119,8 @@ body { -webkit-text-size-adjust: 100%; overflow-x: hidden; }
       <div class="panel">
         <div id="codeSectionContainer">
           <p><b>Código de invitación para socios:</b></p>
-          <div id="displayStoreCode" class="codebox">—</div>
-          <button id="copyStoreCode" class="secondary" style="margin-top:10px">Copiar código socio</button>
+          <div id="displayStoreCode" class="codebox" style="padding:10px; background:var(--bg); border:1px solid var(--line); border-radius:var(--radius); font-weight:bold; font-size:16px; margin:10px 0; text-align:center;">—</div>
+          <button id="copyStoreCode" class="secondary" style="margin-top:5px">Copiar código socio</button>
         </div>
         <div id="membersSectionContainer" style="margin-top:20px; border-top:1px solid var(--line); padding-top:15px">
           <p style="margin:0 0 5px;"><b>Miembros vinculados:</b></p>
@@ -1118,7 +1129,7 @@ body { -webkit-text-size-adjust: 100%; overflow-x: hidden; }
         <form id="settingsForm" style="margin-top:20px; border-top:1px solid var(--line); padding-top:15px">
           <div class="field">
             <label>Logo del negocio</label>
-            <div id="bizLogoPreview" class="business-logo-preview"></div>
+            <div id="bizLogoPreview" class="business-logo-preview" style="margin-bottom:10px;"></div>
             <div class="file-upload-wrapper">
               <span class="file-upload-btn">Subir / Cambiar logo</span>
               <input id="bizLogoFile" type="file" accept="image/*">
@@ -1139,17 +1150,17 @@ body { -webkit-text-size-adjust: 100%; overflow-x: hidden; }
             </select>
           </div>
           <div class="field"><label>Categorías separadas por comas</label><input id="editCategories" required></div>
-          <button type="submit">Guardar cambios</button>
+          <button type="submit" style="margin-top:10px;">Guardar cambios</button>
         </form>
       </div>
     </section>
 
-    <!-- PERFIL Y TEMA (ACCESIBLE SIN ENTRAR A NINGÚN NEGOCIO) -->
+    <!-- PERFIL Y TEMA -->
     <section id="profile" class="hidden">
       <h1>Mi perfil y configuración</h1>
       <p class="sub">Personalizá tu cuenta, foto, tema visual y panel de moderador.</p>
-      <div class="panel profile-card">
-        <div id="profileAvatar" class="avatar-large"></div>
+      <div class="panel profile-card" style="max-width:500px;">
+        <div id="profileAvatar" class="avatar-large" style="width:80px; height:80px; border-radius:50%; margin:0 auto 20px; overflow:hidden; border:2px solid var(--blue); display:flex; align-items:center; justify-content:center; background:var(--line);"></div>
         <form id="profileForm">
           <div class="field">
             <label>Foto de perfil</label>
@@ -1168,18 +1179,18 @@ body { -webkit-text-size-adjust: 100%; overflow-x: hidden; }
         <button id="adminPanelBtn" class="hidden" type="button" style="width:100%; margin-bottom: 20px; background:var(--red);">Panel de moderador</button>
 
         <div style="border-top: 1px solid var(--line); padding-top: 20px; text-align: left;">
-          <h3 style="margin: 0 0 5px; font-size: 16px;">Tema Visual</h3>
-          <div class="theme-selector">
-            <button type="button" class="theme-circle" data-theme="claro" title="Modo Claro"></button>
-            <button type="button" class="theme-circle" data-theme="oscuro" title="Azul Noche"></button>
-            <button type="button" class="theme-circle" data-theme="violeta" title="Púrpura Neón"></button>
-            <button type="button" class="theme-circle" data-theme="verde" title="Verde NEA"></button>
+          <h3 style="margin: 0 0 10px; font-size: 16px;">Tema Visual</h3>
+          <div class="theme-selector" style="display:flex; gap:10px;">
+            <button type="button" class="theme-circle" data-theme="claro" title="Modo Claro" style="width:36px; height:36px; border-radius:50%; background:#ffffff; border:2px solid #ccc; cursor:pointer;"></button>
+            <button type="button" class="theme-circle" data-theme="oscuro" title="Azul Noche" style="width:36px; height:36px; border-radius:50%; background:#141d31; border:2px solid #293650; cursor:pointer;"></button>
+            <button type="button" class="theme-circle" data-theme="violeta" title="Púrpura Neón" style="width:36px; height:36px; border-radius:50%; background:#1a1230; border:2px solid #c084fc; cursor:pointer;"></button>
+            <button type="button" class="theme-circle" data-theme="verde" title="Verde NEA" style="width:36px; height:36px; border-radius:50%; background:#0e2b1b; border:2px solid #6ee7b7; cursor:pointer;"></button>
           </div>
         </div>
       </div>
     </section>
 
-    <p class="notice">Kiosy Stock Manager — Gestión en la nube y local.</p>
+    <p class="notice" style="text-align:center; margin-top:30px; font-size:12px; color:var(--muted);">Kiosy Stock Manager — Gestión en la nube y local.</p>
   </main>
 </div>
 
@@ -1389,7 +1400,7 @@ const triggerLogout = async () => {
   clearListeners();
   if (appMode === "cloud") { try { await auth.signOut(); } catch(e){} }
   appMode = null; currentBusiness = null; products = []; sales = []; payments = []; clients = [];
-  hide("app"); hide("setup"); hide("homeScreen"); hide("authScreen"); hide("cloudLockScreen"); hide("headerAvatar"); hide("headerLogout"); hide("headerProfileBtn"); hide("globalQuickSaleBtn");
+  hide("app"); hide("setup"); hide("homeScreen"); hide("authScreen"); hide("cloudLockScreen"); hide("headerAvatar"); hide("headerLogout"); hide("globalQuickSaleBtn");
   show("modeSelectScreen");
   showToast("Sesión cerrada correctamente", "info");
 };
@@ -1399,7 +1410,7 @@ $("headerHome").onclick = () => $("backHomeBtn").click();
 function initLocalMode() {
   $("tabJoinBiz").classList.add("hidden");
   loadLocalProfile();
-  show("headerLogout"); show("headerAvatar"); show("headerProfileBtn");
+  show("headerLogout"); show("headerAvatar");
   showHome();
 }
 
@@ -1454,7 +1465,7 @@ auth.onAuthStateChanged(async user => {
 
   if (!user) {
     if (appMode === "cloud") {
-      hide("app"); hide("setup"); hide("homeScreen"); hide("cloudLockScreen"); hide("headerAvatar"); hide("headerLogout"); hide("headerProfileBtn"); hide("globalQuickSaleBtn");
+      hide("app"); hide("setup"); hide("homeScreen"); hide("cloudLockScreen"); hide("headerAvatar"); hide("headerLogout"); hide("globalQuickSaleBtn");
       show("authScreen");
     }
     return;
@@ -1462,7 +1473,7 @@ auth.onAuthStateChanged(async user => {
 
   appMode = "cloud";
   hide("authScreen"); hide("modeSelectScreen"); hide("cloudLockScreen");
-  show("headerLogout"); show("headerAvatar"); show("headerProfileBtn");
+  show("headerLogout"); show("headerAvatar");
 
   try {
     const userRef = db.collection("users").doc(user.uid);
@@ -1483,7 +1494,6 @@ auth.onAuthStateChanged(async user => {
 function showHome() {
   hide("authScreen"); hide("setup"); hide("app"); hide("cloudLockScreen"); hide("globalQuickSaleBtn");
   hide("headerHome");
-  show("headerProfileBtn");
   show("homeScreen");
   renderBusinessList();
 }
@@ -1521,7 +1531,7 @@ $("homeJoinBtn").onclick = () => {
 $("backSetupHome").onclick = () => { showHome(); };
 $("backHomeBtn").onclick = () => { clearListeners(); currentBusiness = null; showHome(); };
 
-// ACCESO DIRECTO AL PERFIL DESDE EL HEADER Y EL HOME (INCLUSO BLOQUEADO O SIN NEGOCIO)
+// ACCESO DIRECTO AL PERFIL DESDE EL AVATAR ORIGINAL
 const openDirectProfile = () => {
   clearListeners();
   hide("homeScreen"); hide("setup"); hide("cloudLockScreen"); hide("globalQuickSaleBtn");
@@ -1531,9 +1541,7 @@ const openDirectProfile = () => {
   show("headerHome");
   loadProfileSection();
 };
-$("headerProfileBtn").onclick = openDirectProfile;
 $("headerAvatar").onclick = openDirectProfile;
-$("homeProfileBtn").onclick = openDirectProfile;
 
 function setBizMode(mode) {
   const c = mode === "create";
@@ -1810,13 +1818,13 @@ $("pImageFile").onchange = async e => {
     if (appMode === "local") {
       const base64 = await blobToBase64(blob);
       $("pImage").value = base64;
-      $("imagePreview").innerHTML = `<img src="${base64}" style="max-width:140px; border-radius:8px;">`;
+      $("imagePreview").innerHTML = `<img src="${base64}">`;
     } else {
       const ref = storage.ref(`businesses/${currentBusinessId}/products/${Date.now()}.jpg`);
       await ref.put(blob, { contentType: "image/jpeg" });
       const url = await ref.getDownloadURL();
       $("pImage").value = url;
-      $("imagePreview").innerHTML = `<img src="${url}" style="max-width:140px; border-radius:8px;">`;
+      $("imagePreview").innerHTML = `<img src="${url}">`;
     }
   } catch(err) {
     showToast("Error al subir la imagen", "error");
@@ -1935,7 +1943,7 @@ function editProduct(id) {
   $("pMinStock").value = p.minStock || 3;
   $("pCode").value = p.code || "";
   $("pImage").value = p.image || "";
-  $("imagePreview").innerHTML = p.image ? `<img src="${p.image}" style="max-width:140px; border-radius:8px;">` : "";
+  $("imagePreview").innerHTML = p.image ? `<img src="${p.image}">` : "";
   setText("formTitle", "Editar producto");
   hide("stock"); show("productFormPanel");
 }
@@ -2681,11 +2689,11 @@ async function renderMembersList() {
       const name = m.displayName || m.email || "Usuario";
 
       return `
-        <div class="member-item">
+        <div class="member-item" style="display:flex; align-items:center; gap:10px; padding:8px 0; border-bottom:1px solid var(--line);">
           <div class="avatar-mini">${m.photoURL ? `<img src="${m.photoURL}">` : SVG_USER}</div>
           <span style="flex:1">${clean(name)}</span>
-          ${isCreator ? '<span class="member-badge">Creador</span>' : '<span class="member-badge" style="background:var(--line);">Socio</span>'}
-          ${mine ? '<span class="member-badge" style="background:#1b4a3f; color:#35d49a">Vos</span>' : ''}
+          ${isCreator ? '<span class="member-badge" style="background:var(--badge-bg); color:var(--badge-txt); padding:2px 8px; border-radius:4px; font-size:11px;">Creador</span>' : '<span class="member-badge" style="background:var(--line); padding:2px 8px; border-radius:4px; font-size:11px;">Socio</span>'}
+          ${mine ? '<span class="member-badge" style="background:#1b4a3f; color:#35d49a; padding:2px 8px; border-radius:4px; font-size:11px;">Vos</span>' : ''}
           ${(isOwner && !isCreator) ? `<button type="button" class="danger" data-kick="${m.uid}" style="padding:4px 8px; font-size:11px;">Expulsar</button>` : ''}
         </div>`;
     }).join("");
