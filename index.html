@@ -16,13 +16,13 @@
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 
 <!-- FIREBASE SDKs -->
-<script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js" integrity="sha384-..." crossorigin="anonymous"></script>
-<script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js" integrity="sha384-..." crossorigin="anonymous"></script>
-<script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js" integrity="sha384-..." crossorigin="anonymous"></script>
-<script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-storage-compat.js" integrity="sha384-..." crossorigin="anonymous"></script>
+<script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js" crossorigin="anonymous"></script>
+<script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js" crossorigin="anonymous"></script>
+<script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js" crossorigin="anonymous"></script>
+<script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-storage-compat.js" crossorigin="anonymous"></script>
 
 <!-- CHART.JS -->
-<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js" integrity="sha384-..." crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js" crossorigin="anonymous"></script>
 
 <style>
 :root {
@@ -232,15 +232,14 @@ h2 { font-size: 18px; font-weight: 600; margin-top: 0; display: flex; align-item
 .sale { display: flex; align-items: center; gap: 14px; padding: 14px 0; border-bottom: 1px solid var(--line); flex-wrap: wrap; }
 .sale:last-child { border-bottom: 0; }
 .sale p { color: var(--muted); font-size: 13px; margin: 4px 0 0; }
-.sale.cancelled { opacity: 0.6; text-decoration: line-through; }
 .sale-actions { display: flex; align-items: center; gap: 12px; margin-left: auto; }
 .sale-item-thumb { width: 44px; height: 44px; border-radius: 8px; background: var(--bg); border: 1px solid var(--line); display: flex; align-items: center; justify-content: center; overflow: hidden; flex-shrink: 0; }
 .sale-item-thumb img { max-width: 100%; max-height: 100%; object-fit: contain; }
 
-.charts-grid { display: grid; grid-template-columns: 2fr 1f; gap: 20px; margin-bottom: 20px; }
+.charts-grid { display: grid; grid-template-columns: 2fr 1fr; gap: 20px; margin-bottom: 20px; }
 button { touch-action: manipulation; }
 
-/* NUEVOS ESTILOS (Parches 3 y 6) */
+/* ESTILOS DE CONTRASEÑA Y ADMIN CARDS */
 .pw-wrap { position: relative; }
 .pw-wrap input { padding-right: 90px; }
 .auth-box .pw-toggle {
@@ -315,7 +314,7 @@ button { touch-action: manipulation; }
 <div id="cloudLockScreen" class="hidden" style="max-width: 500px; margin: 40px auto; padding: 20px; text-align: center; position: relative;">
   <div id="persistentPopupBanner" style="display:none; background:var(--panel); border:2px solid var(--blue); border-radius:var(--radius); padding:16px; margin-bottom:20px; text-align:left; position:relative; box-shadow:var(--shadow-lg); cursor:pointer;">
     <button type="button" id="closePersistentPopupBtn" class="secondary" style="position:absolute; top:8px; right:8px; padding:2px 8px; font-size:12px; z-index:5;" aria-label="Cerrar anuncio">✕</button>
-    <div style="font-weight:700; font-size:15px; margin-bottom:4px; padding-right:20px;" id="popupBannerTitlePreview">Información VIP!</div>
+    <div style="font-weight:700; font-size:15px; margin-bottom:4px; padding-right:20px;" id="popupBannerTitlePreview">Información VIP</div>
     <p style="font-size:13px; color:var(--muted); margin:0; line-height:1.4;" id="popupBannerMsgPreview">Hacé clic aquí para ver cómo conseguir acceso anticipado...</p>
   </div>
 
@@ -343,7 +342,7 @@ button { touch-action: manipulation; }
   </div>
 </div>
 
-<!-- MODAL VIP DETALLE (Parche 5) -->
+<!-- MODAL VIP DETALLE -->
 <div id="vipDetailModal" class="hidden" style="max-width:500px; margin:30px auto; padding:0 16px;">
   <button type="button" id="closeVipDetailModalBtn" class="secondary" style="margin-bottom:14px;">← Volver</button>
   <div class="panel" style="text-align:center;">
@@ -360,7 +359,7 @@ button { touch-action: manipulation; }
   </div>
 </div>
 
-<!-- MODAL VENTA RÁPIDA (Parche 2: sin cámara) -->
+<!-- MODAL VENTA RÁPIDA (Sin cámara) -->
 <div id="quickSaleModal" class="modal-overlay hidden" role="dialog" aria-modal="true">
   <div class="modal-content" style="max-width: 650px;">
     <div class="sectionhead" style="margin-bottom:15px;">
@@ -418,7 +417,7 @@ button { touch-action: manipulation; }
   </div>
 </div>
 
-<!-- MODAL DE PANEL DE MODERADOR (Parche 6) -->
+<!-- MODAL DE PANEL DE MODERADOR -->
 <div id="adminModal" class="modal-overlay hidden" role="dialog" aria-modal="true">
   <div class="modal-content" style="max-width: 600px;">
     <div class="sectionhead" style="margin-bottom:15px;">
@@ -552,7 +551,7 @@ button { touch-action: manipulation; }
   <button id="btnLocalMode" type="button" class="secondary" style="width:100%">Modo Local (Este dispositivo)</button>
 </div>
 
-<!-- INICIO DE SESIÓN (Parche 3: contraseña con botón integrado) -->
+<!-- INICIO DE SESIÓN -->
 <div id="authScreen" class="auth-box panel hidden">
   <div style="text-align:center;margin-bottom:20px">
     <h2>Ingresar a Kiosy</h2>
@@ -728,7 +727,7 @@ button { touch-action: manipulation; }
       </div>
     </section>
 
-    <!-- FORMULARIO PRODUCTO (Parche 2: sin cámara) -->
+    <!-- FORMULARIO PRODUCTO (Sin cámara) -->
     <section id="productFormPanel" class="hidden">
       <div class="sectionhead" style="margin-bottom:15px">
         <button type="button" class="secondary" id="cancelProductBtn">← Volver</button>
@@ -1080,7 +1079,6 @@ $("btnCloudMode").onclick = () => { appMode = "cloud"; hide("modeSelectScreen");
 $("btnLocalMode").onclick = () => { appMode = "local"; hide("modeSelectScreen"); initLocalMode(); };
 $("backToModeSelect").onclick = () => { hide("authScreen"); show("modeSelectScreen"); };
 
-// Parche 3: Botón mostrar contraseña
 $("togglePasswordBtn").onclick = () => {
   const pwd = $("authPassword");
   const visible = pwd.type === "text";
@@ -1208,7 +1206,7 @@ async function renderBusinessList() {
       <h3>${clean(b.name)}</h3>
       <p>${clean(b.type || "Negocio")}</p>
       <button type="button" data-open-business="${b.id}" style="width:100%">Entrar al negocio →</button>
-    endrticle>`).join("");
+    </article>`).join("");
   container.querySelectorAll("[data-open-business]").forEach(btn => {
     btn.onclick = async () => {
       try { await openBusiness(btn.dataset.openBusiness); } catch(e) { showToast(e.message, "error"); }
@@ -1277,27 +1275,15 @@ async function showCloudLock(businessId) {
 
       const popupClosed = sessionStorage.getItem(`kiosy_popup_closed_${businessId}`);
       if (d.popupActive === true && !popupClosed) {
-        setText("popupBannerTitlePreview", d.popupTitle || "Información VIP!");
+        setText("popupBannerTitlePreview", d.popupTitle || "Información VIP");
         setText("popupBannerMsgPreview", d.popupMessage || "Hacé clic para ver cómo conseguir acceso anticipado...");
         $("persistentPopupBanner").style.display = "block";
       } else {
         $("persistentPopupBanner").style.display = "none";
       }
 
-      // Parche 5: Rellenar modal VIP correctamente
       setText("vipModalTitle", d.vipTitle || "Acceso Anticipado");
       setText("vipModalMessage", d.vipMessage || "");
-
-      const links = [
-        { name: "Cafecito", url: d.cafecitoUrl },
-        { name: "Ko-fi", url: d.kofiUrl },
-        { name: "Patreon", url: d.patreonUrl }
-      ];
-      const socials = [
-        { name: d.socialName1, url: d.socialUrl1 },
-        { name: d.socialName2, url: d.socialUrl2 },
-        { name: d.socialName3, url: d.socialUrl3 }
-      ];
 
       const fillLinks = (containerId, sectionId, items) => {
         const c = $(containerId);
@@ -1339,7 +1325,6 @@ async function showCloudLock(businessId) {
   };
 }
 
-// Parche 5: Handlers del banner y modal
 $("persistentPopupBanner").onclick = () => {
   hide("cloudLockScreen"); show("vipDetailModal"); window.scrollTo(0, 0);
 };
@@ -1582,7 +1567,6 @@ function renderProducts() {
     const minS = Number(p.minStock) || 0;
     const stockClass = qty <= 0 ? "out" : qty <= minS ? "low" : "";
     const stockLabel = qty <= 0 ? "Sin stock" : qty <= minS ? "Stock bajo" : "Disponible";
-    // Parche 7: XSS Color validation
     const colorAccent = /^#[0-9a-fA-F]{6}$/.test(p.colorCode) ? p.colorCode : "var(--blue)";
 
     return `
@@ -1763,7 +1747,6 @@ function renderClients() {
     const debt = Number(c.debt) || 0;
     const debtClass = debt > 0 ? "danger" : "green";
     const debtLabel = debt > 0 ? `Debe: ${money(debt)}` : "Al día";
-    // Parche 7: Sanitizar teléfono para WhatsApp
     const waPhone = String(c.phone || "").replace(/\D/g, "");
     const waText = encodeURIComponent(`Hola ${c.name}, saldo pendiente: ${money(debt)}. ¡Gracias!`);
 
@@ -1858,13 +1841,19 @@ function getSaleTime(s) {
 function renderSales() {
   const container = $("allSales");
   if (!container) return;
-  if (!sales.length) { container.innerHTML = '<div class="empty">No hay ventas.</div>'; $("loadMoreSalesContainer").classList.add("hidden"); return; }
+  // Ocultar ventas anuladas del historial (vuelven a como estaban originalmente)
+  const activeSales = sales.filter(s => s.status !== "cancelled");
 
-  container.innerHTML = sales.map(s => {
+  if (!activeSales.length) { 
+    container.innerHTML = '<div class="empty">No hay ventas registradas.</div>'; 
+    $("loadMoreSalesContainer").classList.add("hidden"); 
+    return; 
+  }
+
+  container.innerHTML = activeSales.map(s => {
     const time = getSaleTime(s);
     const dateText = time ? new Date(time).toLocaleString("es-AR") : "—";
     const itemsDesc = (s.items || []).map(i => `${i.quantity}x ${clean(i.name)}`).join(", ");
-    const isCancelled = s.status === "cancelled";
 
     let imgHTML = SVG_BOX;
     if (s.items?.[0]) {
@@ -1873,10 +1862,10 @@ function renderSales() {
     }
 
     return `
-      <div class="sale ${isCancelled ? 'cancelled' : ''}">
+      <div class="sale">
         <div class="sale-item-thumb">${imgHTML}</div>
         <div style="flex:1; min-width:180px;">
-          <b>${itemsDesc} ${isCancelled ? '(ANULADA)' : ''}</b>
+          <b>${itemsDesc}</b>
           <p>${dateText} · Pago: ${clean(s.paymentMethod || 'Efectivo')}</p>
         </div>
         <div class="sale-actions">
@@ -1884,7 +1873,7 @@ function renderSales() {
             <b>${money(s.total)}</b>
             <p class="green">Ganancia: ${money(s.profit)}</p>
           </div>
-          ${!isCancelled ? `<button type="button" class="danger" data-cancel-sale="${s.id}" style="padding:6px 10px; font-size:12px;">Anular</button>` : ''}
+          <button type="button" class="danger" data-cancel-sale="${s.id}" style="padding:6px 10px; font-size:12px;">Anular</button>
         </div>
       </div>`;
   }).join("");
@@ -1904,9 +1893,8 @@ $("loadMoreSalesBtn").onclick = async () => {
   renderSales(); renderDashboard();
 };
 
-// Parche 1: Transacción de anulación corregida (lecturas primero, escrituras después)
 function confirmCancelSale(sid) {
-  openConfirmModal("Anular venta", "¿Estás seguro de anular esta venta? Se devolverá el stock.", async () => {
+  openConfirmModal("Anular venta", "¿Estás seguro de anular esta venta? Se devolverá el stock y se borrará del historial.", async () => {
     const s = sales.find(x => x.id === sid);
     if (!s || s.status === "cancelled") return;
 
@@ -1921,10 +1909,10 @@ function confirmCancelSale(sid) {
           const cli = clients.find(c => c.id === s.clientId);
           if (cli) { cli.debt = Math.max(0, (Number(cli.debt) || 0) - Number(s.total)); localStorage.setItem(`stockea_local_clients_${currentBusinessId}`, JSON.stringify(clients)); }
         }
-        s.status = "cancelled";
+        sales = sales.filter(x => x.id !== sid);
         localStorage.setItem(`stockea_local_sales_${currentBusinessId}`, JSON.stringify(sales));
         renderSales(); renderProducts(); renderDashboard(); renderClients();
-        showToast("Venta anulada");
+        showToast("Venta anulada correctamente");
         return;
       }
 
@@ -1954,9 +1942,9 @@ function confirmCancelSale(sid) {
         });
       });
 
-      s.status = "cancelled";
+      sales = sales.filter(x => x.id !== sid);
       renderSales(); renderProducts(); renderDashboard(); renderClients();
-      showToast("Venta anulada");
+      showToast("Venta anulada correctamente");
     } catch(err) { showToast(err.message, "error"); }
   });
 }
@@ -2127,7 +2115,6 @@ function updateCharts() {
   salesChartInstance.data.datasets[0].data = Object.values(daysMap);
   salesChartInstance.update();
 
-  // Parche 7: Gráfico de métodos de cobro acotado al período seleccionado
   const startTime = getPeriodStart($("periodFilter")?.value || "month");
   let cash = 0, transfer = 0, card = 0;
   const add = (m, t) => {
@@ -2278,7 +2265,6 @@ function loadProfileSection() {
   else hide("adminPanelBtn");
 }
 
-// Parche 6: Navegación por tarjetas en el Panel de Moderador
 const ADMIN_FORMS = ["adminGoalForm", "adminPopupForm", "adminVipScreenForm", "adminVipForm"];
 function adminShowMenu() {
   ADMIN_FORMS.forEach(id => hide(id));
@@ -2492,9 +2478,7 @@ $("joinBizForm").onsubmit = async e => {
   } catch(err) { showToast(err.message, "error"); }
 };
 
-/* =========================
-   VENTA RÁPIDA (carrito)
-========================= */
+/* VENTA RÁPIDA */
 let qsCart = [];
 
 function qsNorm(s) {
@@ -2644,7 +2628,6 @@ $("qsForm").onsubmit = async e => {
           createdAt: firebase.firestore.FieldValue.serverTimestamp(), soldBy: currentUser.uid
         });
       });
-      // Parche 7: Se eliminó el push manual en la nube porque el onSnapshot ya lo actualiza automáticamente.
     }
 
     qsCart = [];
