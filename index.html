@@ -690,6 +690,23 @@ body { -webkit-text-size-adjust: 100%; overflow-x: hidden; }
   Venta rápida
 </button>
 
+<!-- PANTALLA DE BLOQUEO CLOUD -->
+<div id="cloudLockScreen" class="hidden" style="max-width: 500px; margin: 40px auto; padding: 20px; text-align: center;">
+  <div class="panel">
+    <h2>Acceso Anticipado / Modo Nube Bloqueado</h2>
+    <p id="cloudGoalMessage" class="sub" style="margin-top: 10px;">Apoyá el desarrollo para desbloquear el Modo Nube.</p>
+    
+    <div style="background:var(--bg); border-radius:8px; height:16px; width:100%; overflow:hidden; margin: 20px 0; border:1px solid var(--line);">
+      <div id="cloudGoalBar" style="background:var(--blue); width:0%; height:100%; transition: width 0.4s;"></div>
+    </div>
+    <p id="cloudGoalText" style="font-weight:bold; margin-bottom: 20px;">$0 de $0</p>
+
+    <div id="cloudDonateLinks" style="margin-bottom: 20px; display:none;"></div>
+
+    <button type="button" id="cloudLockBackBtn" class="secondary" style="width:100%;">← Volver al inicio</button>
+  </div>
+</div>
+
 <!-- MODAL DE VENTA RÁPIDA AVANZADA -->
 <div id="quickSaleModal" class="modal-overlay hidden">
   <div class="modal-content" style="max-width: 650px;">
@@ -755,6 +772,49 @@ body { -webkit-text-size-adjust: 100%; overflow-x: hidden; }
       <button type="button" id="confirmCancelBtn" class="secondary" style="flex:1;">Cancelar</button>
       <button type="button" id="confirmYesBtn" class="danger" style="flex:1;">Confirmar</button>
     </div>
+  </div>
+</div>
+
+<!-- MODAL DE PANEL DE MODERADOR -->
+<div id="adminModal" class="modal-overlay hidden">
+  <div class="modal-content" style="max-width: 600px;">
+    <div class="sectionhead" style="margin-bottom:15px;">
+      <h2 style="margin:0;">Panel de Moderador</h2>
+      <button type="button" id="closeAdminModalBtn" class="secondary" style="padding:4px 10px;">✕</button>
+    </div>
+    
+    <div class="tabs" style="margin-bottom:15px;">
+      <button type="button" id="adminTabGoal" class="active">Meta Cloud</button>
+      <button type="button" id="adminTabVip">Otorgar VIP</button>
+    </div>
+
+    <!-- Bloque A: Meta Cloud -->
+    <form id="adminGoalForm">
+      <div class="field"><label>Título</label><input id="admTitle" required></div>
+      <div class="field"><label>Mensaje</label><textarea id="admMessage" rows="2" required></textarea></div>
+      <div class="formgrid">
+        <div class="field"><label>Meta ($)</label><input id="admGoalAmount" type="number" min="1" required></div>
+        <div class="field"><label>Actual ($)</label><input id="admCurrentAmount" type="number" min="0" required></div>
+      </div>
+      <div class="field"><label>Moneda</label><input id="admCurrency" value="ARS" required></div>
+      <div class="field" style="display:flex; align-items:center; gap:10px;">
+        <input id="admUnlocked" type="checkbox" style="width:auto;"><label style="margin:0; cursor:pointer;" for="admUnlocked">Desbloquear modo Nube para todos</label>
+      </div>
+      <div class="field"><label>Cafecito URL (https://...)</label><input id="admCafecito" placeholder="https://cafecito.app/..."></div>
+      <div class="field"><label>Ko-fi URL (https://...)</label><input id="admKofi" placeholder="https://ko-fi.com/..."></div>
+      <div class="field"><label>Patreon URL (https://...)</label><input id="admPatreon" placeholder="https://patreon.com/..."></div>
+      <button type="submit" style="width:100%; margin-top:10px;">Guardar Meta</button>
+    </form>
+
+    <!-- Bloque B: Otorgar VIP -->
+    <form id="adminVipForm" class="hidden">
+      <div class="field"><label>ID del Negocio *</label><input id="admVipBizId" required placeholder="ID de Firebase del negocio"></div>
+      <div class="field"><label>Días de duración *</label><input id="admVipDays" type="number" min="1" value="30" required></div>
+      <button type="submit" style="width:100%; margin-top:10px;">Dar acceso VIP</button>
+      <div style="margin-top:20px; border-top:1px solid var(--line); padding-top:15px;">
+        <button type="button" id="adminRevokeVipBtn" class="danger" style="width:100%;">Quitar VIP a este negocio</button>
+      </div>
+    </form>
   </div>
 </div>
 
@@ -1273,6 +1333,9 @@ body { -webkit-text-size-adjust: 100%; overflow-x: hidden; }
           <div class="field"><label>Correo electrónico (solo lectura)</label><input id="profileEmail" readonly style="opacity:0.6; cursor:not-allowed"></div>
           <button type="submit" style="width:100%; margin-bottom: 20px;">Guardar perfil</button>
         </form>
+
+        <button id="adminPanelBtn" class="hidden" type="button" style="width:100%; margin-bottom: 20px; background:var(--red);">Panel de moderador</button>
+
         <div style="border-top: 1px solid var(--line); padding-top: 20px; text-align: left;">
           <h3 style="margin: 0 0 5px; font-size: 16px; display:flex; align-items:center; gap:6px;">
             <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l-.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06-.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
@@ -1314,6 +1377,7 @@ const storage = firebase.storage();
 /* =========================
    ESTADO DE LA APLICACIÓN
 ========================= */
+const ADMIN_UID = "o4lCqm4nenSbyXuW0H9kKzxOjOB2";
 let appMode = null; 
 let currentUser = null;
 let userProfile = { displayName: "", photoURL: "", theme: "claro" };
@@ -1472,7 +1536,7 @@ const triggerLogout = async () => {
   clearListeners();
   if (appMode === "cloud") { try { await auth.signOut(); } catch(e){} }
   appMode = null; currentBusiness = null; products = []; sales = []; payments = []; clients = [];
-  hide("app"); hide("setup"); hide("homeScreen"); hide("authScreen"); hide("headerAvatar"); hide("headerLogout"); hide("globalQuickSaleBtn");
+  hide("app"); hide("setup"); hide("homeScreen"); hide("authScreen"); hide("cloudLockScreen"); hide("headerAvatar"); hide("headerLogout"); hide("globalQuickSaleBtn");
   show("modeSelectScreen");
   showToast("Sesión cerrada correctamente", "info");
 };
@@ -1540,14 +1604,14 @@ auth.onAuthStateChanged(async user => {
 
   if (!user) {
     if (appMode === "cloud") {
-      hide("app"); hide("setup"); hide("homeScreen"); hide("headerAvatar"); hide("headerLogout"); hide("globalQuickSaleBtn");
+      hide("app"); hide("setup"); hide("homeScreen"); hide("cloudLockScreen"); hide("headerAvatar"); hide("headerLogout"); hide("globalQuickSaleBtn");
       show("authScreen");
     }
     return;
   }
 
   appMode = "cloud";
-  hide("authScreen"); hide("modeSelectScreen");
+  hide("authScreen"); hide("modeSelectScreen"); hide("cloudLockScreen");
   show("headerLogout"); show("headerAvatar");
 
   try {
@@ -1570,7 +1634,7 @@ auth.onAuthStateChanged(async user => {
    HOME Y NEGOCIOS
 ========================= */
 function showHome() {
-  hide("authScreen"); hide("setup"); hide("app"); hide("globalQuickSaleBtn");
+  hide("authScreen"); hide("setup"); hide("app"); hide("cloudLockScreen"); hide("globalQuickSaleBtn");
   hide("headerHome");
   show("homeScreen");
   renderBusinessList();
@@ -1621,6 +1685,107 @@ $("tabCreateBiz").onclick = () => setBizMode("create");
 $("tabJoinBiz").onclick = () => setBizMode("join");
 
 /* =========================
+   VERIFICACIÓN DE ACCESO NUBE (VIP / META)
+========================= */
+async function checkCloudAccess(businessId) {
+  try {
+    const configSnap = await db.collection("config").doc("cloud_goal").get();
+    if (configSnap.exists) {
+      const configData = configSnap.data();
+      if (configData.unlocked === true) return true;
+    }
+
+    const subSnap = await db.collection("subscriptions").doc(businessId).get();
+    if (subSnap.exists) {
+      const sub = subSnap.data();
+      const now = Date.now();
+      const endTime = sub.currentPeriodEnd?.toMillis ? sub.currentPeriodEnd.toMillis() : (sub.currentPeriodEnd || 0);
+      if ((sub.status === "active" || sub.status === "canceled") && endTime > now) {
+        return true;
+      }
+    }
+    return false;
+  } catch (err) {
+    showToast("Error al verificar el acceso al modo nube.", "error");
+    return false;
+  }
+}
+
+async function showCloudLock(businessId) {
+  hide("app"); hide("setup"); hide("homeScreen"); hide("authScreen"); hide("modeSelectScreen");
+  show("cloudLockScreen");
+
+  try {
+    const configSnap = await db.collection("config").doc("cloud_goal").get();
+    if (configSnap.exists) {
+      const d = configSnap.data();
+      const goal = Number(d.goalAmount) || 1;
+      const current = Number(d.currentAmount) || 0;
+      const pct = Math.min(100, (current / goal) * 100);
+
+      if ($("cloudGoalBar")) $("cloudGoalBar").style.width = pct + "%";
+      if ($("cloudGoalText")) $("cloudGoalText").textContent = `${money(current)} de ${money(goal)}`;
+      if ($("cloudGoalMessage")) $("cloudGoalMessage").textContent = d.message || "Apoyá el desarrollo para desbloquear el Modo Nube.";
+
+      const donateContainer = $("cloudDonateLinks");
+      if (donateContainer) {
+        donateContainer.innerHTML = "";
+        const links = [
+          { name: "Cafecito", url: d.cafecitoUrl },
+          { name: "Ko-fi", url: d.kofiUrl },
+          { name: "Patreon", url: d.patreonUrl }
+        ];
+        let hasLinks = false;
+        links.forEach(l => {
+          if (l.url && typeof l.url === "string" && l.url.startsWith("https://")) {
+            hasLinks = true;
+            const a = document.createElement("a");
+            a.href = l.url;
+            a.target = "_blank";
+            a.rel = "noopener noreferrer";
+            a.className = "secondary";
+            a.style.cssText = "display:inline-block; padding:10px 16px; margin:4px; text-decoration:none; font-weight:600;";
+            a.textContent = `Donar en ${l.name}`;
+            donateContainer.appendChild(a);
+          }
+        });
+        donateContainer.style.display = hasLinks ? "block" : "none";
+      }
+    }
+  } catch(e) {}
+
+  let box = $("cloudLockIdBox");
+  if (!box) {
+    box = document.createElement("div");
+    box.id = "cloudLockIdBox";
+    box.style.cssText = "margin-top:20px; text-align:left; background:var(--bg); padding:15px; border-radius:var(--radius); border:1px solid var(--line);";
+    box.innerHTML = `
+      <p style="margin:0 0 8px; font-size:13px; color:var(--muted);">ID de tu negocio:</p>
+      <div style="display:flex; gap:8px; align-items:center;">
+        <input id="cloudLockIdInput" readonly style="font-weight:bold; font-size:14px; background:var(--panel);" />
+        <button type="button" id="cloudLockCopyBtn" class="secondary" style="white-space:nowrap;">Copiar ID</button>
+      </div>
+      <p style="margin:8px 0 0; font-size:12px; color:var(--muted);">Pasale este ID a Bruno por privado para que te habilite.</p>
+    `;
+    $("cloudLockScreen").querySelector(".panel")?.appendChild(box);
+  }
+  const input = $("cloudLockIdInput");
+  if (input) input.value = businessId;
+  const copyBtn = $("cloudLockCopyBtn");
+  if (copyBtn) {
+    copyBtn.onclick = async () => {
+      await navigator.clipboard.writeText(businessId);
+      showToast("ID copiado al portapapeles");
+    };
+  }
+}
+
+$("cloudLockBackBtn").onclick = () => {
+  hide("cloudLockScreen");
+  showHome();
+};
+
+/* =========================
    ABRIR NEGOCIO Y LISTENERS
 ========================= */
 async function openBusiness(id) {
@@ -1647,12 +1812,19 @@ async function openBusiness(id) {
   currentBusinessId = id;
   currentBusiness = { id: snap.id, ...data };
 
+  const hasAccess = await checkCloudAccess(id);
+  if (!hasAccess) {
+    showToast("Obtené el acceso anticipado al Modo Nube", "info");
+    showCloudLock(id);
+    return;
+  }
+
   setupBusinessUI();
   startBusinessListeners();
 }
 
 function setupBusinessUI() {
-  hide("authScreen"); hide("setup"); hide("homeScreen"); show("app");
+  hide("authScreen"); hide("setup"); hide("homeScreen"); hide("cloudLockScreen"); show("app");
   show("headerHome");
   show("globalQuickSaleBtn");
   setText("welcome", currentBusiness.name);
@@ -1699,7 +1871,6 @@ function startBusinessListeners() {
     renderDashboard();
   });
 
-  // Carga inicial paginada de ventas (Punto C)
   db.collection("businesses").doc(currentBusinessId).collection("sales")
     .orderBy("createdAt", "desc")
     .limit(50)
@@ -1716,7 +1887,6 @@ function startBusinessListeners() {
       renderDashboard();
     });
 
-  // Optimización de lecturas de payments (Punto C: últimos 90 días o máximo 200 registros)
   paymentsUnsubscribe = db.collection("businesses").doc(currentBusinessId).collection("payments")
     .orderBy("createdAt", "desc")
     .limit(200)
@@ -1905,7 +2075,7 @@ $("qsPaymentMethod").onchange = e => {
 };
 
 /* ========================================================
-   TRANSACCIÓN EN FIRESTORE CORREGIDA (PUNTO B.1)
+   TRANSACCIÓN EN FIRESTORE CORREGIDA
 ======================================================== */
 $("qsForm").onsubmit = async e => {
   e.preventDefault();
@@ -1973,12 +2143,10 @@ $("qsForm").onsubmit = async e => {
       renderProducts(); renderSales(); renderDashboard(); renderClients();
       showToast("Venta registrada correctamente");
     } else {
-      // TRANSACCIÓN DE LECTURAS ANTES DE ESCRITURAS (PUNTO B.1)
       const clientRef = clientId ? db.collection("businesses").doc(currentBusinessId).collection("clients").doc(clientId) : null;
       const saleRef = db.collection("businesses").doc(currentBusinessId).collection("sales").doc();
 
       await db.runTransaction(async t => {
-        // 1. TODAS LAS LECTURAS PRIMERO
         const productSnaps = await Promise.all(
           quickSaleItems.map(item => {
             const pRef = db.collection("businesses").doc(currentBusinessId).collection("products").doc(item.product.id);
@@ -1987,7 +2155,6 @@ $("qsForm").onsubmit = async e => {
         );
         const clientSnap = clientRef ? await t.get(clientRef) : null;
 
-        // 2. VALIDACIONES
         productSnaps.forEach((pSnap, idx) => {
           const item = quickSaleItems[idx];
           if (!pSnap.exists) throw new Error(`El producto ${item.product.name} no existe.`);
@@ -2000,7 +2167,6 @@ $("qsForm").onsubmit = async e => {
           clientName = clientSnap.data().name || "";
         }
 
-        // 3. TODAS LAS ESCRITURAS DESPUÉS
         productSnaps.forEach((pSnap, idx) => {
           const item = quickSaleItems[idx];
           const currentQty = pSnap.data().quantity || 0;
@@ -2072,7 +2238,6 @@ $("addProductBtn").onclick = () => {
 
 $("cancelProductBtn").onclick = () => { hide("productFormPanel"); show("stock"); };
 
-/* SUBIDA DE IMAGEN COMPRIMIDA EN STORAGE (PUNTO D) */
 $("pImageFile").onchange = async e => {
   const f = e.target.files?.[0];
   if (!f) return;
@@ -2276,7 +2441,6 @@ function updateSaleModalTotal() {
   setText("saleModalTotal", money(qty * (activeSaleProduct.price || 0)));
 }
 
-/* TRANSACCIÓN EN FIRESTORE CORREGIDA (PUNTO B.2) */
 $("saleModalForm").onsubmit = async e => {
   e.preventDefault();
   if (!activeSaleProduct) return;
@@ -2319,17 +2483,14 @@ $("saleModalForm").onsubmit = async e => {
       return;
     }
 
-    // TRANSACCIÓN DE LECTURAS ANTES DE ESCRITURAS (PUNTO B.2)
     const prodRef = db.collection("businesses").doc(currentBusinessId).collection("products").doc(activeSaleProduct.id);
     const saleRef = db.collection("businesses").doc(currentBusinessId).collection("sales").doc();
     const clientRef = clientId ? db.collection("businesses").doc(currentBusinessId).collection("clients").doc(clientId) : null;
 
     await db.runTransaction(async t => {
-      // 1. TODAS LAS LECTURAS PRIMERO
       const pSnap = await t.get(prodRef);
       const cSnap = clientRef ? await t.get(clientRef) : null;
 
-      // 2. VALIDACIONES
       if (!pSnap.exists) throw new Error("Producto no encontrado");
       const currentQty = pSnap.data().quantity || 0;
       if (currentQty < qty) throw new Error("Stock insuficiente");
@@ -2339,7 +2500,6 @@ $("saleModalForm").onsubmit = async e => {
         clientName = cSnap.data().name || "";
       }
 
-      // 3. TODAS LAS ESCRITURAS DESPUÉS
       t.update(prodRef, { quantity: currentQty - qty });
 
       if (cSnap && cSnap.exists) {
@@ -2494,7 +2654,7 @@ function confirmDeleteClientRecord(cid) {
 }
 
 /* =========================
-   VENTAS E HISTORIAL CON PAGINACIÓN (PUNTO C)
+   VENTAS E HISTORIAL CON PAGINACIÓN
 ========================= */
 function getSaleTime(s) {
   if (s.createdAt && typeof s.createdAt.toMillis === "function") return s.createdAt.toMillis();
@@ -2512,7 +2672,6 @@ function renderSales() {
     return;
   }
 
-  /* ESCAPADO CON CLEAN EN CAMPOS SENSIBLES (PUNTO E) */
   container.innerHTML = sales.map(s => {
     const time = getSaleTime(s);
     const dateText = time ? new Date(time).toLocaleString("es-AR") : "—";
@@ -2554,7 +2713,6 @@ function renderSales() {
   }
 }
 
-/* CARGAR MÁS VENTAS CON PAGINACIÓN startAfter (PUNTO C) */
 $("loadMoreSalesBtn").onclick = async () => {
   if (!lastSaleDoc || appMode !== "cloud") return;
   $("loadMoreSalesBtn").disabled = true;
@@ -2582,7 +2740,6 @@ $("loadMoreSalesBtn").onclick = async () => {
   }
 };
 
-/* TRANSACCIÓN EN FIRESTORE CORREGIDA (PUNTO B.3) */
 function confirmCancelSale(sid) {
   openConfirmModal("Anular venta", "¿Estás seguro de anular esta venta? El stock regresará y se ajustará la cuenta corriente si aplica.", async () => {
     const s = sales.find(x => x.id === sid);
@@ -2611,11 +2768,9 @@ function confirmCancelSale(sid) {
         return;
       }
 
-      // TRANSACCIÓN DE LECTURAS ANTES DE ESCRITURAS (PUNTO B.3)
       const saleRef = db.collection("businesses").doc(currentBusinessId).collection("sales").doc(sid);
 
       await db.runTransaction(async t => {
-        // 1. TODAS LAS LECTURAS PRIMERO
         const sSnap = await t.get(saleRef);
         if (!sSnap.exists) throw new Error("Venta no encontrada");
         const sData = sSnap.data();
@@ -2636,7 +2791,6 @@ function confirmCancelSale(sid) {
           : null;
         const cSnap = clientRef ? await t.get(clientRef) : null;
 
-        // 2. ESCRITURAS DESPUÉS
         productSnaps.forEach((pSnap, idx) => {
           if (pSnap && pSnap.exists) {
             const item = items[idx];
@@ -2853,7 +3007,7 @@ function updateCharts() {
 }
 
 /* =========================
-   EXPORTAR A EXCEL CON CSV INJECTION PROTECTION (PUNTO E)
+   EXPORTAR A EXCEL (CSV INJECTION PROTECTION)
 ========================= */
 function escapeCSV(str) {
   if (str === null || str === undefined) return '""';
@@ -2936,7 +3090,6 @@ $("settingsForm").onsubmit = async e => {
   }
 };
 
-/* SUBIDA DE LOGO COMPRIMIDO (PUNTO D) */
 $("bizLogoFile").onchange = async e => {
   const f = e.target.files?.[0];
   if (!f) return;
@@ -3030,7 +3183,7 @@ async function kickMember(targetUid) {
 }
 
 /* =========================
-   PERFIL DE USUARIO
+   PERFIL DE USUARIO Y PANEL MODERADOR
 ========================= */
 function loadProfileSection() {
   $("profileDisplayName").value = userProfile.displayName || "";
@@ -3038,9 +3191,117 @@ function loadProfileSection() {
   $("profileImageBase64").value = userProfile.photoURL || "";
   if (userProfile.photoURL) $("profileAvatar").innerHTML = `<img src="${userProfile.photoURL}">`;
   else $("profileAvatar").innerHTML = SVG_USER;
+
+  if (currentUser && currentUser.uid === ADMIN_UID) {
+    show("adminPanelBtn");
+  } else {
+    hide("adminPanelBtn");
+  }
 }
 
-/* SUBIDA DE FOTO DE PERFIL COMPRIMIDA (PUNTO D) */
+$("adminPanelBtn").onclick = async () => {
+  show("adminModal");
+  try {
+    const doc = await db.collection("config").doc("cloud_goal").get();
+    if (doc.exists) {
+      const d = doc.data();
+      $("admTitle").value = d.title || "";
+      $("admMessage").value = d.message || "";
+      $("admGoalAmount").value = d.goalAmount || 10000;
+      $("admCurrentAmount").value = d.currentAmount || 0;
+      $("admCurrency").value = d.currency || "ARS";
+      $("admUnlocked").checked = !!d.unlocked;
+      $("admCafecito").value = d.cafecitoUrl || "";
+      $("admKofi").value = d.kofiUrl || "";
+      $("admPatreon").value = d.patreonUrl || "";
+    }
+  } catch(e) {
+    showToast("Error al cargar configuración de meta", "error");
+  }
+};
+
+$("closeAdminModalBtn").onclick = () => hide("adminModal");
+
+$("adminTabGoal").onclick = () => {
+  $("adminTabGoal").classList.add("active");
+  $("adminTabVip").classList.remove("active");
+  show("adminGoalForm");
+  hide("adminVipForm");
+};
+
+$("adminTabVip").onclick = () => {
+  $("adminTabVip").classList.add("active");
+  $("adminTabGoal").classList.remove("active");
+  show("adminVipForm");
+  hide("adminGoalForm");
+};
+
+$("adminGoalForm").onsubmit = async e => {
+  e.preventDefault();
+  const caf = $("admCafecito").value.trim();
+  const kof = $("admKofi").value.trim();
+  const pat = $("admPatreon").value.trim();
+
+  if ((caf && !caf.startsWith("https://")) || (kof && !kof.startsWith("https://")) || (pat && !pat.startsWith("https://"))) {
+    return showToast("Los enlaces de donación deben comenzar con https://", "error");
+  }
+
+  const payload = {
+    title: $("admTitle").value.trim(),
+    message: $("admMessage").value.trim(),
+    goalAmount: Number($("admGoalAmount").value),
+    currentAmount: Number($("admCurrentAmount").value),
+    currency: $("admCurrency").value.trim(),
+    unlocked: $("admUnlocked").checked,
+    cafecitoUrl: caf,
+    kofiUrl: kof,
+    patreonUrl: pat
+  };
+
+  try {
+    await db.collection("config").doc("cloud_goal").set(payload, { merge: true });
+    showToast("Meta actualizada correctamente");
+    hide("adminModal");
+  } catch(err) {
+    showToast("Error al guardar la meta", "error");
+  }
+};
+
+$("adminVipForm").onsubmit = async e => {
+  e.preventDefault();
+  const bizId = $("admVipBizId").value.trim();
+  const days = Number($("admVipDays").value) || 30;
+  if (!bizId) return showToast("Ingresá un ID de negocio válido", "error");
+
+  const expiryDate = Date.now() + (days * 24 * 60 * 60 * 1000);
+  try {
+    await db.collection("subscriptions").doc(bizId).set({
+      status: "active",
+      currentPeriodEnd: firebase.firestore.Timestamp.fromMillis(expiryDate),
+      source: "manual"
+    }, { merge: true });
+    showToast(`Acceso VIP otorgado por ${days} días.`);
+    hide("adminModal");
+  } catch(err) {
+    showToast("Error al otorgar VIP", "error");
+  }
+};
+
+$("adminRevokeVipBtn").onclick = () => {
+  const bizId = $("admVipBizId").value.trim();
+  if (!bizId) return showToast("Ingresá el ID del negocio para quitar VIP", "error");
+
+  openConfirmModal("Quitar VIP", `¿Seguro querés quitar el acceso VIP al negocio ${bizId}?`, async () => {
+    try {
+      await db.collection("subscriptions").doc(bizId).delete();
+      showToast("Acceso VIP removido.");
+      hide("adminModal");
+    } catch(err) {
+      showToast("Error al quitar VIP", "error");
+    }
+  });
+};
+
 $("profileImageFile").onchange = async e => {
   const f = e.target.files?.[0];
   if (!f) return;
@@ -3090,7 +3351,7 @@ function updateUIProfile() {
 }
 
 /* =========================
-   ESCANEO DE CÓDIGO (BARCODE DETECTOR / ZXING)
+   ESCANEO DE CÓDIGO
 ========================= */
 async function runCameraScanner(targetInputId) {
   try {
@@ -3196,7 +3457,6 @@ async function refreshBusinessList() {
   }
 }
 
-/* Formularios de Creación / Unión */
 $("createBizForm").onsubmit = async e => {
   e.preventDefault();
   const name = $("bizName").value.trim();
