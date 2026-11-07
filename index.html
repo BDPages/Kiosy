@@ -22,9 +22,6 @@
 <!-- CHART.JS PARA GRÁFICOS -->
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
 
-<!-- ZXING PARA ESCANEO ALTERNATIVO EN iOS/SAFARI -->
-<script src="https://unpkg.com/@zxing/library@0.21.0/umd/index.min.js"></script>
-
 <style>
 :root {
   --bg:#f3f4f6;
@@ -401,7 +398,6 @@ nav button.active {
   font-weight: 600;
 }
 
-/* NAVEGACIÓN MÓVIL (OCULTA POR DEFECTO EN ESCRITORIO / MODO ESCRITORIO) */
 .mobile-nav { display: none; }
 
 main { padding: 30px; width: 100%; max-width: 1300px; margin: auto; flex: 1; }
@@ -507,7 +503,6 @@ h2 { font-size: 18px; font-weight: 600; margin-top: 0; display: flex; align-item
 button { touch-action: manipulation; }
 body { -webkit-text-size-adjust: 100%; overflow-x: hidden; }
 
-/* ESTILOS ESPECÍFICOS PARA PREVISUALIZACIÓN DE IMÁGENES EN FORMULARIOS */
 #imagePreview img, .business-logo-preview img {
   max-width: 140px;
   max-height: 140px;
@@ -524,7 +519,6 @@ body { -webkit-text-size-adjust: 100%; overflow-x: hidden; }
   .charts-grid { grid-template-columns: 1fr; }
 }
 
-/* MEDIA QUERY ESTRICTA PARA CELULARES REALES (EXCLUYE MODO ESCRITORIO DEL NAVEGADOR) */
 @media(max-width: 650px) and (pointer: coarse) {
   .layout { display:block; min-height:auto; padding-bottom: calc(80px + env(safe-area-inset-bottom)); }
   nav { display:none !important; }
@@ -631,18 +625,24 @@ body { -webkit-text-size-adjust: 100%; overflow-x: hidden; }
   Venta rápida
 </button>
 
-<!-- PANTALLA DE BLOQUEO CLOUD -->
+<!-- PANTALLA DE BLOQUEO CLOUD (ESTRUCTURA REORDENADA CON META Y DONACIONES AL FINAL) -->
 <div id="cloudLockScreen" class="hidden" style="max-width: 500px; margin: 40px auto; padding: 20px; text-align: center;">
   <div class="panel">
     <h2>Acceso Anticipado / Modo Nube Bloqueado</h2>
-    <p id="cloudGoalMessage" class="sub" style="margin-top: 10px;">Apoyá el desarrollo para desbloquear el Modo Nube.</p>
     
-    <div style="background:var(--bg); border-radius:8px; height:16px; width:100%; overflow:hidden; margin: 20px 0; border:1px solid var(--line);">
-      <div id="cloudGoalBar" style="background:var(--blue); width:0%; height:100%; transition: width 0.4s;"></div>
+    <!-- 1. META GLOBAL (ARRIBA) -->
+    <div style="margin: 20px 0 10px;">
+      <div style="background:var(--bg); border-radius:8px; height:16px; width:100%; overflow:hidden; border:1px solid var(--line);">
+        <div id="cloudGoalBar" style="background:var(--blue); width:0%; height:100%; transition: width 0.4s;"></div>
+      </div>
+      <p id="cloudGoalText" style="font-weight:bold; margin-top: 8px; margin-bottom:0;">$0 de $0</p>
     </div>
-    <p id="cloudGoalText" style="font-weight:bold; margin-bottom: 20px;">$0 de $0</p>
 
-    <div id="cloudDonateLinks" style="margin-bottom: 20px; display:none;"></div>
+    <!-- 2. MENSAJE -->
+    <p id="cloudGoalMessage" class="sub" style="margin: 15px 0 20px;">Apoyá el desarrollo para desbloquear el Modo Nube.</p>
+
+    <!-- 3. DONACIONES -->
+    <div id="cloudDonateLinks" style="margin-bottom: 25px; display:none;"></div>
 
     <div style="display:flex; gap:10px;">
       <button type="button" id="cloudLockProfileBtn" class="secondary" style="flex:1;">Ir a mi perfil / VIP</button>
@@ -933,7 +933,7 @@ body { -webkit-text-size-adjust: 100%; overflow-x: hidden; }
     </button>
   </nav>
 
-  <!-- NAVEGACIÓN INFERIOR MÓVIL (EXCLUSIVA PARA CELULARES TÁCTILES REALES) -->
+  <!-- NAVEGACIÓN INFERIOR MÓVIL -->
   <div class="mobile-nav">
     <button class="active" data-page="dashboard">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect></svg>
@@ -1021,13 +1021,17 @@ body { -webkit-text-size-adjust: 100%; overflow-x: hidden; }
           <button id="addProductBtn">+ Agregar producto</button>
         </div>
       </div>
-      <div class="toolbar" style="display:flex; gap:10px; margin-bottom:20px;">
-        <div style="display:flex; gap:6px; align-items:center; flex:1;">
-          <input id="search" placeholder="Buscar por nombre, modelo o código..." style="flex:1;">
-          <button type="button" id="searchScanCameraBtn" class="secondary" title="Escanear con cámara" style="padding:0 14px; height:48px;">📷</button>
+
+      <!-- BUSCADOR Y CATEGORÍA (REORDENADOS Y ANCHO COMPLETO SIN CAMARITA) -->
+      <div class="toolbar" style="display:flex; flex-direction:column; gap:12px; margin-bottom:20px; width:100%;">
+        <div style="width:100%;">
+          <input id="search" placeholder="Buscar por nombre, modelo o código..." style="width:100%; height:46px;">
         </div>
-        <select id="filterCategory" style="max-width:220px;"><option value="">Todas las categorías</option></select>
+        <div style="width:100%;">
+          <select id="filterCategory" style="width:100%; height:46px;"><option value="">Todas las categorías</option></select>
+        </div>
       </div>
+
       <div id="productList" class="product-grid">
         <div class="card skeleton" style="height:220px;"></div>
         <div class="card skeleton" style="height:220px;"></div>
@@ -1042,7 +1046,7 @@ body { -webkit-text-size-adjust: 100%; overflow-x: hidden; }
       </div>
       <div class="panel">
         <form id="productForm">
-          <div class="formgrid" style="display:grid; grid-template-columns:1fr 1fr; gap:15px;">
+          <div class="formgrid" style="display:grid; grid-template-columns:repeat(2, minmax(0,1fr)); gap:15px;">
             <div class="field"><label>Nombre del producto *</label><input id="pName" required placeholder="Ej: Coca Cola 1.5L"></div>
             <div class="field">
               <label>Categoría *</label>
@@ -1055,12 +1059,9 @@ body { -webkit-text-size-adjust: 100%; overflow-x: hidden; }
             <div class="field"><label>Precio de venta ($) *</label><input id="pPrice" type="number" min=".01" step=".01" required></div>
             <div class="field"><label>Cantidad disponible *</label><input id="pQty" type="number" min="0" step="1" required></div>
             <div class="field"><label>Stock mínimo de alerta</label><input id="pMinStock" type="number" min="0" step="1" value="3" required></div>
-            <div class="field">
+            <div class="field" style="grid-column:1 / -1;">
               <label>Código de barras</label>
-              <div style="display:flex; gap:6px;">
-                <input id="pCode" placeholder="Ej: 779123456" style="flex:1;">
-                <button type="button" id="scanCameraBtn" class="secondary" title="Escanear" style="padding:0 14px;">📷</button>
-              </div>
+              <input id="pCode" placeholder="Ej: 779123456">
             </div>
             <div class="field full" style="grid-column:1 / -1;">
               <label>Foto del producto</label>
@@ -1155,13 +1156,13 @@ body { -webkit-text-size-adjust: 100%; overflow-x: hidden; }
       </div>
     </section>
 
-    <!-- PERFIL Y TEMA -->
+    <!-- PERFIL Y TEMA (FOTO DE PERFIL CORREGIDA) -->
     <section id="profile" class="hidden">
       <h1>Mi perfil y configuración</h1>
       <p class="sub">Personalizá tu cuenta, foto, tema visual y panel de moderador.</p>
-      <div class="panel profile-card" style="max-width:500px;">
-        <div id="profileAvatar" class="avatar-large" style="width:80px; height:80px; border-radius:50%; margin:0 auto 20px; overflow:hidden; border:2px solid var(--blue); display:flex; align-items:center; justify-content:center; background:var(--line);"></div>
-        <form id="profileForm">
+      <div class="panel profile-card" style="max-width:500px; margin: 0 auto; text-align:center;">
+        <div id="profileAvatar" class="avatar-large" style="width:90px; height:90px; border-radius:50%; margin:0 auto 20px; overflow:hidden; border:3px solid var(--blue); display:flex; align-items:center; justify-content:center; background:var(--line); flex-shrink:0;"></div>
+        <form id="profileForm" style="text-align:left;">
           <div class="field">
             <label>Foto de perfil</label>
             <div class="file-upload-wrapper">
@@ -1179,12 +1180,12 @@ body { -webkit-text-size-adjust: 100%; overflow-x: hidden; }
         <button id="adminPanelBtn" class="hidden" type="button" style="width:100%; margin-bottom: 20px; background:var(--red);">Panel de moderador</button>
 
         <div style="border-top: 1px solid var(--line); padding-top: 20px; text-align: left;">
-          <h3 style="margin: 0 0 10px; font-size: 16px;">Tema Visual</h3>
-          <div class="theme-selector" style="display:flex; gap:10px;">
-            <button type="button" class="theme-circle" data-theme="claro" title="Modo Claro" style="width:36px; height:36px; border-radius:50%; background:#ffffff; border:2px solid #ccc; cursor:pointer;"></button>
-            <button type="button" class="theme-circle" data-theme="oscuro" title="Azul Noche" style="width:36px; height:36px; border-radius:50%; background:#141d31; border:2px solid #293650; cursor:pointer;"></button>
-            <button type="button" class="theme-circle" data-theme="violeta" title="Púrpura Neón" style="width:36px; height:36px; border-radius:50%; background:#1a1230; border:2px solid #c084fc; cursor:pointer;"></button>
-            <button type="button" class="theme-circle" data-theme="verde" title="Verde NEA" style="width:36px; height:36px; border-radius:50%; background:#0e2b1b; border:2px solid #6ee7b7; cursor:pointer;"></button>
+          <h3 style="margin: 0 0 12px; font-size: 16px;">Tema Visual</h3>
+          <div class="theme-selector" style="display:flex; gap:12px; justify-content:flex-start;">
+            <button type="button" class="theme-circle" data-theme="claro" title="Modo Claro" style="width:38px; height:38px; border-radius:50%; background:#ffffff; border:2px solid #ccc; cursor:pointer; flex-shrink:0;"></button>
+            <button type="button" class="theme-circle" data-theme="oscuro" title="Azul Noche" style="width:38px; height:38px; border-radius:50%; background:#141d31; border:2px solid #293650; cursor:pointer; flex-shrink:0;"></button>
+            <button type="button" class="theme-circle" data-theme="violeta" title="Púrpura Neón" style="width:38px; height:38px; border-radius:50%; background:#1a1230; border:2px solid #c084fc; cursor:pointer; flex-shrink:0;"></button>
+            <button type="button" class="theme-circle" data-theme="verde" title="Verde NEA" style="width:38px; height:38px; border-radius:50%; background:#0e2b1b; border:2px solid #6ee7b7; cursor:pointer; flex-shrink:0;"></button>
           </div>
         </div>
       </div>
@@ -1531,7 +1532,7 @@ $("homeJoinBtn").onclick = () => {
 $("backSetupHome").onclick = () => { showHome(); };
 $("backHomeBtn").onclick = () => { clearListeners(); currentBusiness = null; showHome(); };
 
-// ACCESO DIRECTO AL PERFIL DESDE EL AVATAR ORIGINAL
+// ACCESO DIRECTO AL PERFIL DESDE EL AVATAR DE LA BARRA SUPERIOR
 const openDirectProfile = () => {
   clearListeners();
   hide("homeScreen"); hide("setup"); hide("cloudLockScreen"); hide("globalQuickSaleBtn");
