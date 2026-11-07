@@ -626,7 +626,15 @@ body { -webkit-text-size-adjust: 100%; overflow-x: hidden; }
 </button>
 
 <!-- PANTALLA DE BLOQUEO CLOUD (TÍTULO LIMPIO, META, MONEDAS, MENSAJE, DONACIONES, REDES) -->
-<div id="cloudLockScreen" class="hidden" style="max-width: 500px; margin: 40px auto; padding: 20px; text-align: center;">
+<div id="cloudLockScreen" class="hidden" style="max-width: 500px; margin: 40px auto; padding: 20px; text-align: center; position: relative;">
+  
+  <!-- ANUNCIO EMERGENTE (BANNER FLOTANTE PERSISTENTE CON SU "X" PARA CERRAR Y CLIC PARA ABRIR APARTADO VIP) -->
+  <div id="persistentPopupBanner" style="display:none; background:var(--panel); border:2px solid var(--blue); border-radius:var(--radius); padding:16px; margin-bottom:20px; text-align:left; position:relative; box-shadow:var(--shadow-lg); cursor:pointer;">
+    <button type="button" id="closePersistentPopupBtn" class="secondary" style="position:absolute; top:8px; right:8px; padding:2px 8px; font-size:12px; z-index:5;" title="Cerrar anuncio">✕</button>
+    <div style="font-weight:700; font-size:15px; margin-bottom:4px; padding-right:20px;" id="popupBannerTitlePreview">🚀 ¡Información VIP!</div>
+    <p style="font-size:13px; color:var(--muted); margin:0; line-height:1.4;" id="popupBannerMsgPreview">Hacé clic aquí para ver cómo conseguir acceso anticipado...</p>
+  </div>
+
   <div class="panel">
     <h2 id="cloudLockTitle" style="margin-bottom:15px;">Modo Nube Bloqueado</h2>
     
@@ -645,19 +653,24 @@ body { -webkit-text-size-adjust: 100%; overflow-x: hidden; }
     <!-- DONACIONES -->
     <div id="cloudDonateLinks" style="margin-bottom: 15px; display:none;"></div>
 
-    <!-- BOTONES DE REDES SOCIALES -->
+    <!-- BOTONES DE REDES SOCIALES EN PANTALLA PRINCIPAL -->
     <div id="cloudSocialLinks" style="margin-bottom: 25px; display:flex; gap:8px; justify-content:center; flex-wrap:wrap;"></div>
   </div>
 </div>
 
-<!-- VENTANA EMERGENTE / ANUNCIO FLOTANTE (POPUP) -->
-<div id="cloudPopupBanner" class="modal-overlay hidden" style="background: rgba(0,0,0,0.7);">
-  <div class="modal-content" style="text-align:center; border: 2px solid var(--blue); position:relative;">
-    <button type="button" id="closePopupBannerBtn" class="secondary" style="position:absolute; top:12px; right:12px; padding:4px 10px;">✕</button>
-    <div style="font-size:32px; margin-bottom:10px;">🚀</div>
-    <h3 id="popupBannerTitle" style="margin-bottom:10px;">¡Aviso Importante!</h3>
-    <p id="popupBannerMessage" class="sub" style="margin-bottom:20px;"></p>
-    <div id="popupBannerButtons" style="display:flex; flex-direction:column; gap:10px;"></div>
+<!-- APARTADO / MODAL DE DETALLE VIP DESDE EL ANUNCIO EMERGENTE -->
+<div id="vipDetailModal" class="modal-overlay hidden">
+  <div class="modal-content" style="max-width: 480px; text-align: left; position: relative;">
+    <button type="button" id="closeVipDetailModalBtn" class="secondary" style="position:absolute; top:12px; right:12px; padding:4px 10px;">✕</button>
+    <div style="font-size:28px; margin-bottom:10px; text-align:center;">✨</div>
+    <h3 id="vipModalTitle" style="margin-bottom:10px; text-align:center;">Acceso Anticipado VIP</h3>
+    <p id="vipModalMessage" class="sub" style="margin-bottom:20px; text-align:center;"></p>
+    
+    <div style="font-weight:600; font-size:14px; margin-bottom:8px;">Canales de Donación:</div>
+    <div id="vipModalDonateLinks" style="display:flex; flex-direction:column; gap:8px; margin-bottom:20px;"></div>
+
+    <div style="font-weight:600; font-size:14px; margin-bottom:8px;">Nuestras Redes Sociales / Contacto:</div>
+    <div id="vipModalSocialLinks" style="display:flex; flex-direction:column; gap:8px;"></div>
   </div>
 </div>
 
@@ -795,10 +808,8 @@ body { -webkit-text-size-adjust: 100%; overflow-x: hidden; }
       <div class="field" style="display:flex; align-items:center; gap:10px; margin-bottom:15px;">
         <input id="admPopupActive" type="checkbox" style="width:auto;"><label style="margin:0; cursor:pointer; font-weight:bold;" for="admPopupActive">Activar Anuncio Emergente en pantalla bloqueada</label>
       </div>
-      <div class="field"><label>Título del Anuncio</label><input id="admPopupTitle" placeholder="¡Acceso VIP Disponible!"></div>
-      <div class="field"><label>Mensaje del Anuncio</label><textarea id="admPopupMessage" rows="3" placeholder="Conseguí tu acceso anticipado al modo nube ahora mismo..."></textarea></div>
-      <div class="field"><label>Texto del Botón del Anuncio</label><input id="admPopupButtonText" placeholder="¡Quiero mi acceso!"></div>
-      <div class="field"><label>Enlace del Botón del Anuncio (https://... o WhatsApp)</label><input id="admPopupButtonUrl" placeholder="https://wa.me/549..."></div>
+      <div class="field"><label>Título del Anuncio Emergente</label><input id="admPopupTitle" placeholder="¡Acceso VIP Disponible!"></div>
+      <div class="field"><label>Mensaje del Anuncio Emergente</label><textarea id="admPopupMessage" rows="3" placeholder="Conseguí tu acceso anticipado al modo nube ahora mismo..."></textarea></div>
       <button type="submit" style="width:100%; margin-top:10px;">Guardar Anuncio Emergente</button>
     </form>
 
@@ -1085,7 +1096,7 @@ body { -webkit-text-size-adjust: 100%; overflow-x: hidden; }
         </div>
       </div>
 
-      <!-- BUSCADOR Y CATEGORÍA (ANCHO COMPLETO SIN CAMARITA) -->
+      <!-- BUSCADOR Y CATEGORÍA -->
       <div class="toolbar" style="display:flex; flex-direction:column; gap:12px; margin-bottom:20px; width:100%;">
         <div style="width:100%;">
           <input id="search" placeholder="Buscar por nombre, modelo o código..." style="width:100%; height:46px;">
@@ -1464,7 +1475,7 @@ const triggerLogout = async () => {
   clearListeners();
   if (appMode === "cloud") { try { await auth.signOut(); } catch(e){} }
   appMode = null; currentBusiness = null; products = []; sales = []; payments = []; clients = [];
-  hide("app"); hide("setup"); hide("homeScreen"); hide("authScreen"); hide("cloudLockScreen"); hide("cloudPopupBanner"); hide("headerAvatar"); hide("headerLogout"); hide("globalQuickSaleBtn");
+  hide("app"); hide("setup"); hide("homeScreen"); hide("authScreen"); hide("cloudLockScreen"); hide("vipDetailModal"); hide("headerAvatar"); hide("headerLogout"); hide("globalQuickSaleBtn");
   show("modeSelectScreen");
   showToast("Sesión cerrada correctamente", "info");
 };
@@ -1529,14 +1540,14 @@ auth.onAuthStateChanged(async user => {
 
   if (!user) {
     if (appMode === "cloud") {
-      hide("app"); hide("setup"); hide("homeScreen"); hide("cloudLockScreen"); hide("cloudPopupBanner"); hide("headerAvatar"); hide("headerLogout"); hide("globalQuickSaleBtn");
+      hide("app"); hide("setup"); hide("homeScreen"); hide("cloudLockScreen"); hide("vipDetailModal"); hide("headerAvatar"); hide("headerLogout"); hide("globalQuickSaleBtn");
       show("authScreen");
     }
     return;
   }
 
   appMode = "cloud";
-  hide("authScreen"); hide("modeSelectScreen"); hide("cloudLockScreen"); hide("cloudPopupBanner");
+  hide("authScreen"); hide("modeSelectScreen"); hide("cloudLockScreen"); hide("vipDetailModal");
   show("headerLogout"); show("headerAvatar");
 
   try {
@@ -1556,7 +1567,7 @@ auth.onAuthStateChanged(async user => {
 });
 
 function showHome() {
-  hide("authScreen"); hide("setup"); hide("app"); hide("cloudLockScreen"); hide("cloudPopupBanner"); hide("globalQuickSaleBtn");
+  hide("authScreen"); hide("setup"); hide("app"); hide("cloudLockScreen"); hide("vipDetailModal"); hide("globalQuickSaleBtn");
   hide("headerHome");
   show("homeScreen");
   renderBusinessList();
@@ -1598,7 +1609,7 @@ $("backHomeBtn").onclick = () => { clearListeners(); currentBusiness = null; sho
 // ACCESO DIRECTO AL PERFIL DESDE EL AVATAR DE LA BARRA SUPERIOR
 const openDirectProfile = () => {
   clearListeners();
-  hide("homeScreen"); hide("setup"); hide("cloudLockScreen"); hide("cloudPopupBanner"); hide("globalQuickSaleBtn");
+  hide("homeScreen"); hide("setup"); hide("cloudLockScreen"); hide("vipDetailModal"); hide("globalQuickSaleBtn");
   show("app");
   hide("dashboard"); hide("stock"); hide("productFormPanel"); hide("sales"); hide("clients"); hide("settings");
   show("profile");
@@ -1646,7 +1657,7 @@ async function checkCloudAccess(businessId) {
 }
 
 async function showCloudLock(businessId) {
-  hide("app"); hide("setup"); hide("homeScreen"); hide("authScreen"); hide("cloudPopupBanner");
+  hide("app"); hide("setup"); hide("homeScreen"); hide("authScreen"); hide("vipDetailModal");
   show("cloudLockScreen");
   show("headerHome"); // Botón de volver al inicio en el encabezado
 
@@ -1665,7 +1676,6 @@ async function showCloudLock(businessId) {
 
       if ($("cloudGoalBar")) $("cloudGoalBar").style.width = pct + "%";
 
-      // Formatear montos con moneda y cálculo de dólares
       let mainText = "";
       let subText = "";
 
@@ -1702,19 +1712,74 @@ async function showCloudLock(businessId) {
 
       if ($("cloudGoalMessage")) $("cloudGoalMessage").textContent = d.message || "Apoyá el desarrollo para desbloquear el Modo Nube.";
 
-      // Renderizar links de donación
+      // 1. ANUNCIO EMERGENTE FLOTANTE (BANNER)
+      const popupBanner = $("persistentPopupBanner");
+      if (d.popupActive === true) {
+        setText("popupBannerTitlePreview", d.popupTitle || "¡Información VIP!");
+        setText("popupBannerMsgPreview", d.popupMessage || "Hacé clic aquí para ver cómo conseguir acceso anticipado...");
+        popupBanner.style.display = "block";
+      } else {
+        popupBanner.style.display = "none";
+      }
+
+      // 2. LLENAR MODAL / APARTADO DE DETALLE VIP CON DONACIONES Y REDES
+      setText("vipModalTitle", d.popupTitle || "Acceso Anticipado VIP");
+      setText("vipModalMessage", d.popupMessage || "Información para conseguir el acceso VIP.");
+
+      const vipDonateContainer = $("vipModalDonateLinks");
+      vipDonateContainer.innerHTML = "";
+      const links = [
+        { name: "Cafecito", url: d.cafecitoUrl },
+        { name: "Ko-fi", url: d.kofiUrl },
+        { name: "Patreon", url: d.patreonUrl }
+      ];
+      let hasLinks = false;
+      links.forEach(l => {
+        if (l.url && typeof l.url === "string" && l.url.startsWith("https://")) {
+          hasLinks = true;
+          const a = document.createElement("a");
+          a.href = l.url;
+          a.target = "_blank";
+          a.rel = "noopener noreferrer";
+          a.className = "secondary";
+          a.style.cssText = "display:block; padding:10px 14px; text-decoration:none; font-weight:600; font-size:13px; text-align:center;";
+          a.textContent = `Donar en ${l.name}`;
+          vipDonateContainer.appendChild(a);
+        }
+      });
+      vipDonateContainer.parentElement.style.display = hasLinks ? "block" : "none";
+
+      const vipSocialContainer = $("vipModalSocialLinks");
+      vipSocialContainer.innerHTML = "";
+      const socials = [
+        { name: d.socialName1, url: d.socialUrl1 },
+        { name: d.socialName2, url: d.socialUrl2 },
+        { name: d.socialName3, url: d.socialUrl3 }
+      ];
+      let hasSocials = false;
+      socials.forEach(s => {
+        if (s.name && s.url && typeof s.url === "string" && s.url.startsWith("https://")) {
+          hasSocials = true;
+          const a = document.createElement("a");
+          a.href = s.url;
+          a.target = "_blank";
+          a.rel = "noopener noreferrer";
+          a.className = "secondary";
+          a.style.cssText = "display:block; padding:10px 14px; text-decoration:none; font-weight:600; font-size:13px; text-align:center;";
+          a.textContent = s.name;
+          vipSocialContainer.appendChild(a);
+        }
+      });
+      vipSocialContainer.parentElement.style.display = hasSocials ? "block" : "none";
+
+      // 3. BOTONES DE DONACIÓN EN PANTALLA PRINCIPAL
       const donateContainer = $("cloudDonateLinks");
       if (donateContainer) {
         donateContainer.innerHTML = "";
-        const links = [
-          { name: "Cafecito", url: d.cafecitoUrl },
-          { name: "Ko-fi", url: d.kofiUrl },
-          { name: "Patreon", url: d.patreonUrl }
-        ];
-        let hasLinks = false;
+        let hasMainLinks = false;
         links.forEach(l => {
           if (l.url && typeof l.url === "string" && l.url.startsWith("https://")) {
-            hasLinks = true;
+            hasMainLinks = true;
             const a = document.createElement("a");
             a.href = l.url;
             a.target = "_blank";
@@ -1725,22 +1790,17 @@ async function showCloudLock(businessId) {
             donateContainer.appendChild(a);
           }
         });
-        donateContainer.style.display = hasLinks ? "block" : "none";
+        donateContainer.style.display = hasMainLinks ? "block" : "none";
       }
 
-      // Renderizar botones de redes sociales
+      // 4. BOTONES DE REDES SOCIALES EN PANTALLA PRINCIPAL
       const socialContainer = $("cloudSocialLinks");
       if (socialContainer) {
         socialContainer.innerHTML = "";
-        const socials = [
-          { name: d.socialName1, url: d.socialUrl1 },
-          { name: d.socialName2, url: d.socialUrl2 },
-          { name: d.socialName3, url: d.socialUrl3 }
-        ];
-        let hasSocials = false;
+        let hasMainSocials = false;
         socials.forEach(s => {
           if (s.name && s.url && typeof s.url === "string" && s.url.startsWith("https://")) {
-            hasSocials = true;
+            hasMainSocials = true;
             const a = document.createElement("a");
             a.href = s.url;
             a.target = "_blank";
@@ -1751,26 +1811,7 @@ async function showCloudLock(businessId) {
             socialContainer.appendChild(a);
           }
         });
-        socialContainer.style.display = hasSocials ? "flex" : "none";
-      }
-
-      // Mostrar Anuncio Emergente si está configurado y activo
-      if (d.popupActive === true && d.popupTitle && d.popupMessage) {
-        setText("popupBannerTitle", d.popupTitle);
-        setText("popupBannerMessage", d.popupMessage);
-        const popupBtnContainer = $("popupBannerButtons");
-        popupBtnContainer.innerHTML = "";
-        if (d.popupBtnText && d.popupBtnUrl) {
-          const pb = document.createElement("a");
-          pb.href = d.popupBtnUrl;
-          pb.target = "_blank";
-          pb.rel = "noopener noreferrer";
-          pb.className = "button";
-          pb.style.cssText = "display:block; width:100%; text-decoration:none; padding:12px; font-weight:bold; background:var(--blue); color:#fff; border-radius:var(--radius); text-align:center;";
-          pb.textContent = d.popupBtnText;
-          popupBtnContainer.appendChild(pb);
-        }
-        show("cloudPopupBanner");
+        socialContainer.style.display = hasMainSocials ? "flex" : "none";
       }
     }
   } catch(e) {}
@@ -1801,7 +1842,19 @@ async function showCloudLock(businessId) {
   }
 }
 
-$("closePopupBannerBtn").onclick = () => hide("cloudPopupBanner");
+/* INTERACCIÓN DEL BANNER FLOTANTE Y SU "X" */
+$("closePersistentPopupBtn").onclick = e => {
+  e.stopPropagation(); // Evita que se abra el modal al presionar la "X"
+  $("persistentPopupBanner").style.display = "none";
+};
+
+$("persistentPopupBanner").onclick = () => {
+  show("vipDetailModal");
+};
+
+$("closeVipDetailModalBtn").onclick = () => {
+  hide("vipDetailModal");
+};
 
 /* =========================
    ABRIR NEGOCIO Y LISTENERS
@@ -1842,7 +1895,7 @@ async function openBusiness(id) {
 }
 
 function setupBusinessUI() {
-  hide("authScreen"); hide("setup"); hide("homeScreen"); hide("cloudLockScreen"); hide("cloudPopupBanner"); show("app");
+  hide("authScreen"); hide("setup"); hide("homeScreen"); hide("cloudLockScreen"); hide("vipDetailModal"); show("app");
   show("headerHome");
   show("globalQuickSaleBtn");
   setText("welcome", currentBusiness.name);
@@ -2920,8 +2973,6 @@ $("adminPanelBtn").onclick = async () => {
       $("admPopupActive").checked = !!d.popupActive;
       $("admPopupTitle").value = d.popupTitle || "";
       $("admPopupMessage").value = d.popupMessage || "";
-      $("admPopupButtonText").value = d.popupBtnText || "";
-      $("admPopupButtonUrl").value = d.popupBtnUrl || "";
     }
   } catch(e) {
     showToast("Error al cargar configuración de meta", "error");
@@ -2997,9 +3048,7 @@ $("adminPopupForm").onsubmit = async e => {
   const payload = {
     popupActive: $("admPopupActive").checked,
     popupTitle: $("admPopupTitle").value.trim(),
-    popupMessage: $("admPopupMessage").value.trim(),
-    popupBtnText: $("admPopupButtonText").value.trim(),
-    popupBtnUrl: $("admPopupButtonUrl").value.trim()
+    popupMessage: $("admPopupMessage").value.trim()
   };
 
   try {
